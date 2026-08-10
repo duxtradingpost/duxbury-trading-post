@@ -86,9 +86,16 @@ async function loadFeaturedItems() {
         </a>
         <h3>${product.title}</h3>
         <p class="product-price">$${price}</p>
-        <a href="${url}" target="_blank" rel="noopener" class="btn btn-primary btn-small">Buy Now</a>
+        <div class="product-actions">
+          <a href="${url}" target="_blank" rel="noopener" class="btn btn-primary btn-small">Buy Now</a>
+          <button type="button" class="btn btn-outline btn-small share-btn" data-share-url="${url}" data-share-title="${product.title.replace(/"/g, '&quot;')}" aria-label="Share this listing">Share</button>
+        </div>
       `;
       grid.appendChild(card);
+    });
+
+    grid.querySelectorAll('.share-btn').forEach(btn => {
+      btn.addEventListener('click', () => shareListing(btn.dataset.shareUrl, btn.dataset.shareTitle, btn));
     });
   } catch (err) {
     status.textContent = 'Couldn\'t load featured items right now — browse our full inventory instead.';
@@ -97,6 +104,28 @@ async function loadFeaturedItems() {
 }
 
 loadFeaturedItems();
+
+// Shares a listing link — uses the native share sheet on mobile/supporting browsers,
+// falls back to copying the link to the clipboard with a brief confirmation.
+async function shareListing(url, title, btn) {
+  if (navigator.share) {
+    try {
+      await navigator.share({ title, url });
+    } catch (err) {
+      // User cancelled the share sheet — not an error, do nothing.
+    }
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(url);
+    const original = btn.textContent;
+    btn.textContent = 'Link copied!';
+    setTimeout(() => { btn.textContent = original; }, 2000);
+  } catch (err) {
+    console.error('Copy to clipboard failed:', err);
+  }
+}
 
 // --- eBay live listings ---
 // Pulls the public RSS feed for this seller's active listings and renders them as cards.
