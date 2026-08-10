@@ -12,6 +12,81 @@ mainNav.querySelectorAll('a').forEach(link => {
   link.addEventListener('click', () => mainNav.classList.remove('open'));
 });
 
+// --- Shopify Featured Items (live) ---
+// Pulls products from the "Featured" collection in Shopify via the Storefront API
+// (public, read-only token — safe to expose client-side). To change what's featured,
+// just add/remove products from the "Featured" collection in Shopify admin — no code
+// changes needed.
+const SHOPIFY_DOMAIN = 'duxburytradingpost.myshopify.com';
+const SHOPIFY_STOREFRONT_TOKEN = '6e9ad9c0de82756dc160e72ea5d6c3c5';
+const SHOPIFY_API_VERSION = '2025-10';
+const FEATURED_COLLECTION_HANDLE = 'featured';
+
+async function loadFeaturedItems() {
+  const grid = document.getElementById('product-grid');
+  const status = document.getElementById('shop-status');
+
+  const query = `
+    query {
+      collectionByHandle(handle: "${FEATURED_COLLECTION_HANDLE}") {
+        products(first: 12) {
+          edges {
+            node {
+              title
+              onlineStoreUrl
+              handle
+              images(first: 1) { edges { node { url altText } } }
+              priceRange { minVariantPrice { amount currencyCode } }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  try {
+    const res = await fetch(`https://${SHOPIFY_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Shopify-Storefront-Access-Token': SHOPIFY_STOREFRONT_TOKEN
+      },
+      body: JSON.stringify({ query })
+    });
+    const data = await res.json();
+    const products = data?.data?.collectionByHandle?.products?.edges || [];
+
+    if (products.length === 0) {
+      status.textContent = 'No featured items right now — check back soon, or browse our full inventory.';
+      return;
+    }
+
+    grid.innerHTML = '';
+    products.forEach(({ node: product }) => {
+      const image = product.images.edges[0]?.node;
+      const price = parseFloat(product.priceRange.minVariantPrice.amount).toFixed(2);
+      const url = product.onlineStoreUrl || `https://${SHOPIFY_DOMAIN}/products/${product.handle}`;
+
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      card.innerHTML = `
+        <a href="${url}" target="_blank" rel="noopener">
+          <img src="${image ? image.url : ''}" alt="${image?.altText || product.title}" class="product-image">
+        </a>
+        <h3>${product.title}</h3>
+        <p class="product-price">$${price}</p>
+        <a href="${url}" target="_blank" rel="noopener" class="btn btn-primary btn-small">Buy Now</a>
+      `;
+      grid.appendChild(card);
+    });
+  } catch (err) {
+    status.textContent = 'Couldn\'t load featured items right now — browse our full inventory instead.';
+    console.error('Shopify Featured Items error:', err);
+  }
+}
+
+loadFeaturedItems();
+
 // --- eBay live listings ---
 // Pulls the public RSS feed for this seller's active listings and renders them as cards.
 // Uses rss2json.com's free endpoint to convert RSS to JSON client-side (avoids CORS issues
