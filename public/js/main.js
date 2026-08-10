@@ -35,7 +35,7 @@ async function loadFeaturedItems() {
               title
               onlineStoreUrl
               handle
-              images(first: 1) { edges { node { url altText } } }
+              images(first: 1) { edges { node { url altText width height } } }
               priceRange { minVariantPrice { amount currencyCode } }
             }
           }
@@ -61,8 +61,19 @@ async function loadFeaturedItems() {
       return;
     }
 
+    // Landscape (horizontal) photos go last so the grid stays visually consistent —
+    // most card photos are portrait/square, and mixing in landscape ones mid-grid looks off.
+    const isLandscape = ({ node: product }) => {
+      const image = product.images.edges[0]?.node;
+      return image && image.width > image.height;
+    };
+    const sortedProducts = [
+      ...products.filter(p => !isLandscape(p)),
+      ...products.filter(isLandscape)
+    ];
+
     grid.innerHTML = '';
-    products.forEach(({ node: product }) => {
+    sortedProducts.forEach(({ node: product }) => {
       const image = product.images.edges[0]?.node;
       const price = parseFloat(product.priceRange.minVariantPrice.amount).toFixed(2);
       const url = product.onlineStoreUrl || `https://${SHOPIFY_DOMAIN}/products/${product.handle}`;
