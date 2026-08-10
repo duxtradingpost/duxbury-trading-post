@@ -1,0 +1,7 @@
+# Personal inventory / financial tracking files — never publish these
+inventory-template.csv
+inventory-template.xlsx
+DTP Inventory.xlsx
+~$*.xlsx
+*.xlsx
+.DS_Store
