@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Duxbury Trading Post | Sports Cards, Pokémon & Collectibles</title>
+<meta name="description" content="Duxbury Trading Post — sports cards, Pokémon & TCG, and collector memorabilia in Duxbury, MA. Shop our collection, sell your cards, or find us on eBay.">
+<link rel="icon" type="image/png" href="images/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="#top" class="brand">
+      <img src="images/logo.png" alt="Duxbury Trading Post" class="brand-logo">
+    </a>
+    <nav class="main-nav" id="main-nav">
+      <a href="#shop">Shop</a>
+      <a href="#ebay">eBay Listings</a>
+      <a href="#sell">Sell to Us</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero" id="top">
+  <div class="container hero-inner">
+    <img src="images/logo.png" alt="Duxbury Trading Post logo" class="hero-logo">
+    <h1>Duxbury Trading Post</h1>
+    <p class="hero-tagline">Sports Cards &middot; Pok&eacute;mon &amp; TCG &middot; Collector Memorabilia</p>
+    <p class="hero-sub">Duxbury, Massachusetts</p>
+    <div class="hero-buttons">
+      <a href="#shop" class="btn btn-primary">Shop Now</a>
+      <a href="#sell" class="btn btn-outline">Sell Your Cards</a>
+    </div>
+  </div>
+</section>
+
+<!-- About / Categories -->
+<section class="categories">
+  <div class="container">
+    <h2 class="section-title">What We Deal In</h2>
+    <div class="category-grid">
+      <div class="category-card">
+        <div class="category-icon">🏀</div>
+        <h3>Sports Cards</h3>
+        <p>Baseball, basketball, football, hockey &mdash; vintage to modern, singles to full sets.</p>
+      </div>
+      <div class="category-card">
+        <div class="category-icon">⚡</div>
+        <h3>Pok&eacute;mon &amp; TCG</h3>
+        <p>Booster boxes, singles, graded slabs, and everything in between for collectors young and old.</p>
+      </div>
+      <div class="category-card">
+        <div class="category-icon">🏆</div>
+        <h3>Memorabilia</h3>
+        <p>Autographs, game-used gear, and other one-of-a-kind collector pieces.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Shop / Featured Items -->
+<section class="shop" id="shop">
+  <div class="container">
+    <h2 class="section-title">Featured Items</h2>
+    <p class="section-sub">A few pieces from the shop. Buy directly &mdash; secure checkout powered by Stripe.</p>
+
+    <div class="product-grid" id="product-grid">
+      <!-- EXAMPLE PRODUCT CARDS — replace with real inventory. See README for instructions. -->
+      <div class="product-card">
+        <div class="product-image placeholder">🏀</div>
+        <h3>2003 Topps Chrome LeBron James RC</h3>
+        <p class="product-price">$249.99</p>
+        <a href="#" class="btn btn-primary btn-small stripe-buy" data-stripe-link="REPLACE_WITH_STRIPE_PAYMENT_LINK">Buy Now</a>
+      </div>
+      <div class="product-card">
+        <div class="product-image placeholder">⚡</div>
+        <h3>Pok&eacute;mon Base Set Booster Pack</h3>
+        <p class="product-price">$189.99</p>
+        <a href="#" class="btn btn-primary btn-small stripe-buy" data-stripe-link="REPLACE_WITH_STRIPE_PAYMENT_LINK">Buy Now</a>
+      </div>
+      <div class="product-card">
+        <div class="product-image placeholder">⚾</div>
+        <h3>1989 Upper Deck Ken Griffey Jr. RC</h3>
+        <p class="product-price">$79.99</p>
+        <a href="#" class="btn btn-primary btn-small stripe-buy" data-stripe-link="REPLACE_WITH_STRIPE_PAYMENT_LINK">Buy Now</a>
+      </div>
+      <div class="product-card">
+        <div class="product-image placeholder">🏈</div>
+        <h3>Signed Tom Brady Mini Helmet</h3>
+        <p class="product-price">$599.99</p>
+        <a href="#" class="btn btn-primary btn-small stripe-buy" data-stripe-link="REPLACE_WITH_STRIPE_PAYMENT_LINK">Buy Now</a>
+      </div>
+    </div>
+    <p class="placeholder-note">These are example listings so you can see the layout. Swap in your real items — see the README for how.</p>
+  </div>
+</section>
+
+<!-- eBay Listings -->
+<section class="ebay" id="ebay">
+  <div class="container">
+    <h2 class="section-title">Live on eBay</h2>
+    <p class="section-sub">Our current eBay listings, updated automatically.</p>
+    <div class="ebay-grid" id="ebay-grid">
+      <p class="ebay-status" id="ebay-status">Loading listings&hellip;</p>
+    </div>
+    <div class="ebay-cta">
+      <a href="https://www.ebay.com/usr/duxburytradingpost" target="_blank" rel="noopener" class="btn btn-outline">View Full eBay Store &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- Sell to Us -->
+<section class="sell" id="sell">
+  <div class="container sell-inner">
+    <div class="sell-text">
+      <h2 class="section-title">We Buy Sports &amp; Trading Cards</h2>
+      <p>Cleaning out a collection or a shoebox of old cards? We'll take them off your hands. Send us a few photos and details, and we'll get back to you with an offer.</p>
+      <a href="#contact" class="btn btn-primary">Get an Offer</a>
+    </div>
+    <img src="images/promo-card.jpeg" alt="We buy sports and trading cards" class="sell-image">
+  </div>
+</section>
+
+<!-- Contact -->
+<section class="contact" id="contact">
+  <div class="container">
+    <h2 class="section-title">Get In Touch</h2>
+    <div class="contact-grid">
+      <form class="contact-form" id="contact-form" action="https://formspree.io/f/moeaerqg" method="POST">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="5" required></textarea>
+
+        <button type="submit" class="btn btn-primary">Send Message</button>
+        <p class="form-status" id="form-status"></p>
+      </form>
+
+      <div class="contact-info">
+        <h3>Duxbury Trading Post</h3>
+        <p>Duxbury, Massachusetts</p>
+        <p><a href="tel:7812172728">781-217-2728</a></p>
+        <p><a href="mailto:info@duxburytradingpost.com">info@duxburytradingpost.com</a></p>
+        <div class="social-links">
+          <a href="https://instagram.com/duxburytradingpost" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.98-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
+          <a href="https://facebook.com/duxburytradingpost" target="_blank" rel="noopener" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M22 12.06C22 6.505 17.523 2 12 2S2 6.505 2 12.06c0 5.022 3.657 9.184 8.438 9.94v-7.03H7.898v-2.91h2.54V9.845c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.459h-1.26c-1.243 0-1.63.771-1.63 1.562v1.878h2.773l-.443 2.91h-2.33V22c4.78-.756 8.437-4.918 8.437-9.94z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <img src="images/logo.png" alt="Duxbury Trading Post" class="footer-logo">
+    <p>&copy; <span id="year"></span> Duxbury Trading Post. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
