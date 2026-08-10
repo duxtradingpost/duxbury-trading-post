@@ -104,19 +104,3 @@ contactForm.addEventListener('submit', async (e) => {
     formStatus.textContent = 'Something went wrong — please email us directly at info@duxburytradingpost.com.';
   }
 });
-
-// --- Stripe "Buy Now" buttons ---
-// Each product card carries a data-stripe-link attribute pointing to a Stripe Payment Link.
-// Replace REPLACE_WITH_STRIPE_PAYMENT_LINK with the real link for each item (see README).
-document.querySelectorAll('.stripe-buy').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    const link = btn.getAttribute('data-stripe-link');
-    if (!link || link === 'REPLACE_WITH_STRIPE_PAYMENT_LINK') {
-      e.preventDefault();
-      alert('This item isn\'t connected to checkout yet. Add a Stripe Payment Link in index.html — see the README.');
-      return;
-    }
-    e.preventDefault();
-    window.open(link, '_blank', 'noopener');
-  });
-});

@@ -196,54 +196,26 @@ a { color: inherit; text-decoration: none; }
 /* Shop */
 .shop { padding: 80px 0; background: var(--cream); }
 
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-}
-
-.product-card {
+.coming-soon {
+  max-width: 480px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 48px 32px;
   background: var(--cream-white);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 20px;
-  text-align: center;
 }
 
-.product-image.placeholder {
-  height: 140px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3rem;
-  background: var(--cream);
-  border-radius: 6px;
-  margin-bottom: 16px;
+.coming-soon-icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+.coming-soon h3 {
+  font-size: 1.3rem;
+  margin-bottom: 12px;
 }
 
-.product-card h3 {
-  font-family: var(--font-body);
-  text-transform: none;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text-dark);
-  margin-bottom: 8px;
-  letter-spacing: normal;
-}
-
-.product-price {
-  font-family: var(--font-display);
-  font-size: 1.2rem;
-  color: var(--forest);
-  margin-bottom: 16px;
-}
-
-.placeholder-note {
-  text-align: center;
+.coming-soon p {
   color: var(--text-muted);
-  font-size: 0.85rem;
-  margin-top: 32px;
-  font-style: italic;
+  font-size: 0.95rem;
 }
 
 /* eBay */
@@ -417,7 +389,6 @@ a { color: inherit; text-decoration: none; }
     gap: 16px;
   }
   .category-grid { grid-template-columns: 1fr; }
-  .product-grid { grid-template-columns: repeat(2, 1fr); }
   .ebay-grid { grid-template-columns: repeat(2, 1fr); }
   .sell-inner { grid-template-columns: 1fr; }
   .sell-image { order: -1; }
@@ -426,6 +397,5 @@ a { color: inherit; text-decoration: none; }
 }
 
 @media (max-width: 480px) {
-  .product-grid { grid-template-columns: 1fr; }
   .ebay-grid { grid-template-columns: 1fr; }
 }
