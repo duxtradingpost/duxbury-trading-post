@@ -1,0 +1,101 @@
+<!-- Duxbury Trading Post — product page Share button -->
+<style>
+  .dtp-share-wrap { margin-top: 12px; }
+  .dtp-share-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px 20px;
+    background: transparent;
+    color: #0F3C1F;
+    border: 1px solid #0F3C1F;
+    border-radius: 6px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .dtp-share-btn:hover { background: #0F3C1F; color: #fff; }
+  .dtp-share-btn svg { width: 18px; height: 18px; flex: none; }
+</style>
+
+<script>
+(function () {
+  var LABEL = 'Share this card';
+
+  function buildButton() {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'dtp-share-btn';
+    btn.setAttribute('aria-label', LABEL);
+    btn.innerHTML =
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<circle cx="18" cy="5" r="3"></circle>' +
+      '<circle cx="6" cy="12" r="3"></circle>' +
+      '<circle cx="18" cy="19" r="3"></circle>' +
+      '<line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>' +
+      '<line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>' +
+      '</svg><span>' + LABEL + '</span>';
+
+    btn.addEventListener('click', function () {
+      var canonical = document.querySelector('link[rel="canonical"]');
+      var url = (canonical && canonical.href) || window.location.href;
+      var ogTitle = document.querySelector('meta[property="og:title"]');
+      var title = (ogTitle && ogTitle.content) || document.title;
+
+      // Native share sheet (Messages, Instagram, Mail…) on phones and supporting browsers.
+      if (navigator.share) {
+        navigator.share({ title: title, text: title, url: url }).catch(function () {
+          /* user dismissed the share sheet — not an error */
+        });
+        return;
+      }
+
+      // Desktop fallback: copy the link and confirm briefly.
+      var label = btn.querySelector('span');
+      navigator.clipboard.writeText(url).then(function () {
+        var original = label.textContent;
+        label.textContent = 'Link copied!';
+        setTimeout(function () { label.textContent = original; }, 2000);
+      }).catch(function (err) {
+        console.error('Copy to clipboard failed:', err);
+      });
+    });
+
+    return btn;
+  }
+
+  function initShareButton() {
+    // The buy-buttons block only exists on product pages, so its presence is our gate.
+    var anchor = document.querySelector('.buy-buttons-block');
+    if (!anchor) return;
+    if (document.querySelector('.dtp-share-wrap')) return; // already added
+
+    var wrap = document.createElement('div');
+    wrap.className = 'dtp-share-wrap';
+    wrap.appendChild(buildButton());
+    anchor.insertAdjacentElement('afterend', wrap);
+  }
+
+  function start() {
+    initShareButton();
+
+    // This theme re-renders on variant changes and soft page transitions,
+    // which can wipe the button out. Re-add it when that happens.
+    var pending = null;
+    new MutationObserver(function () {
+      clearTimeout(pending);
+      pending = setTimeout(initShareButton, 150);
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start);
+  } else {
+    start();
+  }
+})();
+</script>
