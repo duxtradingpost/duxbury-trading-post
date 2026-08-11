@@ -38,6 +38,7 @@ async function loadFeaturedItems() {
               onlineStoreUrl
               handle
               availableForSale
+              updatedAt
               images(first: 1) { edges { node { url altText width height } } }
               priceRange { minVariantPrice { amount currencyCode } }
             }
