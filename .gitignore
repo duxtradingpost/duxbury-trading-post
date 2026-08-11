@@ -5,3 +5,7 @@ DTP Inventory.xlsx
 ~$*.xlsx
 *.xlsx
 .DS_Store
+
+# Whatnot purchase data / cost basis — private business data, never publish
+whatnot/
+order-report-*.csv
