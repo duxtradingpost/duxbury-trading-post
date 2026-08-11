@@ -22,6 +22,7 @@ const SHOPIFY_STOREFRONT_TOKEN = '6e9ad9c0de82756dc160e72ea5d6c3c5';
 const SHOPIFY_API_VERSION = '2025-10';
 const FEATURED_COLLECTION_HANDLE = 'featured';
 const MAX_FEATURED = 8;
+const SOLD_WINDOW_DAYS = 3;   // how long a sold card stays up with a SOLD badge
 
 async function loadFeaturedItems() {
   const grid = document.getElementById('product-grid');
@@ -58,12 +59,21 @@ async function loadFeaturedItems() {
     const data = await res.json();
     const allProducts = data?.data?.collectionByHandle?.products?.edges || [];
 
-    // Drop anything that has sold. Cards are one-of-a-kind, so a sold item must
-    // never sit here with a working Buy Now button. We over-fetch above so the
-    // grid stays full as inventory sells through.
-    const products = allProducts.filter(({ node }) => node.availableForSale).slice(0, MAX_FEATURED);
+    // Cards are one-of-a-kind, so a sold item must never keep a working Buy Now
+    // button. But a recent sale is good social proof, so we hold sold cards on
+    // the page for a few days with a SOLD badge before they drop off.
+    //
+    // Shopify's Storefront API doesn't expose a sale date, so updatedAt stands in
+    // for it — inventory hitting zero updates the product. Caveat: any edit to a
+    // product also bumps updatedAt, so a bulk edit can make a sold card linger a
+    // little longer than SOLD_WINDOW_DAYS. Harmless, just not exact.
+    const soldCutoff = Date.now() - SOLD_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+    const available = allProducts.filter(({ node }) => node.availableForSale);
+    const recentlySold = allProducts.filter(({ node }) =>
+      !node.availableForSale && new Date(node.updatedAt).getTime() >= soldCutoff
+    );
 
-    if (products.length === 0) {
+    if (available.length === 0 && recentlySold.length === 0) {
       status.textContent = 'No featured items right now — check back soon, or browse our full inventory.';
       return;
     }
@@ -74,10 +84,12 @@ async function loadFeaturedItems() {
       const image = product.images.edges[0]?.node;
       return image && image.width > image.height;
     };
+    // Available first (portrait before landscape), then recently sold at the end.
     const sortedProducts = [
-      ...products.filter(p => !isLandscape(p)),
-      ...products.filter(isLandscape)
-    ];
+      ...available.filter(p => !isLandscape(p)),
+      ...available.filter(isLandscape),
+      ...recentlySold
+    ].slice(0, MAX_FEATURED);
 
     grid.innerHTML = '';
     sortedProducts.forEach(({ node: product }) => {
@@ -85,16 +97,23 @@ async function loadFeaturedItems() {
       const price = parseFloat(product.priceRange.minVariantPrice.amount).toFixed(2);
       const url = product.onlineStoreUrl || `https://${SHOPIFY_DOMAIN}/products/${product.handle}`;
 
+      const sold = !product.availableForSale;
+
       const card = document.createElement('div');
-      card.className = 'product-card';
+      card.className = sold ? 'product-card product-card--sold' : 'product-card';
       card.innerHTML = `
-        <a href="${url}" target="_blank" rel="noopener">
-          <img src="${image ? image.url : ''}" alt="${image?.altText || product.title}" class="product-image">
-        </a>
+        <div class="product-image-wrap">
+          <a href="${url}" target="_blank" rel="noopener">
+            <img src="${image ? image.url : ''}" alt="${image?.altText || product.title}" class="product-image">
+          </a>
+          ${sold ? '<span class="sold-badge">Sold</span>' : ''}
+        </div>
         <h3>${product.title}</h3>
         <p class="product-price">$${price}</p>
         <div class="product-actions">
-          <a href="${url}" target="_blank" rel="noopener" class="btn btn-primary btn-small">Buy Now</a>
+          ${sold
+            ? '<span class="btn btn-small btn-sold" aria-disabled="true">Sold</span>'
+            : `<a href="${url}" target="_blank" rel="noopener" class="btn btn-primary btn-small">Buy Now</a>`}
           <button type="button" class="btn btn-outline btn-small share-btn" data-share-url="${url}" data-share-title="${product.title.replace(/"/g, '&quot;')}" aria-label="Share this listing">Share</button>
         </div>
       `;

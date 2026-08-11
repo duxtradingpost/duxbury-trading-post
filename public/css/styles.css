@@ -205,13 +205,51 @@ a { color: inherit; text-decoration: none; }
   text-align: center;
 }
 
+.product-image-wrap {
+  position: relative;
+  margin-bottom: 16px;
+}
+
 .product-image {
   width: 100%;
   height: 180px;
   object-fit: cover;
   border-radius: 6px;
-  margin-bottom: 16px;
+  display: block;
   background: var(--cream);
+}
+
+/* Recently sold — kept on the page briefly as social proof */
+.product-card--sold .product-image {
+  filter: grayscale(0.75);
+  opacity: 0.55;
+}
+
+.sold-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: var(--forest);
+  color: var(--cream-white);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 5px 12px;
+  border-radius: 3px;
+}
+
+.btn-sold {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.product-card--sold h3,
+.product-card--sold .product-price {
+  opacity: 0.6;
 }
 
 .product-card h3 {
