@@ -337,6 +337,45 @@ a { color: inherit; text-decoration: none; }
 .social-links a { color: var(--forest); }
 .social-links a:hover { color: var(--forest-light); }
 
+/* Legal / policy pages */
+.legal { padding: 64px 0 80px; }
+
+.legal-inner {
+  max-width: 760px;
+}
+
+.legal h1 {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.legal-updated {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 32px;
+}
+
+.legal h2 {
+  font-size: 1.15rem;
+  margin-top: 36px;
+  margin-bottom: 12px;
+}
+
+.legal p { margin-bottom: 16px; }
+
+.legal ul {
+  margin: 0 0 16px 0;
+  padding-left: 22px;
+}
+
+.legal li { margin-bottom: 8px; }
+
+.legal a {
+  color: var(--forest);
+  text-decoration: underline;
+}
+.legal a:hover { color: var(--forest-light); }
+
 /* Footer */
 .site-footer {
   background: var(--forest-dark);
