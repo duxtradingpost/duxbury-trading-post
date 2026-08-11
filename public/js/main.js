@@ -13,10 +13,15 @@ mainNav.querySelectorAll('a').forEach(link => {
 });
 
 // --- Shopify Featured Items (live) ---
-// Pulls products from the "Featured" collection in Shopify via the Storefront API
-// (public, read-only token — safe to expose client-side). To change what's featured,
-// just add/remove products from the "Featured" collection in Shopify admin — no code
-// changes needed.
+// Runs itself. Anything in the Shopify "Featured" collection is shown first; the
+// rest of the grid fills automatically with the highest-priced cards in stock, so
+// the section is never empty and never needs maintenance. Cards that sell stay up
+// with a SOLD badge for a few days, then drop off on their own.
+//
+// To spotlight something specific, add it to the "Featured" collection in Shopify.
+// To go back to fully automatic, empty the collection. No code changes either way.
+//
+// Uses the public, read-only Storefront API token — safe to expose client-side.
 const SHOPIFY_DOMAIN = 'duxburytradingpost.myshopify.com';
 const SHOPIFY_STOREFRONT_TOKEN = '6e9ad9c0de82756dc160e72ea5d6c3c5';
 const SHOPIFY_API_VERSION = '2025-10';
@@ -29,21 +34,21 @@ async function loadFeaturedItems() {
   const status = document.getElementById('shop-status');
 
   const query = `
+    fragment card on Product {
+      title
+      onlineStoreUrl
+      handle
+      availableForSale
+      updatedAt
+      images(first: 1) { edges { node { url altText width height } } }
+      priceRange { minVariantPrice { amount currencyCode } }
+    }
     query {
-      collectionByHandle(handle: "${FEATURED_COLLECTION_HANDLE}") {
-        products(first: 24) {
-          edges {
-            node {
-              title
-              onlineStoreUrl
-              handle
-              availableForSale
-              updatedAt
-              images(first: 1) { edges { node { url altText width height } } }
-              priceRange { minVariantPrice { amount currencyCode } }
-            }
-          }
-        }
+      featured: collectionByHandle(handle: "${FEATURED_COLLECTION_HANDLE}") {
+        products(first: 24) { edges { node { ...card } } }
+      }
+      topPriced: products(first: 24, sortKey: PRICE, reverse: true) {
+        edges { node { ...card } }
       }
     }
   `;
@@ -58,7 +63,8 @@ async function loadFeaturedItems() {
       body: JSON.stringify({ query })
     });
     const data = await res.json();
-    const allProducts = data?.data?.collectionByHandle?.products?.edges || [];
+    const picked = data?.data?.featured?.products?.edges || [];   // hand-picked in Shopify
+    const topPriced = data?.data?.topPriced?.edges || [];          // automatic fallback
 
     // Cards are one-of-a-kind, so a sold item must never keep a working Buy Now
     // button. But a recent sale is good social proof, so we hold sold cards on
@@ -69,15 +75,18 @@ async function loadFeaturedItems() {
     // product also bumps updatedAt, so a bulk edit can make a sold card linger a
     // little longer than SOLD_WINDOW_DAYS. Harmless, just not exact.
     const soldCutoff = Date.now() - SOLD_WINDOW_DAYS * 24 * 60 * 60 * 1000;
-    const available = allProducts.filter(({ node }) => node.availableForSale);
-    const recentlySold = allProducts.filter(({ node }) =>
-      !node.availableForSale && new Date(node.updatedAt).getTime() >= soldCutoff
-    );
+    const isAvailable = ({ node }) => node.availableForSale;
+    const soldRecently = ({ node }) =>
+      !node.availableForSale && new Date(node.updatedAt).getTime() >= soldCutoff;
 
-    if (available.length === 0 && recentlySold.length === 0) {
-      status.textContent = 'No featured items right now — check back soon, or browse our full inventory.';
-      return;
-    }
+    const pickedAvailable = picked.filter(isAvailable);
+    const pickedSold = picked.filter(soldRecently);
+
+    // Top up with the priciest cards in stock so the grid is never sparse, skipping
+    // anything already hand-picked. Empty the Featured collection and this becomes
+    // fully automatic on its own.
+    const seen = new Set(picked.map(({ node }) => node.handle));
+    const filler = topPriced.filter(e => isAvailable(e) && !seen.has(e.node.handle));
 
     // Landscape (horizontal) photos go last so the grid stays visually consistent —
     // most card photos are portrait/square, and mixing in landscape ones mid-grid looks off.
@@ -85,12 +94,20 @@ async function loadFeaturedItems() {
       const image = product.images.edges[0]?.node;
       return image && image.width > image.height;
     };
-    // Available first (portrait before landscape), then recently sold at the end.
+
+    // Reserve room for the sold cards so the grid never overflows MAX_FEATURED.
+    const availableSlots = Math.max(0, MAX_FEATURED - pickedSold.length);
+    const inStock = [...pickedAvailable, ...filler].slice(0, availableSlots);
     const sortedProducts = [
-      ...available.filter(p => !isLandscape(p)),
-      ...available.filter(isLandscape),
-      ...recentlySold
-    ].slice(0, MAX_FEATURED);
+      ...inStock.filter(p => !isLandscape(p)),
+      ...inStock.filter(isLandscape),
+      ...pickedSold
+    ];
+
+    if (sortedProducts.length === 0) {
+      status.textContent = 'No featured items right now — check back soon, or browse our full inventory.';
+      return;
+    }
 
     grid.innerHTML = '';
     sortedProducts.forEach(({ node: product }) => {
