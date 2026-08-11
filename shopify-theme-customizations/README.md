@@ -1,20 +1,41 @@
 # Shopify theme customizations
 
-Code pasted manually into the Shopify **Drive** theme. Shopify theme edits are not
-version-controlled, so keep copies here — a theme update or reset will wipe them.
+Code pasted manually into the Shopify **Drive** theme, in
+`layout/theme.liquid`, immediately before the closing `</body>` tag.
+
+Shopify theme edits are not version-controlled, so keep copies here — a theme
+update, theme switch, or reset will wipe them.
 
 Nothing in this folder is deployed to the website. Only `public/` is served
 (see `wrangler.jsonc`).
 
+**To reinstall:** Online Store → Themes → (Drive, Active) → ... → Edit code →
+`layout/theme.liquid` → paste before `</body>` → **Save**.
+Watch for the unsaved-changes dot (●) on the file tab, and confirm you are in
+the Drive theme, not the Radiant draft.
+
 ## product-share-button.html
 
 Adds a "Share this card" button below "Buy it now" on every product page.
-Native share sheet (Messages, Instagram, Mail) on mobile; copy-link fallback on desktop.
+Native share sheet (Messages, Instagram, Mail) on mobile; copy-link fallback
+on desktop.
 
-**Where it lives:** `layout/theme.liquid`, immediately before the closing `</body>` tag.
+Anchored to `.buy-buttons-block`, which appears exactly once on product pages
+and nowhere else, so it doubles as the product-page gate.
 
-**To reinstall:** Online Store → Themes → (Drive, Active) → ... → Edit code →
-`layout/theme.liquid` → paste before `</body>` → Save.
+## home-links-to-main-site.html
 
-Anchored to `.buy-buttons-block`, which appears exactly once on product pages and
-nowhere else, so it doubles as the product-page gate.
+Points Shopify navigation back at duxburytradingpost.com so customers are never
+dropped on the bare Shopify storefront:
+
+| Shopify link | Goes to |
+| --- | --- |
+| Header logo | duxburytradingpost.com |
+| "Home" (desktop nav + mobile drawer) | duxburytradingpost.com |
+| Footer copyright link | duxburytradingpost.com |
+| "Contact" (desktop nav + mobile drawer) | duxburytradingpost.com#contact |
+
+"Catalog" is deliberately left alone — that's the inventory customers should reach.
+
+Both scripts re-apply themselves via MutationObserver, because this theme
+re-renders on soft navigation and would otherwise undo the changes.

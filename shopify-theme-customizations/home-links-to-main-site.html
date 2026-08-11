@@ -1,0 +1,44 @@
+<!-- Duxbury Trading Post — send navigation links back to the real site
+     instead of the Shopify storefront. Covers the header logo, "Home"
+     (desktop nav + mobile drawer), the footer copyright link, and "Contact". -->
+<script>
+(function () {
+  var MAIN_SITE = 'https://duxburytradingpost.com';
+
+  // Shopify path -> where it should actually go.
+  var REDIRECTS = {
+    '/': MAIN_SITE,
+    '/pages/contact': MAIN_SITE + '#contact'
+  };
+
+  function fixLinks() {
+    Object.keys(REDIRECTS).forEach(function (path) {
+      var selector = 'a[href="' + path + '"], a[href="' + window.location.origin + path + '"]';
+      var links = document.querySelectorAll(selector);
+      for (var i = 0; i < links.length; i++) {
+        if (links[i].dataset.dtpLinkFixed) continue;
+        links[i].href = REDIRECTS[path];
+        links[i].dataset.dtpLinkFixed = '1';
+      }
+    });
+  }
+
+  function start() {
+    fixLinks();
+
+    // The theme re-renders parts of the page (soft navigation, drawers opening),
+    // which restores the original hrefs. Re-apply when that happens.
+    var pending = null;
+    new MutationObserver(function () {
+      clearTimeout(pending);
+      pending = setTimeout(fixLinks, 100);
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start);
+  } else {
+    start();
+  }
+})();
+</script>
