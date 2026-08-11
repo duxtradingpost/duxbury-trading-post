@@ -21,6 +21,7 @@ const SHOPIFY_DOMAIN = 'duxburytradingpost.myshopify.com';
 const SHOPIFY_STOREFRONT_TOKEN = '6e9ad9c0de82756dc160e72ea5d6c3c5';
 const SHOPIFY_API_VERSION = '2025-10';
 const FEATURED_COLLECTION_HANDLE = 'featured';
+const MAX_FEATURED = 8;
 
 async function loadFeaturedItems() {
   const grid = document.getElementById('product-grid');
@@ -29,12 +30,13 @@ async function loadFeaturedItems() {
   const query = `
     query {
       collectionByHandle(handle: "${FEATURED_COLLECTION_HANDLE}") {
-        products(first: 12) {
+        products(first: 24) {
           edges {
             node {
               title
               onlineStoreUrl
               handle
+              availableForSale
               images(first: 1) { edges { node { url altText width height } } }
               priceRange { minVariantPrice { amount currencyCode } }
             }
@@ -54,7 +56,12 @@ async function loadFeaturedItems() {
       body: JSON.stringify({ query })
     });
     const data = await res.json();
-    const products = data?.data?.collectionByHandle?.products?.edges || [];
+    const allProducts = data?.data?.collectionByHandle?.products?.edges || [];
+
+    // Drop anything that has sold. Cards are one-of-a-kind, so a sold item must
+    // never sit here with a working Buy Now button. We over-fetch above so the
+    // grid stays full as inventory sells through.
+    const products = allProducts.filter(({ node }) => node.availableForSale).slice(0, MAX_FEATURED);
 
     if (products.length === 0) {
       status.textContent = 'No featured items right now — check back soon, or browse our full inventory.';
