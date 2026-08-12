@@ -1,7 +1,12 @@
 {
   "name": "duxbury-trading-post",
+  "main": "src/index.js",
   "compatibility_date": "2026-08-10",
   "assets": {
-    "directory": "./public"
+    "directory": "./public",
+    "binding": "ASSETS",
+    // Without this, static assets are served before the Worker runs and the
+    // duxtradingpost.com redirect in src/index.js would never fire.
+    "run_worker_first": true
   }
 }
