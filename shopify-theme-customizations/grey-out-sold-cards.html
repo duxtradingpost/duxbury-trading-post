@@ -1,0 +1,17 @@
+<!-- Duxbury Trading Post — grey out sold-out cards in the catalog,
+     matching the SOLD treatment on duxburytradingpost.com's Featured Items. -->
+<style>
+  /* The theme puts a "Sold out" badge inside the card wrapper, so :has() lets us
+     style the image based on it. Pure CSS, so a theme re-render can't undo it. */
+  .product-grid__card:has(.color-custom-badge-sold-out) .product-media__image {
+    filter: grayscale(0.75);
+    opacity: 0.55;
+    transition: filter 0.2s ease, opacity 0.2s ease;
+  }
+
+  /* Same treatment on the product page itself. */
+  .card-gallery:has(.color-custom-badge-sold-out) .product-media__image {
+    filter: grayscale(0.75);
+    opacity: 0.55;
+  }
+</style>

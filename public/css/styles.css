@@ -247,6 +247,29 @@ a { color: inherit; text-decoration: none; }
   cursor: default;
 }
 
+/* Coming Soon — cards not yet listed, offers only */
+.coming-soon-section {
+  padding: 80px 0;
+  background: var(--cream-white);
+  border-top: 1px solid var(--border);
+}
+
+.soon-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: var(--cream-white);
+  color: var(--forest);
+  border: 1px solid var(--forest);
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 5px 12px;
+  border-radius: 3px;
+}
+
 .product-card--sold h3,
 .product-card--sold .product-price {
   opacity: 0.6;
@@ -262,6 +285,10 @@ a { color: inherit; text-decoration: none; }
   letter-spacing: normal;
   min-height: 2.7em;
 }
+
+/* No price on these, so give the title the extra line instead.
+   Must sit after .product-card h3 — same specificity, later wins. */
+.product-card--soon h3 { min-height: 3.4em; margin-bottom: 16px; }
 
 .product-price {
   font-family: var(--font-display);

@@ -149,6 +149,81 @@ async function loadFeaturedItems() {
 
 loadFeaturedItems();
 
+// --- Coming Soon ---
+// Cards that aren't listed yet: in transit, or in hand but not priced. Managed
+// entirely from the "Coming Soon" collection in Shopify — add a product to show
+// it here, remove it to take it down. No price is shown on purpose; the point is
+// to collect offers rather than anchor a number before the card is researched.
+//
+// The whole section stays hidden unless the collection has products in it, so an
+// empty collection looks like nothing rather than like something broken.
+const COMING_SOON_HANDLE = 'coming-soon';
+
+async function loadComingSoon() {
+  const section = document.getElementById('coming-soon');
+  const grid = document.getElementById('coming-soon-grid');
+  if (!section || !grid) return;
+
+  const query = `
+    query {
+      collectionByHandle(handle: "${COMING_SOON_HANDLE}") {
+        products(first: 24) {
+          edges {
+            node {
+              title
+              handle
+              images(first: 1) { edges { node { url altText width height } } }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  try {
+    const res = await fetch(`https://${SHOPIFY_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Shopify-Storefront-Access-Token': SHOPIFY_STOREFRONT_TOKEN
+      },
+      body: JSON.stringify({ query })
+    });
+    const data = await res.json();
+    const products = data?.data?.collectionByHandle?.products?.edges || [];
+    if (products.length === 0) return;   // leave the section hidden
+
+    grid.innerHTML = '';
+    products.forEach(({ node: product }) => {
+      const image = product.images.edges[0]?.node;
+      const subject = encodeURIComponent(`Offer: ${product.title}`);
+      const body = encodeURIComponent(
+        `Hi Duxbury Trading Post,\r\n\r\nI'd like to make an offer on:\r\n${product.title}\r\n\r\nMy offer: $\r\n\r\nThanks!`
+      );
+
+      const card = document.createElement('div');
+      card.className = 'product-card product-card--soon';
+      card.innerHTML = `
+        <div class="product-image-wrap">
+          <img src="${image ? image.url : ''}" alt="${image?.altText || product.title}" class="product-image">
+          <span class="soon-badge">Coming Soon</span>
+        </div>
+        <h3>${product.title}</h3>
+        <div class="product-actions">
+          <a href="mailto:info@duxburytradingpost.com?subject=${subject}&body=${body}" class="btn btn-primary btn-small">Make an Offer</a>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+    section.hidden = false;
+  } catch (err) {
+    console.error('Coming Soon error:', err);   // stays hidden on failure
+  }
+}
+
+loadComingSoon();
+
 // Shares a listing link — uses the native share sheet on mobile/supporting browsers,
 // falls back to copying the link to the clipboard with a brief confirmation.
 async function shareListing(url, title, btn) {
