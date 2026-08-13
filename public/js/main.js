@@ -26,6 +26,10 @@ const SHOPIFY_DOMAIN = 'duxburytradingpost.myshopify.com';
 const SHOPIFY_STOREFRONT_TOKEN = '6e9ad9c0de82756dc160e72ea5d6c3c5';
 const SHOPIFY_API_VERSION = '2025-10';
 const FEATURED_COLLECTION_HANDLE = 'featured';
+// Everything for sale. An automated Shopify collection (price > 0, excluding
+// Coming Soon), so unlisted cards can never leak into the Featured grid with a
+// working Buy Now button.
+const SHOP_ALL_COLLECTION_HANDLE = 'shop-all';
 const MAX_FEATURED = 8;
 const SOLD_WINDOW_DAYS = 3;   // how long a sold card stays up with a SOLD badge
 
@@ -47,8 +51,8 @@ async function loadFeaturedItems() {
       featured: collectionByHandle(handle: "${FEATURED_COLLECTION_HANDLE}") {
         products(first: 24) { edges { node { ...card } } }
       }
-      topPriced: products(first: 24, sortKey: PRICE, reverse: true) {
-        edges { node { ...card } }
+      topPriced: collectionByHandle(handle: "${SHOP_ALL_COLLECTION_HANDLE}") {
+        products(first: 24, sortKey: PRICE, reverse: true) { edges { node { ...card } } }
       }
     }
   `;
@@ -64,7 +68,7 @@ async function loadFeaturedItems() {
     });
     const data = await res.json();
     const picked = data?.data?.featured?.products?.edges || [];   // hand-picked in Shopify
-    const topPriced = data?.data?.topPriced?.edges || [];          // automatic fallback
+    const topPriced = data?.data?.topPriced?.products?.edges || [];  // automatic fallback
 
     // Cards are one-of-a-kind, so a sold item must never keep a working Buy Now
     // button. But a recent sale is good social proof, so we hold sold cards on
