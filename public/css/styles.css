@@ -210,10 +210,14 @@ a { color: inherit; text-decoration: none; }
   margin-bottom: 16px;
 }
 
+/* Card photos vary slightly in aspect ratio, and a graded slab shot is never
+   worth cropping. A fixed-ratio box plus object-fit: contain gives every card
+   an identical footprint in the grid while showing the whole card. */
 .product-image {
   width: 100%;
-  height: 180px;
-  object-fit: cover;
+  aspect-ratio: 3 / 4;
+  height: auto;
+  object-fit: contain;
   border-radius: 6px;
   display: block;
   background: var(--cream);
