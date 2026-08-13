@@ -1,0 +1,25 @@
+Shopify theme → Theme settings → Custom CSS
+Copy of what's pasted there, so it isn't lost if the theme is changed or reset.
+
+-------------------------------------------------------------------
+/* Uniform product photos.
+   Card images arrive at slightly different aspect ratios, and the theme's
+   "adapt to image" sizing made the grid ragged. A fixed 3:4 box with
+   object-fit: contain gives every card the same footprint and never crops
+   a graded slab. */
+.product-grid__card .product-media__image,
+.product-grid__card .product-media__image img {
+  aspect-ratio: 3 / 4;
+  object-fit: contain;
+  width: 100%;
+  height: auto;
+}
+
+/* Sold cards sink to the bottom of the grid.
+   Cards are one-of-a-kind, so sold-out items accumulate and would otherwise
+   sit at the top of Shop All. Shopify's collection sort options don't include
+   availability, so this reorders visually instead. */
+.product-grid__card:has(.color-custom-badge-sold-out) {
+  order: 99;
+}
+-------------------------------------------------------------------
