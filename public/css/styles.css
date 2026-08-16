@@ -589,3 +589,45 @@ a { color: inherit; text-decoration: none; }
 .main-nav a.is-current { color: var(--forest-light); text-decoration: underline; }
 
 .load-more-wrap { text-align: center; margin-top: 32px; }
+
+/* Local pickup band */
+.local-band {
+  background: var(--forest);
+  color: var(--cream-white);
+  padding: 28px 0;
+}
+
+.local-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.local-text { flex: 1 1 460px; }
+
+.local-text h2 {
+  color: var(--cream-white);
+  font-size: 1.4rem;
+  margin-bottom: 6px;
+  text-align: left;
+}
+
+.local-text p {
+  color: #D9E4DC;
+  font-size: 0.94rem;
+  max-width: 620px;
+}
+
+.btn-local {
+  background: var(--cream-white);
+  color: var(--forest);
+  white-space: nowrap;
+}
+.btn-local:hover { background: var(--cream); }
+
+@media (max-width: 700px) {
+  .local-inner { justify-content: center; text-align: center; }
+  .local-text h2 { text-align: center; }
+}
