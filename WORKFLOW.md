@@ -33,20 +33,27 @@ HeyStack  ──push──>  eBay  ──InfoShore──>  Shopify  ──>  dux
 
 ## Coming Soon cards (not yet listed for sale)
 
-The order matters. Skipping step 2 creates a duplicate Shopify product later.
+A Coming Soon product is a **placeholder, not a draft listing**. The website
+section only reads `title` and the first image — it never queries price, SKU, or
+inventory. So don't build anything you'd want to keep.
 
-1. Create the product in Shopify: title, **SKU** (own convention, e.g.
-   `DTP-2025-PRIZM-MAYE-329`), image, **inventory 0**, track quantity ON,
-   "continue selling when out of stock" OFF
-2. **InfoShore → Shopify Products → Fetch Shopify Products** — registers the
-   product with the app so it can be mapped
-3. Add it to the **Coming Soon** collection
-4. When ready to sell: list on eBay with the **same title and same SKU**
-5. InfoShore links the eBay item to the existing Shopify product and updates it
-6. Remove it from the Coming Soon collection
+**To add one:**
 
-InfoShore does not match on SKU alone — it maintains its own eBay-item ↔
-Shopify-product mapping, which is why the Fetch step is required.
+1. Shopify → Products → Add product — title and photo
+2. Inventory 0
+3. Add to the **Coming Soon** collection
+
+**When it's ready to sell:**
+
+1. **Delete** the Shopify placeholder
+2. List on HeyStack like any other card, and let the normal
+   eBay → InfoShore → Shopify import create the real product
+
+Don't try to convert the placeholder into the real listing. InfoShore maps by
+its own eBay-item ↔ Shopify-product table, and a relisted card gets a new eBay
+item ID — so reusing a placeholder is how you end up with duplicate products.
+The placeholder holds no cost, no SKU, and no sales history. Throwing it away
+costs nothing.
 
 ## When a card sells
 
