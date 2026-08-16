@@ -25,6 +25,7 @@ const moreBtn = document.getElementById('inv-more');
 const sortSel = document.getElementById('inv-sort');
 
 let CARDS = [];
+const ACTIVE = new Set();   // chips currently toggled on
 
 document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -110,31 +111,37 @@ function buildChips() {
   const present = QUICK_FILTERS.filter(f => CARDS.some(c => c.tags.includes(f)));
   if (!present.length) return;
   chipWrap.innerHTML = present
-    .map(f => `<button type="button" class="chip" data-term="${f}">${f}</button>`)
+    .map(f => `<button type="button" class="chip" data-term="${f}" aria-pressed="false">${f}</button>`)
     .join('');
   chipWrap.hidden = false;
   chipWrap.querySelectorAll('.chip').forEach(btn => {
     btn.addEventListener('click', () => {
+      // Chips stack: Football + Auto + Numbered narrows to cards with all three.
       const term = btn.dataset.term;
-      // Clicking the active chip clears it, so chips toggle rather than trap you.
-      input.value = input.value.trim().toLowerCase() === term.toLowerCase() ? '' : term;
+      ACTIVE.has(term) ? ACTIVE.delete(term) : ACTIVE.add(term);
       applySearch();
-      input.focus();
     });
   });
 }
 
-// Every whitespace-separated word must appear somewhere in the card, so
-// "allen numbered" narrows rather than widening the way an OR match would.
+// Chips and typed words both narrow, and they combine: Football + Auto plus
+// "brady" means all three must match. Chips test the tag exactly; typed words
+// match anywhere in the title or tags.
 function applySearch() {
   const q = input.value.trim().toLowerCase();
-  clearBtn.hidden = !q;
+  const words = q ? q.split(/\s+/) : [];
+  clearBtn.hidden = !q && !ACTIVE.size;
+
   chipWrap.querySelectorAll('.chip').forEach(btn => {
-    btn.classList.toggle('chip--on', btn.dataset.term.toLowerCase() === q);
+    btn.classList.toggle('chip--on', ACTIVE.has(btn.dataset.term));
+    btn.setAttribute('aria-pressed', String(ACTIVE.has(btn.dataset.term)));
   });
-  if (!q) return render(CARDS);
-  const words = q.split(/\s+/);
-  render(CARDS.filter(c => words.every(w => c.haystack.includes(w))));
+
+  if (!words.length && !ACTIVE.size) return render(CARDS);
+  render(CARDS.filter(c =>
+    [...ACTIVE].every(t => c.tags.includes(t)) &&
+    words.every(w => c.haystack.includes(w))
+  ));
 }
 
 // Searching stays instant because the whole catalog is already in memory, but
@@ -234,6 +241,6 @@ async function shareListing(url, title, btn) {
 moreBtn.addEventListener('click', appendPage);
 sortSel.addEventListener('change', applySearch);
 input.addEventListener('input', applySearch);
-clearBtn.addEventListener('click', () => { input.value = ''; applySearch(); input.focus(); });
+clearBtn.addEventListener('click', () => { input.value = ''; ACTIVE.clear(); applySearch(); input.focus(); });
 input.disabled = true;
 loadInventory();
