@@ -21,6 +21,7 @@ const input = document.getElementById('inv-search');
 const clearBtn = document.getElementById('inv-clear');
 const countEl = document.getElementById('inv-count');
 const chipWrap = document.getElementById('quick-filters');
+const moreBtn = document.getElementById('inv-more');
 
 let CARDS = [];
 
@@ -133,17 +134,15 @@ function applySearch() {
   render(CARDS.filter(c => words.every(w => c.haystack.includes(w))));
 }
 
-function render(list) {
-  countEl.textContent = list.length === CARDS.length
-    ? `${CARDS.length} cards in stock`
-    : `${list.length} of ${CARDS.length} cards`;
+// Searching stays instant because the whole catalog is already in memory, but
+// painting 120+ cards with images at once is slow on a phone. So the results
+// render a page at a time — the filter still runs across everything.
+const PAGE_SIZE = 24;
+let CURRENT = [];   // the active result set, however long
+let shown = 0;      // how much of it is on screen
 
-  if (!list.length) {
-    grid.innerHTML = '<p class="grid-status">No cards match that search. Try a player, team, or set name.</p>';
-    return;
-  }
-
-  grid.innerHTML = list.map(c => `
+function cardHtml(c) {
+  return `
     <div class="product-card">
       <div class="product-image-wrap">
         <a href="${c.url}" target="_blank" rel="noopener">
@@ -159,11 +158,43 @@ function render(list) {
                 aria-label="Share this listing">Share</button>
       </div>
     </div>
-  `).join('');
+  `;
+}
 
-  grid.querySelectorAll('.share-btn').forEach(btn => {
+function wireShare(scope) {
+  scope.querySelectorAll('.share-btn:not([data-wired])').forEach(btn => {
+    btn.dataset.wired = '1';
     btn.addEventListener('click', () => shareListing(btn.dataset.shareUrl, btn.dataset.shareTitle, btn));
   });
+}
+
+function updateCount() {
+  const total = CURRENT.length;
+  const scope = total === CARDS.length ? `${CARDS.length} cards in stock` : `${total} of ${CARDS.length} cards`;
+  countEl.textContent = shown < total ? `${scope} — showing ${shown}` : scope;
+  moreBtn.hidden = shown >= total;
+  moreBtn.textContent = `Load ${Math.min(PAGE_SIZE, total - shown)} more`;
+}
+
+function appendPage() {
+  const next = CURRENT.slice(shown, shown + PAGE_SIZE);
+  grid.insertAdjacentHTML('beforeend', next.map(cardHtml).join(''));
+  shown += next.length;
+  wireShare(grid);
+  updateCount();
+}
+
+function render(list) {
+  CURRENT = list;
+  shown = 0;
+  grid.innerHTML = '';
+  if (!list.length) {
+    grid.innerHTML = '<p class="grid-status">No cards match that search. Try a player, team, or set name.</p>';
+    countEl.textContent = `0 of ${CARDS.length} cards`;
+    moreBtn.hidden = true;
+    return;
+  }
+  appendPage();
 }
 
 const escapeHtml = s => s.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
@@ -188,6 +219,7 @@ async function shareListing(url, title, btn) {
   }
 }
 
+moreBtn.addEventListener('click', appendPage);
 input.addEventListener('input', applySearch);
 clearBtn.addEventListener('click', () => { input.value = ''; applySearch(); input.focus(); });
 input.disabled = true;
