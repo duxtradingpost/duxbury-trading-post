@@ -107,6 +107,21 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
   </div>
 </section>
 
+<!-- Photo viewer -->
+<div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Card photos">
+  <button type="button" class="lb-close" id="lb-close" aria-label="Close">&times;</button>
+  <button type="button" class="lb-nav lb-prev" id="lb-prev" aria-label="Previous photo">&#8249;</button>
+  <figure class="lb-stage">
+    <img id="lb-img" alt="">
+    <figcaption>
+      <span id="lb-title"></span>
+      <span class="lb-counter" id="lb-counter"></span>
+      <a id="lb-buy" class="btn btn-primary btn-small" target="_blank" rel="noopener">Buy Now</a>
+    </figcaption>
+  </figure>
+  <button type="button" class="lb-nav lb-next" id="lb-next" aria-label="Next photo">&#8250;</button>
+</div>
+
 <!-- Footer -->
 <footer class="site-footer">
   <div class="container footer-inner">

@@ -52,7 +52,7 @@ async function loadInventory() {
               tags
               createdAt
               availableForSale
-              images(first: 1) { edges { node { url altText } } }
+              images(first: 12) { edges { node { url altText } } }
               priceRange { minVariantPrice { amount } }
             }
           }
@@ -76,7 +76,8 @@ async function loadInventory() {
     CARDS = edges
       .filter(({ node }) => node.availableForSale)
       .map(({ node }) => {
-        const image = node.images.edges[0]?.node;
+        const imgs = node.images.edges.map(e => e.node);
+        const image = imgs[0];
         // Pre-compute the haystack once so keystrokes stay cheap.
         const haystack = [node.title, ...node.tags.map(stripPrefix), ...node.tags]
           .join(' ')
@@ -87,6 +88,7 @@ async function loadInventory() {
           price: Number(node.priceRange.minVariantPrice.amount).toFixed(2),
           img: image ? image.url : '',
           alt: image?.altText || node.title,
+          photos: imgs.map(x => x.url),
           tags: node.tags,
           created: node.createdAt,
           haystack
@@ -152,13 +154,17 @@ const PAGE_SIZE = 24;
 let CURRENT = [];   // the active result set, however long
 let shown = 0;      // how much of it is on screen
 
+const IDX = new Map();   // card object -> stable index for the rendered buttons
+
 function cardHtml(c) {
   return `
     <div class="product-card">
       <div class="product-image-wrap">
-        <a href="${c.url}" target="_blank" rel="noopener">
+        <button type="button" class="photo-btn" data-idx="${IDX.get(c)}"
+                aria-label="View photos of ${escapeAttr(c.title)}">
           <img src="${c.img}" alt="${escapeAttr(c.alt)}" class="product-image" loading="lazy">
-        </a>
+          ${c.photos.length > 1 ? `<span class="photo-count">${c.photos.length} photos</span>` : ''}
+        </button>
       </div>
       <h3>${escapeHtml(c.title)}</h3>
       <p class="product-price">$${c.price}</p>
@@ -170,6 +176,16 @@ function cardHtml(c) {
       </div>
     </div>
   `;
+}
+
+function wirePhotos(scope) {
+  scope.querySelectorAll('.photo-btn:not([data-wired])').forEach(btn => {
+    btn.dataset.wired = '1';
+    btn.addEventListener('click', () => {
+      const card = [...IDX.entries()].find(([, i]) => String(i) === btn.dataset.idx)?.[0];
+      if (card) openLightbox(card);
+    });
+  });
 }
 
 function wireShare(scope) {
@@ -189,9 +205,11 @@ function updateCount() {
 
 function appendPage() {
   const next = CURRENT.slice(shown, shown + PAGE_SIZE);
+  next.forEach(c => { if (!IDX.has(c)) IDX.set(c, IDX.size); });
   grid.insertAdjacentHTML('beforeend', next.map(cardHtml).join(''));
   shown += next.length;
   wireShare(grid);
+  wirePhotos(grid);
   updateCount();
 }
 
@@ -241,6 +259,76 @@ async function shareListing(url, title, btn) {
 
 moreBtn.addEventListener('click', appendPage);
 sortSel.addEventListener('change', applySearch);
+
+// ---- Photo viewer -------------------------------------------------------
+// Cards are photographed front and back (some have a dozen shots), and the
+// grid can only show one. Clicking the photo opens the rest in place rather
+// than sending people to Shopify before they've decided to buy.
+const lb = {
+  el: document.getElementById('lightbox'),
+  img: document.getElementById('lb-img'),
+  title: document.getElementById('lb-title'),
+  counter: document.getElementById('lb-counter'),
+  buy: document.getElementById('lb-buy'),
+  prev: document.getElementById('lb-prev'),
+  next: document.getElementById('lb-next'),
+  close: document.getElementById('lb-close')
+};
+let lbCard = null, lbAt = 0;
+
+function openLightbox(card, at = 0) {
+  lbCard = card; lbAt = at;
+  lb.title.textContent = card.title;
+  lb.buy.href = card.url;
+  paintLightbox();
+  lb.el.hidden = false;
+  document.body.style.overflow = 'hidden';
+  lb.close.focus();
+}
+
+function paintLightbox() {
+  const shots = lbCard.photos.length ? lbCard.photos : [lbCard.img];
+  lbAt = (lbAt + shots.length) % shots.length;
+  lb.img.src = shots[lbAt];
+  lb.img.alt = `${lbCard.title} — photo ${lbAt + 1} of ${shots.length}`;
+  lb.counter.textContent = shots.length > 1 ? `${lbAt + 1} / ${shots.length}` : '';
+  const solo = shots.length < 2;
+  lb.prev.hidden = solo;
+  lb.next.hidden = solo;
+  // Preload the neighbours so arrowing through doesn't flash.
+  if (!solo) [lbAt + 1, lbAt - 1].forEach(i => {
+    new Image().src = shots[(i + shots.length) % shots.length];
+  });
+}
+
+function stepLightbox(d) { if (lbCard) { lbAt += d; paintLightbox(); } }
+
+function closeLightbox() {
+  lb.el.hidden = true;
+  lbCard = null;
+  document.body.style.overflow = '';
+}
+
+lb.prev.addEventListener('click', () => stepLightbox(-1));
+lb.next.addEventListener('click', () => stepLightbox(1));
+lb.close.addEventListener('click', closeLightbox);
+lb.el.addEventListener('click', e => { if (e.target === lb.el) closeLightbox(); });
+document.addEventListener('keydown', e => {
+  if (lb.el.hidden) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') stepLightbox(-1);
+  if (e.key === 'ArrowRight') stepLightbox(1);
+});
+// Swipe, since most of the traffic arrives from Instagram on a phone.
+let touchX = null;
+lb.el.addEventListener('touchstart', e => { touchX = e.changedTouches[0].clientX; }, { passive: true });
+lb.el.addEventListener('touchend', e => {
+  if (touchX === null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (Math.abs(dx) > 45) stepLightbox(dx < 0 ? 1 : -1);
+  touchX = null;
+}, { passive: true });
+
 input.addEventListener('input', applySearch);
 clearBtn.addEventListener('click', () => { input.value = ''; ACTIVE.clear(); applySearch(); input.focus(); });
 input.disabled = true;
