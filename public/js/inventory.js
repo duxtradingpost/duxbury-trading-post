@@ -22,6 +22,7 @@ const clearBtn = document.getElementById('inv-clear');
 const countEl = document.getElementById('inv-count');
 const chipWrap = document.getElementById('quick-filters');
 const moreBtn = document.getElementById('inv-more');
+const sortSel = document.getElementById('inv-sort');
 
 let CARDS = [];
 
@@ -47,6 +48,7 @@ async function loadInventory() {
               handle
               onlineStoreUrl
               tags
+              createdAt
               availableForSale
               images(first: 1) { edges { node { url altText } } }
               priceRange { minVariantPrice { amount } }
@@ -84,6 +86,7 @@ async function loadInventory() {
           img: image ? image.url : '',
           alt: image?.altText || node.title,
           tags: node.tags,
+          created: node.createdAt,
           haystack
         };
       });
@@ -184,8 +187,17 @@ function appendPage() {
   updateCount();
 }
 
+// Sorting acts on whatever is currently matched, so it composes with search
+// rather than resetting it.
+const SORTS = {
+  'price-desc': (a, b) => Number(b.price) - Number(a.price),
+  'price-asc':  (a, b) => Number(a.price) - Number(b.price),
+  'newest':     (a, b) => (a.created < b.created ? 1 : a.created > b.created ? -1 : 0),
+  'title':      (a, b) => a.title.localeCompare(b.title)
+};
+
 function render(list) {
-  CURRENT = list;
+  CURRENT = [...list].sort(SORTS[sortSel.value] || SORTS['price-desc']);
   shown = 0;
   grid.innerHTML = '';
   if (!list.length) {
@@ -220,6 +232,7 @@ async function shareListing(url, title, btn) {
 }
 
 moreBtn.addEventListener('click', appendPage);
+sortSel.addEventListener('change', applySearch);
 input.addEventListener('input', applySearch);
 clearBtn.addEventListener('click', () => { input.value = ''; applySearch(); input.focus(); });
 input.disabled = true;

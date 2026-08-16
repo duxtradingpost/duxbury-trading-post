@@ -84,7 +84,18 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
 
     <div class="quick-filters" id="quick-filters" hidden></div>
 
-    <p class="inv-count" id="inv-count" aria-live="polite"></p>
+    <div class="inv-bar">
+      <p class="inv-count" id="inv-count" aria-live="polite"></p>
+      <label class="sort-label" for="inv-sort">
+        Sort
+        <select id="inv-sort" class="sort-select">
+          <option value="price-desc">Price: high to low</option>
+          <option value="price-asc">Price: low to high</option>
+          <option value="newest">Newest first</option>
+          <option value="title">Name: A&ndash;Z</option>
+        </select>
+      </label>
+    </div>
 
     <div class="product-grid" id="inv-grid">
       <p class="grid-status" id="inv-status">Loading inventory&hellip;</p>
