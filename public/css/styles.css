@@ -1,14 +1,62 @@
+/* Colors are split by ROLE, not by name, so dark mode is a token swap rather
+   than a rewrite. --forest is a green *surface* (buttons, header, sell band);
+   --accent is green *text* on a light surface. They're the same value in light
+   mode and deliberately different in dark, where green text has to lift off a
+   dark background instead of sitting on cream. */
 :root {
-  --forest: #0F3C1F;
+  color-scheme: light dark;
+
+  --page: #FFFFFF;        /* page + card surface */
+  --band: #F7F4EB;        /* alternating section band */
+  --forest: #0F3C1F;      /* green surface: primary button, header, sell */
   --forest-dark: #0A2814;
   --forest-light: #1B5230;
-  --cream: #F7F4EB;
-  --cream-white: #FFFFFF;
+  --accent: #0F3C1F;      /* green text/border on a light surface */
+  --on-dark: #FFFFFF;     /* text sitting on a green surface */
   --text-dark: #16281C;
   --text-muted: #4A5750;
   --border: #DCD6C4;
+  --field: #FFFFFF;    /* form input surface */
+
+  --cream: #F7F4EB;       /* kept: referenced by the Shopify theme CSS */
+  --cream-white: #FFFFFF;
+
   --font-display: 'Oswald', sans-serif;
   --font-body: 'Inter', sans-serif;
+}
+
+/* Dark mode follows the phone's own setting — including iOS's sunset schedule,
+   so "dark after dark" comes free without us guessing at a cutoff hour.
+   Guarded with :not([data-theme="light"]) so the manual toggle can win. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #0D1B12;
+    --band: #12261A;
+    --forest: #1E5C36;    /* lifted, or a primary button vanishes into the page */
+    --forest-dark: #0A2814;
+    --forest-light: #2A6E45;
+    --accent: #7FBF95;    /* green text has to be light here, not dark */
+    --on-dark: #FFFFFF;
+    --text-dark: #E7EDE8;
+    --text-muted: #A0B0A6;
+    --border: #27402F;
+    --field: #162C1E;
+  }
+}
+
+/* Explicit choice from the toggle beats the OS setting in both directions. */
+:root[data-theme="dark"] {
+  --page: #0D1B12;
+  --band: #12261A;
+  --forest: #1E5C36;
+  --forest-dark: #0A2814;
+  --forest-light: #2A6E45;
+  --accent: #7FBF95;
+  --on-dark: #FFFFFF;
+  --text-dark: #E7EDE8;
+  --text-muted: #A0B0A6;
+  --border: #27402F;
+  --field: #162C1E;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -18,7 +66,7 @@ html { scroll-behavior: smooth; }
 body {
   font-family: var(--font-body);
   color: var(--text-dark);
-  background: var(--cream-white);
+  background: var(--page);
   line-height: 1.6;
 }
 
@@ -32,7 +80,7 @@ h1, h2, h3 {
   font-family: var(--font-display);
   text-transform: uppercase;
   letter-spacing: 0.02em;
-  color: var(--forest);
+  color: var(--accent);
 }
 
 a { color: inherit; text-decoration: none; }
@@ -67,16 +115,16 @@ a { color: inherit; text-decoration: none; }
 
 .btn-primary {
   background: var(--forest);
-  color: var(--cream-white);
+  color: var(--on-dark);
 }
 .btn-primary:hover { background: var(--forest-dark); }
 
 .btn-outline {
   background: transparent;
-  border-color: var(--forest);
-  color: var(--forest);
+  border-color: var(--accent);
+  color: var(--accent);
 }
-.btn-outline:hover { background: var(--forest); color: var(--cream-white); }
+.btn-outline:hover { background: var(--forest); color: var(--on-dark); }
 
 .btn-small { padding: 10px 20px; font-size: 0.8rem; }
 
@@ -84,7 +132,7 @@ a { color: inherit; text-decoration: none; }
 .site-header {
   position: sticky;
   top: 0;
-  background: var(--cream-white);
+  background: var(--page);
   border-bottom: 1px solid var(--border);
   z-index: 100;
 }
@@ -110,7 +158,7 @@ a { color: inherit; text-decoration: none; }
   text-transform: uppercase;
   font-size: 0.85rem;
   letter-spacing: 0.04em;
-  color: var(--forest);
+  color: var(--accent);
 }
 .main-nav a:hover { color: var(--forest-light); }
 
@@ -132,7 +180,7 @@ a { color: inherit; text-decoration: none; }
 
 /* Hero */
 .hero {
-  background: var(--cream);
+  background: var(--band);
   text-align: center;
   padding: 72px 0 88px;
   border-bottom: 1px solid var(--border);
@@ -151,7 +199,7 @@ a { color: inherit; text-decoration: none; }
 .hero-tagline {
   font-family: var(--font-display);
   font-size: 1.1rem;
-  color: var(--forest);
+  color: var(--accent);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 32px;
@@ -179,7 +227,7 @@ a { color: inherit; text-decoration: none; }
   padding: 32px 20px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--cream);
+  background: var(--band);
 }
 
 .category-icon { font-size: 2.5rem; margin-bottom: 12px; }
@@ -189,7 +237,7 @@ a { color: inherit; text-decoration: none; }
 .category-card p { color: var(--text-muted); font-size: 0.92rem; }
 
 /* Shop */
-.shop { padding: 80px 0; background: var(--cream); }
+.shop { padding: 80px 0; background: var(--band); }
 
 .product-grid {
   display: grid;
@@ -198,7 +246,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .product-card {
-  background: var(--cream-white);
+  background: var(--page);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 20px;
@@ -220,7 +268,7 @@ a { color: inherit; text-decoration: none; }
   object-fit: contain;
   border-radius: 6px;
   display: block;
-  background: var(--cream);
+  background: var(--band);
 }
 
 /* Recently sold — kept on the page briefly as social proof */
@@ -234,7 +282,7 @@ a { color: inherit; text-decoration: none; }
   top: 10px;
   left: 10px;
   background: var(--forest);
-  color: var(--cream-white);
+  color: var(--on-dark);
   font-family: var(--font-display);
   font-size: 0.75rem;
   font-weight: 600;
@@ -254,7 +302,7 @@ a { color: inherit; text-decoration: none; }
 /* Coming Soon — cards not yet listed, offers only */
 .coming-soon-section {
   padding: 80px 0;
-  background: var(--cream-white);
+  background: var(--page);
   border-top: 1px solid var(--border);
 }
 
@@ -262,9 +310,9 @@ a { color: inherit; text-decoration: none; }
   position: absolute;
   top: 10px;
   left: 10px;
-  background: var(--cream-white);
-  color: var(--forest);
-  border: 1px solid var(--forest);
+  background: var(--page);
+  color: var(--accent);
+  border: 1px solid var(--accent);
   font-family: var(--font-display);
   font-size: 0.7rem;
   font-weight: 600;
@@ -297,7 +345,7 @@ a { color: inherit; text-decoration: none; }
 .product-price {
   font-family: var(--font-display);
   font-size: 1.2rem;
-  color: var(--forest);
+  color: var(--accent);
   margin-bottom: 16px;
 }
 
@@ -335,12 +383,12 @@ a { color: inherit; text-decoration: none; }
 .shop-note strong { color: var(--text-dark); }
 
 .shop-note a {
-  color: var(--forest);
+  color: var(--accent);
   text-decoration: underline;
 }
 
 /* Sell to us */
-.sell { padding: 80px 0; background: var(--forest); color: var(--cream-white); }
+.sell { padding: 80px 0; background: var(--forest); color: var(--on-dark); }
 
 .sell-inner {
   display: grid;
@@ -349,7 +397,7 @@ a { color: inherit; text-decoration: none; }
   align-items: center;
 }
 
-.sell-text h2 { color: var(--cream-white); text-align: left; margin-bottom: 16px; }
+.sell-text h2 { color: var(--on-dark); text-align: left; margin-bottom: 16px; }
 .sell-text p { margin-bottom: 16px; color: #D9E4DC; }
 .sell-list {
   margin: 0 0 20px 0;
@@ -357,8 +405,8 @@ a { color: inherit; text-decoration: none; }
   color: #D9E4DC;
 }
 .sell-list li { margin-bottom: 6px; }
-.sell-text .btn-primary { background: var(--cream-white); color: var(--forest); }
-.sell-text .btn-primary:hover { background: var(--cream); }
+.sell-text .btn-primary { background: var(--page); color: var(--accent); }
+.sell-text .btn-primary:hover { background: var(--band); }
 
 .sell-image {
   width: 100%;
@@ -383,13 +431,15 @@ a { color: inherit; text-decoration: none; }
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--forest);
+  color: var(--accent);
   margin-top: 16px;
   margin-bottom: 6px;
 }
 
 .contact-form input,
 .contact-form textarea {
+  background: var(--field);
+  color: var(--text-dark);
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 12px 14px;
@@ -400,22 +450,25 @@ a { color: inherit; text-decoration: none; }
 .contact-form input:focus,
 .contact-form textarea:focus {
   outline: none;
-  border-color: var(--forest);
+  border-color: var(--accent);
 }
+
+.contact-form input::placeholder,
+.contact-form textarea::placeholder { color: var(--text-muted); }
 
 .contact-form button { margin-top: 24px; align-self: flex-start; }
 
-.form-status { margin-top: 12px; font-size: 0.9rem; color: var(--forest); }
+.form-status { margin-top: 12px; font-size: 0.9rem; color: var(--accent); }
 
 .contact-info p { margin-bottom: 8px; color: var(--text-muted); }
-.contact-info a:hover { color: var(--forest); }
+.contact-info a:hover { color: var(--accent); }
 
 .social-links {
   display: flex;
   gap: 16px;
   margin-top: 20px;
 }
-.social-links a { color: var(--forest); }
+.social-links a { color: var(--accent); }
 .social-links a:hover { color: var(--forest-light); }
 
 /* Legal / policy pages */
@@ -452,7 +505,7 @@ a { color: inherit; text-decoration: none; }
 .legal li { margin-bottom: 8px; }
 
 .legal a {
-  color: var(--forest);
+  color: var(--accent);
   text-decoration: underline;
 }
 .legal a:hover { color: var(--forest-light); }
@@ -488,7 +541,7 @@ a { color: inherit; text-decoration: none; }
   letter-spacing: 0.04em;
   color: #B8C6BC;
 }
-.footer-links a:hover { color: var(--cream-white); }
+.footer-links a:hover { color: var(--on-dark); }
 
 /* Responsive */
 @media (max-width: 860px) {
@@ -501,7 +554,7 @@ a { color: inherit; text-decoration: none; }
     top: 100%;
     left: 0;
     right: 0;
-    background: var(--cream-white);
+    background: var(--page);
     border-bottom: 1px solid var(--border);
     padding: 16px 24px;
     gap: 16px;
@@ -535,9 +588,11 @@ a { color: inherit; text-decoration: none; }
   font-size: 1rem;
   border: 2px solid var(--border);
   border-radius: 6px;
-  background: var(--cream-white);
+  background: var(--field);
+  color: var(--text-dark);
 }
-.search-input:focus { outline: none; border-color: var(--forest); }
+.search-input::placeholder { color: var(--text-muted); }
+.search-input:focus { outline: none; border-color: var(--accent); }
 .search-input:disabled { opacity: 0.6; }
 
 .search-clear {
@@ -553,7 +608,7 @@ a { color: inherit; text-decoration: none; }
   cursor: pointer;
   padding: 0 6px;
 }
-.search-clear:hover { color: var(--forest); }
+.search-clear:hover { color: var(--accent); }
 
 .quick-filters {
   display: flex;
@@ -571,13 +626,13 @@ a { color: inherit; text-decoration: none; }
   padding: 7px 14px;
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: var(--cream-white);
-  color: var(--forest);
+  background: var(--page);
+  color: var(--accent);
   cursor: pointer;
   transition: all 0.15s ease;
 }
-.chip:hover { border-color: var(--forest); }
-.chip--on { background: var(--forest); color: var(--cream-white); border-color: var(--forest); }
+.chip:hover { border-color: var(--accent); }
+.chip--on { background: var(--forest); color: var(--on-dark); border-color: var(--accent); }
 
 .inv-count {
   text-align: center;
@@ -593,7 +648,7 @@ a { color: inherit; text-decoration: none; }
 /* Local pickup band */
 .local-band {
   background: var(--forest);
-  color: var(--cream-white);
+  color: var(--on-dark);
   padding: 28px 0;
 }
 
@@ -608,7 +663,7 @@ a { color: inherit; text-decoration: none; }
 .local-text { flex: 1 1 460px; }
 
 .local-text h2 {
-  color: var(--cream-white);
+  color: var(--on-dark);
   font-size: 1.4rem;
   margin-bottom: 6px;
   text-align: left;
@@ -621,18 +676,18 @@ a { color: inherit; text-decoration: none; }
 }
 
 .btn-local {
-  background: var(--cream-white);
-  color: var(--forest);
+  background: var(--page);
+  color: var(--accent);
   white-space: nowrap;
 }
-.btn-local:hover { background: var(--cream); }
+.btn-local:hover { background: var(--band); }
 
 @media (max-width: 700px) {
   .local-inner { justify-content: center; text-align: center; }
   .local-text h2 { text-align: center; }
 }
 
-.local-note { font-size: 0.9rem; color: var(--forest); font-weight: 500; }
+.local-note { font-size: 0.9rem; color: var(--accent); font-weight: 500; }
 
 .inv-bar {
   display: flex;
@@ -662,11 +717,11 @@ a { color: inherit; text-decoration: none; }
   padding: 8px 10px;
   border: 1px solid var(--border);
   border-radius: 4px;
-  background: var(--cream-white);
+  background: var(--field);
   color: var(--text-dark);
   cursor: pointer;
 }
-.sort-select:focus { outline: none; border-color: var(--forest); }
+.sort-select:focus { outline: none; border-color: var(--accent); }
 
 /* Photo viewer */
 .photo-btn {
@@ -684,7 +739,7 @@ a { color: inherit; text-decoration: none; }
   bottom: 8px;
   right: 8px;
   background: rgba(15, 60, 31, 0.85);
-  color: var(--cream-white);
+  color: var(--on-dark);
   font-family: var(--font-display);
   font-size: 0.68rem;
   text-transform: uppercase;
@@ -720,7 +775,7 @@ a { color: inherit; text-decoration: none; }
   max-height: 74vh;
   object-fit: contain;
   border-radius: 6px;
-  background: var(--cream);
+  background: var(--band);
 }
 
 .lb-stage figcaption {
@@ -729,7 +784,7 @@ a { color: inherit; text-decoration: none; }
   gap: 16px;
   flex-wrap: wrap;
   justify-content: center;
-  color: var(--cream-white);
+  color: var(--on-dark);
   font-size: 0.92rem;
   text-align: center;
 }
@@ -743,7 +798,7 @@ a { color: inherit; text-decoration: none; }
 .lb-nav, .lb-close {
   background: rgba(255,255,255,0.12);
   border: none;
-  color: var(--cream-white);
+  color: var(--on-dark);
   cursor: pointer;
   border-radius: 50%;
   line-height: 1;
@@ -770,4 +825,20 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 640px) {
   .lb-nav { width: 42px; height: 42px; font-size: 1.6rem; }
   .lb-stage img { max-height: 62vh; }
+}
+
+/* The wordmark is a single dark green with a transparent interior, so on a dark
+   page it flattens into an outline. Same fix the footer already uses on its
+   forest band: knock it to white. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .brand-logo,
+  :root:not([data-theme="light"]) .hero-logo {
+    filter: brightness(0) invert(1);
+    opacity: 0.92;
+  }
+}
+:root[data-theme="dark"] .brand-logo,
+:root[data-theme="dark"] .hero-logo {
+  filter: brightness(0) invert(1);
+  opacity: 0.92;
 }
