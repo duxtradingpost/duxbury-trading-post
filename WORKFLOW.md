@@ -59,8 +59,15 @@ costs nothing.
 
 - **eBay sale** — inventory zeroes automatically; Shopify order self-fulfills
   hourly; the site shows a SOLD badge for 3 days
-- **Private/local sale** — set Shopify inventory to 0 by hand. That ends the
-  eBay listing automatically. Self-report MA sales tax; no platform collects it.
+- **Private/local sale** — **end the eBay listing by hand FIRST, then zero
+  Shopify.** Order matters: InfoShore's inventory sync runs on a schedule, not
+  instantly, so a card zeroed in Shopify can stay buyable on eBay for an hour or
+  more. That gap is how you end up selling the same card twice and taking a
+  cancellation defect. Ending it manually is safe — Shopify is already at 0, so
+  the sync has nothing to undo.
+  Record the sale as **Orders → Create order → mark as paid (Cash/Other)**, which
+  captures the revenue instead of leaving it only in the spreadsheet.
+  Self-report MA sales tax; no platform collects it.
 - **After the SOLD badge window** — archive the product. Sold one-of-ones
   otherwise accumulate in the catalog forever.
 
