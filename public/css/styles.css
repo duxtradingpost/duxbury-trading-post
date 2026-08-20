@@ -943,21 +943,21 @@ a { color: inherit; text-decoration: none; }
    the product's second Shopify image — HeyStack uploads front then back, so it
    is reliably the right one. Cards without a second image just don't flip;
    .has-back is only set when there is something to turn to. */
-.product-image-wrap {
-  position: relative;
-  perspective: 1100px;
-}
-
+/* Perspective goes in the transform itself rather than on an ancestor. The
+   perspective property only reaches an element's DIRECT children, and there is
+   a wrapper in between — a button on the inventory page, a link on the home
+   page. Putting it here means the flip does not depend on that structure. */
 .card-flip {
   display: block;
   position: relative;
   transform-style: preserve-3d;
+  transform: perspective(1100px) rotateY(0deg);
   transition: transform 0.65s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 
 .has-back:hover .card-flip,
 .has-back:focus-within .card-flip {
-  transform: rotateY(180deg);
+  transform: perspective(1100px) rotateY(180deg);
 }
 
 .card-face {
@@ -973,8 +973,10 @@ a { color: inherit; text-decoration: none; }
 .card-face--back {
   position: absolute;
   inset: 0;
+  width: 100%;
   height: 100%;
   object-fit: contain;
+  background: var(--band);
   transform: rotateY(180deg);
 }
 
@@ -1023,5 +1025,5 @@ a { color: inherit; text-decoration: none; }
 
   .product-card:hover { transform: none; }
   .has-back:hover .card-flip,
-  .has-back:focus-within .card-flip { transform: none; }
+  .has-back:focus-within .card-flip { transform: perspective(1100px) rotateY(0deg); }
 }
