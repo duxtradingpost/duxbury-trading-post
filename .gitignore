@@ -9,3 +9,8 @@ DTP Inventory.xlsx
 # Whatnot purchase data / cost basis — private business data, never publish
 whatnot/
 order-report-*.csv
+
+# Weekly report output — cost basis and inventory snapshots, never publish.
+# The script itself is tracked; its data files are not.
+reports/*.csv
+reports/*.json

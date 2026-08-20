@@ -14,7 +14,7 @@ const stripPrefix = tag => tag.replace(/^(Player|Team|Brand|League|Year):\s*/i, 
 // Shown as one-click chips above the grid. Kept short on purpose — these are
 // the ways people actually browse cards, not an exhaustive list.
 const QUICK_FILTERS = ['Football', 'Baseball', 'Basketball', 'Hockey', 'Soccer',
-                       'Auto', 'Graded', 'Numbered', 'Parallel', 'Rookie'];
+                       'Auto', 'Graded', 'Numbered', 'Parallel', 'Rookie', 'Relic'];
 
 const grid = document.getElementById('inv-grid');
 const status = document.getElementById('inv-status');
