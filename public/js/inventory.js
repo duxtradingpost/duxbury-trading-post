@@ -52,7 +52,7 @@ async function loadInventory() {
               tags
               createdAt
               availableForSale
-              // Front and back only — the extra angles are for eBay, not here.
+              # Front and back only — the extra angles are for eBay, not here.
               images(first: 2) { edges { node { url altText } } }
               priceRange { minVariantPrice { amount } }
             }
