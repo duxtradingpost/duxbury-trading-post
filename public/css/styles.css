@@ -1027,3 +1027,61 @@ a { color: inherit; text-decoration: none; }
   .has-back:hover .card-flip,
   .has-back:focus-within .card-flip { transform: perspective(1100px) rotateY(0deg); }
 }
+
+/* --- Loading placeholders ---------------------------------------------------
+   The grid used to sit empty behind the words "Loading inventory" while 151
+   products came down the wire, which reads as broken rather than busy. These
+   are card-shaped so the layout does not jump when the real ones land.
+   render() replaces the whole grid, so they need no cleanup. */
+.skeleton-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.sk-img,
+.sk-line {
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--band) 25%, var(--border) 50%, var(--band) 75%);
+  background-size: 200% 100%;
+  animation: sk-sweep 1.4s ease-in-out infinite;
+}
+
+.sk-img { aspect-ratio: 3 / 4; margin-bottom: 16px; }
+.sk-line { height: 13px; margin: 0 auto 9px; width: 85%; }
+.sk-line--short { width: 45%; }
+
+@keyframes sk-sweep {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* --- Lightbox ---------------------------------------------------------------
+   It used to appear instantly, which is jarring at full-screen size. */
+.lightbox {
+  animation: lb-in 0.2s ease both;
+}
+
+.lightbox .lb-stage {
+  animation: lb-rise 0.26s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+@keyframes lb-in   { from { opacity: 0; } to { opacity: 1; } }
+@keyframes lb-rise { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+
+/* --- Section reveal ---------------------------------------------------------
+   Homepage sections settle in as they come into view. Added by js/main.js only
+   once IntersectionObserver is confirmed available, so without JS every section
+   is simply visible — never hidden with no way back. */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.reveal.is-in { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sk-img, .sk-line { animation: none; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+}

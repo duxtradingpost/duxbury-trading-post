@@ -112,8 +112,34 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
       </label>
     </div>
 
+    <!-- Placeholder cards while the catalogue loads. render() replaces the whole
+         grid, so nothing here needs clearing by hand. -->
     <div class="product-grid" id="inv-grid">
-      <p class="grid-status" id="inv-status">Loading inventory&hellip;</p>
+      <div class="skeleton-card" aria-hidden="true">
+        <div class="sk-img"></div><div class="sk-line"></div><div class="sk-line sk-line--short"></div>
+      </div>
+      <div class="skeleton-card" aria-hidden="true">
+        <div class="sk-img"></div><div class="sk-line"></div><div class="sk-line sk-line--short"></div>
+      </div>
+      <div class="skeleton-card" aria-hidden="true">
+        <div class="sk-img"></div><div class="sk-line"></div><div class="sk-line sk-line--short"></div>
+      </div>
+      <div class="skeleton-card" aria-hidden="true">
+        <div class="sk-img"></div><div class="sk-line"></div><div class="sk-line sk-line--short"></div>
+      </div>
+      <div class="skeleton-card" aria-hidden="true">
+        <div class="sk-img"></div><div class="sk-line"></div><div class="sk-line sk-line--short"></div>
+      </div>
+      <div class="skeleton-card" aria-hidden="true">
+        <div class="sk-img"></div><div class="sk-line"></div><div class="sk-line sk-line--short"></div>
+      </div>
+      <div class="skeleton-card" aria-hidden="true">
+        <div class="sk-img"></div><div class="sk-line"></div><div class="sk-line sk-line--short"></div>
+      </div>
+      <div class="skeleton-card" aria-hidden="true">
+        <div class="sk-img"></div><div class="sk-line"></div><div class="sk-line sk-line--short"></div>
+      </div>
+      <p class="grid-status" id="inv-status" hidden>Loading inventory&hellip;</p>
     </div>
 
     <div class="load-more-wrap">
