@@ -44,7 +44,7 @@ async function loadFeaturedItems() {
       handle
       availableForSale
       updatedAt
-      images(first: 1) { edges { node { url altText width height } } }
+      images(first: 2) { edges { node { url altText width height } } }
       priceRange { minVariantPrice { amount currencyCode } }
     }
     query {
@@ -116,6 +116,8 @@ async function loadFeaturedItems() {
     grid.innerHTML = '';
     sortedProducts.forEach(({ node: product }) => {
       const image = product.images.edges[0]?.node;
+      // Second image is the card back, used for the hover flip.
+      const back = product.images.edges[1]?.node?.url || '';
       const price = parseFloat(product.priceRange.minVariantPrice.amount).toFixed(2);
       const url = product.onlineStoreUrl || `https://${SHOPIFY_DOMAIN}/products/${product.handle}`;
 
@@ -124,9 +126,12 @@ async function loadFeaturedItems() {
       const card = document.createElement('div');
       card.className = sold ? 'product-card product-card--sold' : 'product-card';
       card.innerHTML = `
-        <div class="product-image-wrap">
+        <div class="product-image-wrap${back ? ' has-back' : ''}">
           <a href="${url}" target="_blank" rel="noopener">
-            <img src="${image ? image.url : ''}" alt="${image?.altText || product.title}" class="product-image">
+            <span class="card-flip">
+              <img src="${image ? image.url : ''}" alt="${image?.altText || product.title}" class="product-image card-face card-face--front">
+              ${back ? `<img src="${back}" alt="" class="card-face card-face--back" loading="lazy" aria-hidden="true">` : ''}
+            </span>
           </a>
           ${sold ? '<span class="sold-badge">Sold</span>' : ''}
         </div>

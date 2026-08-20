@@ -52,7 +52,8 @@ async function loadInventory() {
               tags
               createdAt
               availableForSale
-              images(first: 12) { edges { node { url altText } } }
+              // Front and back only — the extra angles are for eBay, not here.
+              images(first: 2) { edges { node { url altText } } }
               priceRange { minVariantPrice { amount } }
             }
           }
@@ -89,6 +90,8 @@ async function loadInventory() {
           img: image ? image.url : '',
           alt: image?.altText || node.title,
           photos: imgs.map(x => x.url),
+          // Second image is the card back — HeyStack uploads front then back.
+          back: imgs[1] ? imgs[1].url : '',
           tags: node.tags,
           created: node.createdAt,
           haystack
@@ -159,11 +162,13 @@ const IDX = new Map();   // card object -> stable index for the rendered buttons
 function cardHtml(c) {
   return `
     <div class="product-card">
-      <div class="product-image-wrap">
+      <div class="product-image-wrap${c.back ? ' has-back' : ''}">
         <button type="button" class="photo-btn" data-idx="${IDX.get(c)}"
                 aria-label="View photos of ${escapeAttr(c.title)}">
-          <img src="${c.img}" alt="${escapeAttr(c.alt)}" class="product-image" loading="lazy">
-          ${c.photos.length > 1 ? `<span class="photo-count">${c.photos.length} photos</span>` : ''}
+          <span class="card-flip">
+            <img src="${c.img}" alt="${escapeAttr(c.alt)}" class="product-image card-face card-face--front" loading="lazy">
+            ${c.back ? `<img src="${c.back}" alt="Back of ${escapeAttr(c.title)}" class="card-face card-face--back" loading="lazy" aria-hidden="true">` : ''}
+          </span>
         </button>
       </div>
       <h3>${escapeHtml(c.title)}</h3>

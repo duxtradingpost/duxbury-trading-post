@@ -913,3 +913,115 @@ a { color: inherit; text-decoration: none; }
   .promo-sep { display: none; }
   .promo-fine { display: block; margin-left: 0; margin-top: 3px; }
 }
+
+/* --- Motion -----------------------------------------------------------------
+   Four small things, all tied to something the page is actually doing: cards
+   respond to a cursor, images catch light the way a refractor does, and the
+   grid settles in rather than snapping. Everything here is switched off wholesale
+   for prefers-reduced-motion at the bottom of this block. */
+
+/* A card is a link target, so it should react to a cursor. */
+.product-card {
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  will-change: transform;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--forest);
+  box-shadow: 0 10px 24px -12px rgba(15, 60, 31, 0.45);
+}
+
+/* Sold cards are history, not offers — they shouldn't invite a click. */
+.product-card--sold:hover {
+  transform: none;
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+/* Hovering a card turns it over, the way you would in your hands. The back is
+   the product's second Shopify image — HeyStack uploads front then back, so it
+   is reliably the right one. Cards without a second image just don't flip;
+   .has-back is only set when there is something to turn to. */
+.product-image-wrap {
+  position: relative;
+  perspective: 1100px;
+}
+
+.card-flip {
+  display: block;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.has-back:hover .card-flip,
+.has-back:focus-within .card-flip {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  display: block;
+  width: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 6px;
+}
+
+/* The back is stacked on the front and pre-rotated, so the halves meet edge-on
+   halfway through the turn. */
+.card-face--back {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  object-fit: contain;
+  transform: rotateY(180deg);
+}
+
+/* Both of these have to stay readable through the turn, so they sit outside the
+   flipping element rather than on a face. */
+.sold-badge { z-index: 3; }
+
+/* The grid settles in instead of snapping. Short, and only the first dozen are
+   staggered — past that the delay would read as the page being slow. */
+@keyframes dtp-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.product-card {
+  animation: dtp-rise 0.4s ease both;
+}
+
+.product-card:nth-child(1)  { animation-delay: 0.00s; }
+.product-card:nth-child(2)  { animation-delay: 0.04s; }
+.product-card:nth-child(3)  { animation-delay: 0.08s; }
+.product-card:nth-child(4)  { animation-delay: 0.12s; }
+.product-card:nth-child(5)  { animation-delay: 0.16s; }
+.product-card:nth-child(6)  { animation-delay: 0.20s; }
+.product-card:nth-child(7)  { animation-delay: 0.24s; }
+.product-card:nth-child(8)  { animation-delay: 0.28s; }
+.product-card:nth-child(9)  { animation-delay: 0.32s; }
+.product-card:nth-child(10) { animation-delay: 0.36s; }
+.product-card:nth-child(11) { animation-delay: 0.40s; }
+.product-card:nth-child(12) { animation-delay: 0.44s; }
+
+/* Buttons already transition; give the filter chips the same courtesy. */
+.chip { transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease; }
+
+/* Someone who has asked their OS for less motion gets none of it. The layout is
+   identical either way — only the movement goes. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .product-card:hover { transform: none; }
+  .has-back:hover .card-flip,
+  .has-back:focus-within .card-flip { transform: none; }
+}
