@@ -63,6 +63,10 @@
 
 html { scroll-behavior: smooth; }
 
+/* The header is sticky, so an anchor jump lands with the section heading hidden
+   behind it. Offset every linkable section by roughly the header's height. */
+section[id] { scroll-margin-top: 86px; }
+
 body {
   font-family: var(--font-body);
   color: var(--text-dark);
@@ -1114,6 +1118,9 @@ a { color: inherit; text-decoration: none; }
    on the site that justifies the friction of a real form. */
 .sell-form { margin-top: 18px; }
 
+/* This form sits on the forest band, so its labels take the on-dark colour.
+   They were inheriting the light-surface value and rendering near-black on
+   dark green. */
 .sell-form label {
   display: block;
   margin-bottom: 12px;
@@ -1121,7 +1128,7 @@ a { color: inherit; text-decoration: none; }
   font-size: 0.82rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--text-dark);
+  color: var(--on-dark);
 }
 
 .sell-optional {
@@ -1129,7 +1136,7 @@ a { color: inherit; text-decoration: none; }
   font-size: 0.75rem;
   letter-spacing: 0;
   text-transform: none;
-  color: var(--text-muted);
+  color: #B9CDC0;
   margin-left: 6px;
 }
 
@@ -1164,13 +1171,36 @@ a { color: inherit; text-decoration: none; }
 .sell-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
 @media (max-width: 560px) { .sell-row { grid-template-columns: 1fr; } }
 
+/* The default control is an unstyled OS button that looks nothing like the
+   rest of the page. Style the ::file-selector-button rather than hiding the
+   input, so keyboard and screen-reader behaviour stays intact. */
 .sell-form input[type="file"] {
   display: block;
+  width: 100%;
   margin-top: 6px;
+  padding: 8px;
   font-family: var(--font-body);
   font-size: 0.85rem;
   text-transform: none;
   letter-spacing: 0;
+  color: #D9E4DC;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px dashed rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+}
+
+.sell-form input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  padding: 7px 14px;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--forest);
+  background: var(--on-dark);
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .sell-file-list {
@@ -1187,7 +1217,7 @@ a { color: inherit; text-decoration: none; }
   gap: 10px;
   padding: 6px 10px;
   margin-bottom: 5px;
-  background: var(--band);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 5px;
 }
 
@@ -1203,11 +1233,11 @@ a { color: inherit; text-decoration: none; }
   border: 0;
   font-size: 1.15rem;
   line-height: 1;
-  color: var(--text-muted);
+  color: #B9CDC0;
   cursor: pointer;
 }
 
-.sell-file-list button:hover { color: var(--text-dark); }
+.sell-file-list button:hover { color: var(--on-dark); }
 
 /* Off-screen rather than display:none — some bots skip hidden fields, and the
    point is for them to fill it in. */
@@ -1222,19 +1252,19 @@ a { color: inherit; text-decoration: none; }
 .sell-status {
   margin-top: 12px;
   font-size: 0.9rem;
-  color: var(--text-muted);
+  color: #D9E4DC;
 }
 
-.sell-status--ok    { color: var(--accent); font-weight: 600; }
-.sell-status--error { color: #B3261E; }
+.sell-status--ok    { color: #FFFFFF; font-weight: 600; }
+.sell-status--error { color: #FFB4AB; }
 
 .sell-alt {
   margin-top: 14px;
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: #B9CDC0;
 }
 
-.sell-alt a { color: var(--accent); }
+.sell-alt a { color: var(--on-dark); text-decoration: underline; }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .sell-status--error { color: #F2B8B5; }
