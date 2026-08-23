@@ -1270,3 +1270,16 @@ a { color: inherit; text-decoration: none; }
   :root:not([data-theme="light"]) .sell-status--error { color: #F2B8B5; }
 }
 :root[data-theme="dark"] .sell-status--error { color: #F2B8B5; }
+
+/* The Formspree contact form was removed — the sell form above it does the same
+   job and does it better. What remains is the address, the local-delivery note
+   and the social links, so the grid collapses to a single centred column
+   instead of leaving an empty half. */
+.contact-grid--solo {
+  grid-template-columns: 1fr;
+  max-width: 46rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.contact-grid--solo .social-links { justify-content: center; }
