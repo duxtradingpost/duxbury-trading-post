@@ -200,8 +200,43 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
         <li>A brief description (set, player/character, year if known)</li>
         <li>Condition and quantity</li>
       </ul>
-      <p>We'll get back to you with an offer within 1-2 business days.</p>
-      <a href="mailto:info@duxburytradingpost.com?subject=Selling%20My%20Cards&body=Hi%20Duxbury%20Trading%20Post%2C%0D%0A%0D%0AI%20have%20the%20following%20items%20to%20sell%3A%0D%0A%0D%0AItem%20description%3A%20%0D%0ACondition%3A%20%0D%0AQuantity%3A%20%0D%0A%0D%0APhotos%20are%20attached%20to%20this%20email.%0D%0A%0D%0AThanks!" class="btn btn-primary">Email Us Photos &amp; Details</a>
+      <p>We&rsquo;ll get back to you with an offer within 1&ndash;2 business days.</p>
+
+      <form id="sell-form" class="sell-form" novalidate>
+        <div class="sell-form-fields">
+          <div class="sell-row">
+            <label>Name
+              <input type="text" name="name" required autocomplete="name">
+            </label>
+            <label>Email
+              <input type="email" name="email" required autocomplete="email">
+            </label>
+          </div>
+          <label>Phone <span class="sell-optional">optional</span>
+            <input type="tel" name="phone" autocomplete="tel">
+          </label>
+          <label>What do you have?
+            <textarea name="details" rows="4" required
+              placeholder="Set, player, year and condition if you know them &mdash; a rough description is fine."></textarea>
+          </label>
+
+          <label class="sell-photos-label">Photos
+            <span class="sell-optional">up to 8 &middot; fronts and backs help most</span>
+            <input type="file" id="sell-photos" accept="image/*" multiple>
+          </label>
+          <ul id="sell-file-list" class="sell-file-list" hidden></ul>
+
+          <!-- Hidden from people; only a bot fills this in. See handleSell(). -->
+          <div class="sell-hp" aria-hidden="true">
+            <label>Company<input type="text" name="company" tabindex="-1" autocomplete="off"></label>
+          </div>
+
+          <button type="submit" id="sell-submit" class="btn btn-primary">Send It Over</button>
+        </div>
+        <p id="sell-status" class="sell-status" role="status" aria-live="polite" hidden></p>
+      </form>
+
+      <p class="sell-alt">Rather use email? <a href="mailto:info@duxburytradingpost.com?subject=Selling%20My%20Cards">info@duxburytradingpost.com</a></p>
     </div>
     <img src="images/promo-card.jpeg" alt="We buy sports and trading cards" class="sell-image">
   </div>
@@ -259,5 +294,6 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
 
 <script src="js/main.js"></script>
 <script src="js/banner.js"></script>
+<script src="js/sell-form.js"></script>
 </body>
 </html>

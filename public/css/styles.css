@@ -1107,3 +1107,136 @@ a { color: inherit; text-decoration: none; }
 }
 
 .inv-intro a { color: var(--accent); text-decoration: underline; }
+
+/* --- Sell-to-us form --------------------------------------------------------
+   This replaced a mailto button. A card buyer is worth a few dollars of margin;
+   someone handing over a collection is worth hundreds, so this is the one path
+   on the site that justifies the friction of a real form. */
+.sell-form { margin-top: 18px; }
+
+.sell-form label {
+  display: block;
+  margin-bottom: 12px;
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dark);
+}
+
+.sell-optional {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-muted);
+  margin-left: 6px;
+}
+
+.sell-form input[type="text"],
+.sell-form input[type="email"],
+.sell-form input[type="tel"],
+.sell-form textarea {
+  display: block;
+  width: 100%;
+  margin-top: 5px;
+  padding: 10px 12px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-dark);
+  background: var(--field);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.sell-form textarea { resize: vertical; }
+
+.sell-form input:focus-visible,
+.sell-form textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* Two across on a desktop, stacked on a phone — nothing here is worth
+   squeezing side by side on a narrow screen. */
+.sell-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+@media (max-width: 560px) { .sell-row { grid-template-columns: 1fr; } }
+
+.sell-form input[type="file"] {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.sell-file-list {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  font-size: 0.85rem;
+}
+
+.sell-file-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 10px;
+  margin-bottom: 5px;
+  background: var(--band);
+  border-radius: 5px;
+}
+
+.sell-file-list span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sell-file-list button {
+  flex: none;
+  background: none;
+  border: 0;
+  font-size: 1.15rem;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.sell-file-list button:hover { color: var(--text-dark); }
+
+/* Off-screen rather than display:none — some bots skip hidden fields, and the
+   point is for them to fill it in. */
+.sell-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.sell-status {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.sell-status--ok    { color: var(--accent); font-weight: 600; }
+.sell-status--error { color: #B3261E; }
+
+.sell-alt {
+  margin-top: 14px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.sell-alt a { color: var(--accent); }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .sell-status--error { color: #F2B8B5; }
+}
+:root[data-theme="dark"] .sell-status--error { color: #F2B8B5; }

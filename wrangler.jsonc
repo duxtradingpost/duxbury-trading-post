@@ -8,5 +8,14 @@
     // Without this, static assets are served before the Worker runs and the
     // duxtradingpost.com redirect in src/index.js would never fire.
     "run_worker_first": true
-  }
+  },
+  // Sell-to-us form submissions are emailed straight to the shop inbox rather
+  // than stored anywhere. Requires duxburytradingpost.com to be onboarded under
+  // Cloudflare Email Service and info@ verified as a destination address.
+  "send_email": [
+    {
+      "name": "SELL_EMAIL",
+      "destination_address": "info@duxburytradingpost.com"
+    }
+  ]
 }
