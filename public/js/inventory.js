@@ -312,9 +312,15 @@ const lb = {
 };
 let lbCard = null, lbAt = 0;
 
+// The caption title is wired once. openLightbox only refreshes the text and
+// the data attribute, so there is no handler stacking up per open.
+if (lb.title) lb.title.addEventListener('click', () => copyTitle(lb.title));
+
 function openLightbox(card, at = 0) {
   lbCard = card; lbAt = at;
   lb.title.textContent = card.title;
+  lb.title.dataset.title = card.title;
+  lb.title.classList.remove('copy-title--done');
   lb.buy.href = card.url;
   paintLightbox();
   lb.el.hidden = false;
