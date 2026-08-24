@@ -28,7 +28,7 @@ HeyStack  ──push──>  eBay  ──InfoShore──>  Shopify  ──>  dux
    Shop, POS, Facebook & Instagram) — imports land on Online Store only
 4. Tag by sport in Shopify (Football / Baseball / Basketball / Soccer)
 5. Enter **Cost per item**
-6. Set **Best Offer auto-decline** = the 20% floor
+6. Set **Best Offer auto-decline** = **10% below ask**. Leave auto-accept blank.
 7. Log the purchase in `whatnot/purchase-log.xlsx`
 
 ## Coming Soon cards (not yet listed for sale)
@@ -103,6 +103,25 @@ is the only screen in the stack that reports what physically moved.
   Ground Advantage.
 - ESE is eBay-exclusive — Pirate Ship cannot sell it.
 - No acceptance scan needed; it can go straight in the mailbox.
+
+### Best Offer
+
+**Auto-decline at 10% below ask on every listing. Auto-accept stays blank.**
+
+Bulk-editable at Seller Hub -> Listings -> Actions -> Edit Best Offer. Best Offer
+is not part of eBay business policies, so HeyStack does not inherit it — check
+whether it has its own default, or set it per batch.
+
+Auto-accept stays off because eBay takes the first qualifying offer without
+telling you. The Burrow in Aug 2026 came in at $200 against a $250 ask; countering
+at $235 landed $30.36 more than accepting would have. An auto-accept would have
+taken the $200 silently.
+
+**What the 10% rule does and does not do.** It kills lowball noise — the $35
+offers on $66 cards — and that is worth the time it saves. It is not margin
+protection: 78 listings were already below break-even at full ask in Aug 2026, and
+a percentage floor cannot fix a price that is too low to start with. Check the
+break-even before countering anything, not the auto-decline number.
 
 ### Shipping policy: set it before every HeyStack batch
 
