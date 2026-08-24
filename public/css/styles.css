@@ -1349,3 +1349,42 @@ a { color: inherit; text-decoration: none; }
 .lb-stage .copy-title--done { background: rgba(255, 255, 255, 0.14); }
 
 .lb-stage .copy-title--done::after { color: #FFFFFF; }
+
+/* --- Away / shipping delay notice -------------------------------------------
+   Sits above the promo bar and reads as information rather than marketing, so
+   it takes a warm neutral instead of the forest green. Not dismissible: a buyer
+   who closes it and then waits four days for a card has been poorly served. */
+.away-bar {
+  background: #F4E9CE;
+  color: #4A3B1A;
+  border-bottom: 1px solid #E3D3AC;
+}
+
+.away-inner {
+  padding-top: 9px;
+  padding-bottom: 9px;
+  text-align: center;
+}
+
+.away-text {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.away-text strong { font-family: var(--font-display); letter-spacing: 0.01em; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .away-bar {
+    background: #3A3020;
+    color: #F0E4C8;
+    border-bottom-color: #4E4128;
+  }
+}
+:root[data-theme="dark"] .away-bar {
+  background: #3A3020;
+  color: #F0E4C8;
+  border-bottom-color: #4E4128;
+}
+
+@media (max-width: 640px) { .away-text { font-size: 0.82rem; } }
