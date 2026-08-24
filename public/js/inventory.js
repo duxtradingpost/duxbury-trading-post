@@ -171,7 +171,8 @@ function cardHtml(c) {
           </span>
         </button>
       </div>
-      <h3>${escapeHtml(c.title)}</h3>
+      <h3><button type="button" class="copy-title" data-title="${escapeAttr(c.title)}"
+        title="Click to copy this title">${escapeHtml(c.title)}</button></h3>
       <p class="product-price">$${c.price}</p>
       <div class="product-actions">
         <a href="${c.url}" target="_blank" rel="noopener" class="btn btn-primary btn-small">Buy Now</a>
@@ -181,6 +182,35 @@ function cardHtml(c) {
       </div>
     </div>
   `;
+}
+
+// Titles are not links on this page, so a click has nothing better to do than
+// hand you the text. People check comps constantly and the alternative is
+// selecting 60 characters by hand.
+function wireCopyTitles(scope) {
+  scope.querySelectorAll('.copy-title:not([data-wired])').forEach(btn => {
+    btn.dataset.wired = '1';
+    btn.addEventListener('click', () => copyTitle(btn));
+  });
+}
+
+async function copyTitle(btn) {
+  const text = btn.dataset.title;
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    // Clipboard blocked (no HTTPS, or permission denied) — select it instead so
+    // a long-press or ctrl-C still works.
+    const r = document.createRange();
+    r.selectNodeContents(btn);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(r);
+    return;
+  }
+  btn.classList.add('copy-title--done');
+  clearTimeout(btn._t);
+  btn._t = setTimeout(() => btn.classList.remove('copy-title--done'), 1400);
 }
 
 function wirePhotos(scope) {
@@ -215,6 +245,7 @@ function appendPage() {
   shown += next.length;
   wireShare(grid);
   wirePhotos(grid);
+  wireCopyTitles(grid);
   updateCount();
 }
 

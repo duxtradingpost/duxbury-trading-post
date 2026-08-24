@@ -135,7 +135,8 @@ async function loadFeaturedItems() {
           </a>
           ${sold ? '<span class="sold-badge">Sold</span>' : ''}
         </div>
-        <h3>${product.title}</h3>
+        <h3><button type="button" class="copy-title" data-title="${product.title.replace(/"/g, '&quot;')}"
+          title="Click to copy this title">${product.title}</button></h3>
         <p class="product-price">$${price}</p>
         <div class="product-actions">
           ${sold
@@ -217,7 +218,8 @@ async function loadComingSoon() {
           <img src="${image ? image.url : ''}" alt="${image?.altText || product.title}" class="product-image">
           <span class="soon-badge">Coming Soon</span>
         </div>
-        <h3>${product.title}</h3>
+        <h3><button type="button" class="copy-title" data-title="${product.title.replace(/"/g, '&quot;')}"
+          title="Click to copy this title">${product.title}</button></h3>
         <div class="product-actions">
           <a href="mailto:info@duxburytradingpost.com?subject=${subject}&body=${body}" class="btn btn-primary btn-small">Make an Offer</a>
         </div>
@@ -254,3 +256,26 @@ async function shareListing(url, title, btn) {
     console.error('Copy to clipboard failed:', err);
   }
 }
+
+
+// --- Copy a card title ------------------------------------------------------
+// Titles in the grid are not links, so clicking one copies it. Checking comps
+// means pasting an exact title into eBay or 130point, and selecting it by hand
+// is the fiddliest part of that.
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.copy-title');
+  if (!btn) return;
+  try {
+    await navigator.clipboard.writeText(btn.dataset.title);
+  } catch {
+    const r = document.createRange();
+    r.selectNodeContents(btn);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(r);
+    return;
+  }
+  btn.classList.add('copy-title--done');
+  clearTimeout(btn._t);
+  btn._t = setTimeout(() => btn.classList.remove('copy-title--done'), 1400);
+});

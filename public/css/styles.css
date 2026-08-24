@@ -1283,3 +1283,60 @@ a { color: inherit; text-decoration: none; }
 }
 
 .contact-grid--solo .social-links { justify-content: center; }
+
+/* --- Copy a card title ------------------------------------------------------
+   Grid titles are not links, so a click copies them. Checking comps means
+   pasting an exact title into eBay or 130point, and hand-selecting 60
+   characters is the fiddliest part of that.
+
+   It is a real <button> rather than a click handler on the <h3> so it is
+   reachable by keyboard and announced as interactive, but it inherits the
+   heading's type so nothing looks like a control until you go near it. */
+.copy-title {
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  background: none;
+  border: 0;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s ease;
+}
+
+.copy-title:hover,
+.copy-title:focus-visible { background: var(--band); }
+
+/* A quiet copy glyph, only once you are on it — a permanent icon next to every
+   title in a 24-card grid would be noise. */
+.copy-title::after {
+  content: "⧉";
+  margin-left: 6px;
+  opacity: 0;
+  font-size: 0.85em;
+  transition: opacity 0.15s ease;
+}
+
+.copy-title:hover::after,
+.copy-title:focus-visible::after { opacity: 0.55; }
+
+.copy-title--done { background: var(--band); }
+
+.copy-title--done::after {
+  content: "Copied";
+  opacity: 1;
+  margin-left: 8px;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  text-transform: none;
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .copy-title, .copy-title::after { transition: none; }
+}

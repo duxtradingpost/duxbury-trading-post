@@ -23,6 +23,16 @@ on desktop.
 Anchored to `.buy-buttons-block`, which appears exactly once on product pages
 and nowhere else, so it doubles as the product-page gate.
 
+## product-title-copy.html
+
+Makes the product title on every product page click-to-copy. Checking comps
+means pasting an exact card title into eBay or 130point, and hand-selecting
+60 characters is the fiddliest part of that.
+
+Gated on `.buy-buttons-block` like the share button, so it never fires on a
+collection or cart page that happens to have an h1. Falls back to selecting the
+text where the clipboard API is unavailable.
+
 ## home-links-to-main-site.html
 
 Points Shopify navigation back at duxburytradingpost.com so customers are never

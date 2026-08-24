@@ -1,0 +1,101 @@
+<!-- Duxbury Trading Post — click the product title to copy it -->
+<style>
+  .dtp-copy-title {
+    cursor: pointer;
+    border-radius: 5px;
+    padding: 2px 6px;
+    margin: -2px -6px;
+    transition: background 0.15s ease;
+    position: relative;
+  }
+  .dtp-copy-title:hover,
+  .dtp-copy-title:focus-visible { background: rgba(15, 60, 31, 0.08); }
+  .dtp-copy-title::after {
+    content: "\29C9";
+    margin-left: 8px;
+    font-size: 0.7em;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    vertical-align: middle;
+  }
+  .dtp-copy-title:hover::after,
+  .dtp-copy-title:focus-visible::after { opacity: 0.5; }
+  .dtp-copy-title.dtp-copied::after {
+    content: "Copied";
+    opacity: 1;
+    font-size: 0.5em;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #0F3C1F;
+    text-transform: none;
+  }
+</style>
+
+<script>
+(function () {
+  // The product title is the only h1 on a product page. Gate on the buy-buttons
+  // block the same way the share button does, so this never fires on a
+  // collection or cart page that happens to have an h1.
+  function titleEl() {
+    if (!document.querySelector('.buy-buttons-block')) return null;
+    return document.querySelector('h1.product-title, .product__title h1, h1');
+  }
+
+  function copy(el) {
+    // textContent, not innerText — innerText would pick up the "Copied" label
+    // from the ::after if a second click lands during the confirmation window.
+    var text = (el.dataset.dtpTitle || '').trim();
+    function done() {
+      el.classList.add('dtp-copied');
+      clearTimeout(el._dtpT);
+      el._dtpT = setTimeout(function () { el.classList.remove('dtp-copied'); }, 1500);
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(done).catch(function () { select(el); });
+    } else {
+      select(el);
+    }
+  }
+
+  // Clipboard blocked: select the text so a long-press or ctrl-C still works.
+  function select(el) {
+    var r = document.createRange();
+    r.selectNodeContents(el);
+    var s = window.getSelection();
+    s.removeAllRanges();
+    s.addRange(r);
+  }
+
+  function init() {
+    var el = titleEl();
+    if (!el || el.dataset.dtpWired) return;
+    el.dataset.dtpWired = '1';
+    el.dataset.dtpTitle = el.textContent.trim();
+    el.classList.add('dtp-copy-title');
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('role', 'button');
+    el.setAttribute('title', 'Click to copy this title');
+    el.addEventListener('click', function () { copy(el); });
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copy(el); }
+    });
+  }
+
+  function start() {
+    init();
+    // This theme re-renders on variant changes and soft page transitions, which
+    // would drop the handler. Re-apply when that happens.
+    var pending = null;
+    new MutationObserver(function () {
+      clearTimeout(pending);
+      pending = setTimeout(init, 150);
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start);
+  } else {
+    start();
+  }
+})();
+</script>
