@@ -268,7 +268,10 @@ def send(text):
     req = urllib.request.Request(
         'https://duxburytradingpost.com/api/briefing',
         data=text.encode('utf-8'),
-        headers={'Content-Type': 'text/plain; charset=utf-8', 'X-DTP-Key': key})
+        headers={'Content-Type': 'text/plain; charset=utf-8', 'X-DTP-Key': key,
+                 # Cloudflare's bot rules reject urllib's default agent with a
+                 # 1010 before the request ever reaches the Worker.
+                 'User-Agent': 'DuxburyTradingPost-Briefing/1.0 (+https://duxburytradingpost.com)'})
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             print(f'[emailed: HTTP {r.status}]', file=sys.stderr)

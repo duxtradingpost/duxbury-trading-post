@@ -56,7 +56,11 @@ async function handleBriefing(request, env) {
   const given = request.headers.get('X-DTP-Key') || '';
   const want = env.BRIEFING_KEY || '';
   if (!want || given.length !== want.length || given !== want) {
-    return json({ ok: false, error: 'Not authorised' }, 401);
+    // Says whether the secret is configured and how long each side is — never
+    // the values. Enough to tell "not set" from "mismatch" without leaking it.
+    return json({ ok: false, error: 'Not authorised',
+                  serverKeySet: Boolean(want), serverLen: want.length,
+                  sentLen: given.length }, 401);
   }
 
   const text = (await request.text()).slice(0, 60000);
