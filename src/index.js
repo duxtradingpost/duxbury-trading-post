@@ -32,6 +32,14 @@ export default {
       return Response.redirect(url.toString(), 301);
     }
 
+    // The morning briefing posts itself here from the Mac. Guarded by a shared
+    // secret set as a Worker secret — without it anyone could fill the inbox.
+    if (url.pathname === '/api/briefing') {
+      return request.method === 'POST'
+        ? handleBriefing(request, env)
+        : json({ ok: false, error: 'Method not allowed' }, 405);
+    }
+
     if (url.pathname === '/api/sell') {
       return request.method === 'POST'
         ? handleSell(request, env)
@@ -41,6 +49,41 @@ export default {
     return env.ASSETS.fetch(request);
   }
 };
+
+async function handleBriefing(request, env) {
+  // Constant-time-ish compare is overkill here, but a plain !== leaks length by
+  // timing and costs nothing to avoid.
+  const given = request.headers.get('X-DTP-Key') || '';
+  const want = env.BRIEFING_KEY || '';
+  if (!want || given.length !== want.length || given !== want) {
+    return json({ ok: false, error: 'Not authorised' }, 401);
+  }
+
+  const text = (await request.text()).slice(0, 60000);
+  if (!text.trim()) return json({ ok: false, error: 'Empty briefing' }, 400);
+
+  // First line of the briefing carries the date; use it as the subject so the
+  // inbox threads them sensibly rather than collapsing on an identical subject.
+  const firstLine = text.split('\n', 1)[0].trim().slice(0, 120);
+
+  const raw = buildMime({
+    from: SELL_FROM,
+    fromName: 'Duxbury Trading Post',
+    to: SELL_TO,
+    replyTo: SELL_TO,
+    subject: firstLine || 'DTP morning briefing',
+    text,
+    attachments: []
+  });
+
+  try {
+    await env.SELL_EMAIL.send(new EmailMessage(SELL_FROM, SELL_TO, raw));
+  } catch (err) {
+    console.error('briefing send failed:', err && err.message);
+    return json({ ok: false, error: 'Send failed' }, 502);
+  }
+  return json({ ok: true });
+}
 
 async function handleSell(request, env) {
   let form;

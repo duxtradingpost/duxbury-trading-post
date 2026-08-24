@@ -255,8 +255,32 @@ def build():
     return "\n".join(out)
 
 
+def send(text):
+    """POST the briefing to the site's Worker, which emails it. The key lives in
+    ~/.dtp-briefing-key, outside the repo — a secret in a tracked file is a
+    secret you have published."""
+    import urllib.request, urllib.error
+    kp = os.path.expanduser('~/.dtp-briefing-key')
+    if not os.path.exists(kp):
+        print('[no ~/.dtp-briefing-key — skipping email]', file=sys.stderr)
+        return
+    key = open(kp).read().strip()
+    req = urllib.request.Request(
+        'https://duxburytradingpost.com/api/briefing',
+        data=text.encode('utf-8'),
+        headers={'Content-Type': 'text/plain; charset=utf-8', 'X-DTP-Key': key})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            print(f'[emailed: HTTP {r.status}]', file=sys.stderr)
+    except urllib.error.HTTPError as e:
+        print(f'[email failed: HTTP {e.code} {e.read().decode()[:120]}]', file=sys.stderr)
+    except Exception as e:
+        print(f'[email failed: {e}]', file=sys.stderr)
+
+
 if __name__ == '__main__':
     text = build()
     print(text)
-    out = os.path.join(DESKTOP, 'DTP-daily-briefing.txt')
-    open(out, 'w').write(text + "\n")
+    open(os.path.join(DESKTOP, 'DTP-daily-briefing.txt'), 'w').write(text + "\n")
+    if '--no-email' not in sys.argv:
+        send(text)
