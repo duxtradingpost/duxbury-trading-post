@@ -104,6 +104,25 @@ is the only screen in the stack that reports what physically moved.
 - ESE is eBay-exclusive — Pirate Ship cannot sell it.
 - No acceptance scan needed; it can go straight in the mailbox.
 
+### Shipping policy: set it before every HeyStack batch
+
+HeyStack has one global shipping policy, not a per-listing rule, so whatever is
+selected applies to everything in the batch. Two policies exist on eBay:
+
+| Policy | Service | Use for |
+|---|---|---|
+| `Shipping (DTP)` | Ground Advantage | slabs, mags, anything over $19 |
+| `Shipping (DTP)- ESE` | eBay Standard Envelope | raw cards at or under $19 |
+
+**Set it in HeyStack -> eBay Marketplace Defaults before listing, and set it back
+afterwards.** Leaving it on ESE and then listing a $300 card produces a listing
+eBay will reject or that cannot ship at the quoted rate. Leaving it on Ground
+Advantage costs $5.29 of postage on every cheap card that sells.
+
+As of Aug 2026 there were 132 active listings under $19 on the Ground Advantage
+policy — about $700 of avoidable postage. The switch is two clicks; forgetting
+it is the expensive part.
+
 ### Printing 4x6 labels on the Rollo
 
 Set the format **before buying the label** — it cannot be changed afterward.
