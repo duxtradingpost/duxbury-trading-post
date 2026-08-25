@@ -31,7 +31,13 @@ from datetime import date, datetime, timedelta
 HERE    = os.path.dirname(os.path.abspath(__file__))
 STATE   = os.path.join(HERE, 'daily-state.json')
 LOG     = os.path.join(HERE, '..', 'whatnot', 'purchase-log.xlsx')
-DESKTOP = os.path.expanduser('~/Desktop')
+
+# Where to look for the Shopify export, in order. HERE comes first because
+# launchd jobs cannot touch ~/Desktop: macOS puts it behind TCC, and a process
+# started by launchd has no Full Disk Access, so a glob there silently returns
+# nothing and an open() there raises PermissionError. The Desktop stays in the
+# list only so a hand-run from a Terminal still finds a file dropped there.
+SEARCH_DIRS = [HERE, os.path.expanduser('~/Desktop'), os.path.expanduser('~/Downloads')]
 
 FEE, PER_LOW, PER_HIGH, ESE, GA = 0.1325, 0.30, 0.40, 0.78, 6.07
 ESE_MAX_ITEM = 20 - ESE          # item + shipping must clear $20
@@ -54,7 +60,12 @@ def break_even(cost):
 
 
 def newest_export():
-    files = glob.glob(os.path.join(DESKTOP, 'products_export*.csv'))
+    files = []
+    for d in SEARCH_DIRS:
+        try:
+            files += glob.glob(os.path.join(d, 'products_export*.csv'))
+        except OSError:
+            continue          # unreadable directory is a miss, not a crash
     return max(files, key=os.path.getmtime) if files else None
 
 
@@ -284,6 +295,16 @@ def send(text):
 if __name__ == '__main__':
     text = build()
     print(text)
-    open(os.path.join(DESKTOP, 'DTP-daily-briefing.txt'), 'w').write(text + "\n")
+
+    # Email first. Saving a copy is a convenience; delivering the briefing is
+    # the whole job. The original order had the write first, and when launchd
+    # hit PermissionError on ~/Desktop the process died on that line and the
+    # briefing was never sent — a failed nicety silently cancelled the point.
     if '--no-email' not in sys.argv:
         send(text)
+
+    try:
+        with open(os.path.join(HERE, 'DTP-daily-briefing.txt'), 'w') as fh:
+            fh.write(text + "\n")
+    except OSError as e:
+        print(f'[could not save a copy: {e}]', file=sys.stderr)

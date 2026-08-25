@@ -17,7 +17,11 @@ from datetime import date, datetime
 HERE     = os.path.dirname(os.path.abspath(__file__))
 HISTORY  = os.path.join(HERE, 'inventory-history.json')
 LOG      = os.path.join(HERE, '..', 'whatnot', 'purchase-log.xlsx')
-DESKTOP  = os.path.expanduser('~/Desktop')
+
+# HERE first: launchd cannot read ~/Desktop (TCC, no Full Disk Access), so a
+# glob there comes back empty from a scheduled run even when the file is
+# plainly sitting on the Desktop. Kept in the list for hand-runs.
+SEARCH_DIRS = [HERE, os.path.expanduser('~/Desktop'), os.path.expanduser('~/Downloads')]
 
 FEE, PER_LOW, PER_HIGH, ESE, GA = 0.1325, 0.30, 0.40, 0.78, 6.07
 STALE_DAYS = 30
@@ -33,8 +37,15 @@ def break_even(cost):
     return None
 
 def newest_export():
-    files = glob.glob(os.path.join(DESKTOP, 'products_export*.csv'))
-    if not files: sys.exit('No products_export*.csv found on the Desktop. Export from Shopify first.')
+    files = []
+    for d in SEARCH_DIRS:
+        try:
+            files += glob.glob(os.path.join(d, 'products_export*.csv'))
+        except OSError:
+            continue
+    if not files:
+        sys.exit('No products_export*.csv found in %s. Export from Shopify first.'
+                 % ' or '.join(SEARCH_DIRS))
     return max(files, key=os.path.getmtime)
 
 def load_shopify(path):

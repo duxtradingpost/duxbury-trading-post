@@ -15,6 +15,7 @@ order-report-*.csv
 reports/*.csv
 reports/*.json
 
-# The daily briefing's launchd log — it contains the briefing itself, which
-# lists costs and break-evens for live inventory.
+# The reports themselves and the launchd log that captures them. All three
+# print cost, break-even and margin for live inventory. This repo is public.
 reports/*.log
+reports/*.txt
