@@ -14,3 +14,7 @@ order-report-*.csv
 # The script itself is tracked; its data files are not.
 reports/*.csv
 reports/*.json
+
+# The daily briefing's launchd log — it contains the briefing itself, which
+# lists costs and break-evens for live inventory.
+reports/*.log
