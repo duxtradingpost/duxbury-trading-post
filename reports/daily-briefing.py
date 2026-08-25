@@ -25,7 +25,9 @@ judgement to a human with the Price Guide open.
     python3 daily-briefing.py            print to stdout
     python3 daily-briefing.py --email     also send via the Cloudflare Worker
 """
-import csv, json, glob, os, re, sys, subprocess
+import csv, json, glob, os, re, sys
+
+from briefing_render import Section, render_text, render_html
 from datetime import date, datetime, timedelta
 
 HERE    = os.path.dirname(os.path.abspath(__file__))
@@ -96,17 +98,28 @@ def iso(v):
     return s if re.fullmatch(r'\d{4}-\d{2}-\d{2}', s) else None
 
 
+def money(v):
+    return f"${v:,.2f}"
+
+
+def signed(v):
+    return f"{v:+,.2f}"
+
+
+def plural(n, word):
+    return f"{n} {word}" + ("" if n == 1 else "s")
+
+
 def build():
+    """Returns (title, meta, sections, stats). Rendering happens in
+    briefing_render — this function only decides what is worth saying."""
     today = date.today()
     st = load_state()
     seen = set(st.get('sales_seen', []))
-    out = []
-    w = out.append
+    sections = []
 
-    w(f"DUXBURY TRADING POST — morning briefing   {today}")
-    if st.get('last_run'):
-        w(f"since {st['last_run']}")
-    w("")
+    title = f"DUXBURY TRADING POST — morning briefing   {today}"
+    meta = f"since {st['last_run']}" if st.get('last_run') else str(today)
 
     # ---- sales since the last run -------------------------------------------
     sales = sheet_rows('Sales')[1:]
@@ -130,28 +143,41 @@ def build():
         if pl is not None and pl < 0:
             below.append((card, sold, basis, pl))
 
-    if new_sales:
-        tot = sum(s[2] for s in new_sales)
-        known = [s[3] for s in new_sales if s[3] is not None]
-        w(f"── SOLD — {len(new_sales)} cards, ${tot:,.2f} gross")
-        for d, card, sold, pl in sorted(new_sales, key=lambda x: -x[2]):
-            tag = f"{pl:+8.2f}" if pl is not None else "       ?"
-            w(f"   {tag}   ${sold:8.2f}  {card[:56]}")
-        if known:
-            w(f"   {'':8}   realised P/L on the {len(known)} with a cost basis: {sum(known):+,.2f}")
-    else:
-        w("── SOLD — nothing since the last run")
-    w("")
+    gross = sum(s[2] for s in new_sales)
+    known = [s[3] for s in new_sales if s[3] is not None]
+    realised = sum(known) if known else None
+
+    sold_rows = []
+    for d, card, sold, pl in sorted(new_sales, key=lambda x: -x[2]):
+        tone = None if pl is None else ('good' if pl >= 0 else 'bad')
+        sold_rows.append([
+            (signed(pl) if pl is not None else '?', tone),
+            money(sold),
+            card[:56],
+        ])
+    foot = None
+    if known:
+        foot = (f"Realised P/L on the {plural(len(known), 'sale')} with a cost basis: "
+                f"{signed(sum(known))}")
+    sections.append(Section(
+        'Sold', tone='good' if (realised or 0) >= 0 else 'bad',
+        subtitle=(f"{plural(len(new_sales), 'card')}, {money(gross)} gross" if new_sales else None),
+        cols=[('P/L', 'r'), ('Price', 'r'), ('Card', 'l')],
+        rows=sold_rows, footnote=foot,
+        empty='Nothing since the last run.'))
 
     if below:
-        w(f"!! SOLD BELOW BREAK-EVEN — {len(below)}")
-        for card, sold, basis, pl in below:
-            w(f"   {pl:+8.2f}   sold ${sold:7.2f} against ${basis:7.2f} cost   {card[:48]}")
-        w("")
+        sections.append(Section(
+            'Sold below break-even', tone='bad', text_prefix='!!',
+            cols=[('P/L', 'r'), ('Sold', 'r'), ('Cost', 'r'), ('Card', 'l')],
+            rows=[[(signed(pl), 'bad'), money(sold), money(basis), card[:48]]
+                  for card, sold, basis, pl in below]))
 
     # ---- arrivals due ---------------------------------------------------------
     log = sheet_rows('Purchase log')[1:]
     due, overdue = [], []
+    MON = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
+           'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12}
     for i, r in enumerate(log, start=2):
         status = str(r[12] or '')
         if 'IN TRANSIT' not in status.upper() and 'AWAITING' not in status.upper():
@@ -162,8 +188,6 @@ def build():
         m = re.findall(r'([A-Z][a-z]{2})\s+(\d{1,2})', status)
         if not m:
             continue
-        MON = {'Jan':1,'Feb':2,'Mar':3,'Apr':4,'May':5,'Jun':6,
-               'Jul':7,'Aug':8,'Sep':9,'Oct':10,'Nov':11,'Dec':12}
         last = m[-1]
         try:
             eta = date(today.year, MON[last[0]], int(last[1]))
@@ -175,24 +199,30 @@ def build():
             due.append((i, card, paid))
 
     if overdue:
-        w(f"!! OVERDUE ARRIVALS — {len(overdue)}")
-        for i, card, paid, eta, days in sorted(overdue, key=lambda x: -x[4]):
-            w(f"   {days:3}d late  ${paid:8,.2f}  row {i:3}  {card[:50]}")
-        w("")
+        stuck = sum(o[2] for o in overdue)
+        sections.append(Section(
+            'Overdue arrivals', tone='warn', text_prefix='!!',
+            subtitle=f"{plural(len(overdue), 'shipment')}, {money(stuck)} past ETA",
+            cols=[('Late', 'r'), ('Paid', 'r'), ('Row', 'r'), ('Card', 'l')],
+            rows=[[(f"{days}d", 'warn'), money(paid), f"row {i}", card[:50]]
+                  for i, card, paid, eta, days in sorted(overdue, key=lambda x: -x[4])]))
     if due:
-        w(f"── DUE TODAY — {len(due)}")
-        for i, card, paid in due:
-            w(f"   ${paid:8,.2f}  row {i:3}  {card[:56]}")
-        w("")
+        sections.append(Section(
+            'Due today', tone='info',
+            cols=[('Paid', 'r'), ('Row', 'r'), ('Card', 'l')],
+            rows=[[money(paid), f"row {i}", card[:56]] for i, card, paid in due]))
 
     # ---- the catalogue side ---------------------------------------------------
     export = newest_export()
     if not export:
-        w("── no Shopify export on the Desktop — catalogue checks skipped")
+        sections.append(Section(
+            'Catalogue checks skipped', tone='muted',
+            rows=[], empty='No Shopify export found — export from Shopify to restore '
+                           'the comping queue.'))
         st['last_run'] = str(today)
         st['sales_seen'] = sorted(seen)
         save_state(st)
-        return "\n".join(out)
+        return title, meta, sections, _stats(new_sales, gross, realised, overdue)
 
     age = (datetime.now() - datetime.fromtimestamp(os.path.getmtime(export))).days
     rows = list(csv.DictReader(open(export)))
@@ -202,9 +232,12 @@ def build():
         t = (r.get('Title') or '').strip()
         if not h or not t or h in prods:
             continue
+
         def f(k):
-            try: return float(r.get(k) or 0)
-            except: return 0.0
+            try:
+                return float(r.get(k) or 0)
+            except Exception:
+                return 0.0
         prods[h] = {'t': t, 'status': (r.get('Status') or '').lower(),
                     'cost': f('Cost per item'), 'price': f('Variant Price'),
                     'bc': (r.get('Variant Barcode') or '').strip().lstrip("'")}
@@ -223,11 +256,13 @@ def build():
         if days >= STALE_DAYS:
             stale.append((days, p))
     if stale:
-        w(f"── SITTING {STALE_DAYS}+ DAYS — {len(stale)}")
-        for days, p in sorted(stale, key=lambda x: -x[0])[:12]:
-            w(f"   {days:3}d  ${p['price']:8.2f}  {p['bc'] or '--':10} {p['t'][:46]}")
-        w("   your own rule: 90 days with no watchers -> unlist and demote to a bin")
-        w("")
+        sections.append(Section(
+            f'Sitting {STALE_DAYS}+ days', tone='warn',
+            subtitle=plural(len(stale), 'listing'),
+            cols=[('Age', 'r'), ('Price', 'r'), ('Barcode', 'l'), ('Card', 'l')],
+            rows=[[f"{days}d", money(p['price']), p['bc'] or '--', p['t'][:46]]
+                  for days, p in sorted(stale, key=lambda x: -x[0])[:12]],
+            footnote='Your own rule: 90 days with no watchers, then unlist and demote to a bin.'))
 
     # ---- needs comping --------------------------------------------------------
     # Not a market check. These are cards whose own numbers disagree with each
@@ -238,48 +273,75 @@ def build():
             continue
         be = break_even(p['cost'])
         if net(p['price']) < p['cost']:
-            flags.append(('under break-even', p, be))
+            flags.append(('under break-even', 'bad', p, be))
         elif p['price'] >= p['cost'] * OVERPRICED_X:
-            flags.append((f'listed {p["price"]/p["cost"]:.1f}x cost', p, be))
+            flags.append((f'listed {p["price"]/p["cost"]:.1f}x cost', 'warn', p, be))
     dead = [p for p in active.values() if ESE_MAX_ITEM < p['price'] <= 26]
 
     if flags:
-        w(f"── NEEDS COMPING — {len(flags)} cards whose numbers disagree")
-        w("   (no automated source for sold prices exists for this inventory —")
-        w("    these are the ones to check by hand, not a market verdict)")
-        for why, p, be in sorted(flags, key=lambda x: -x[1]['price'])[:12]:
-            w(f"   ${p['price']:8.2f}  cost ${p['cost']:7.2f}  BE ${be:7.2f}  {why:18} {p['t'][:34]}")
-        w("")
+        shown = sorted(flags, key=lambda x: -x[2]['price'])[:12]
+        more = len(flags) - len(shown)
+        sections.append(Section(
+            'Needs comping', tone='warn',
+            subtitle=f"{plural(len(flags), 'card')} whose numbers disagree with each other",
+            cols=[('Listed', 'r'), ('Cost', 'r'), ('Break-even', 'r'),
+                  ('Why', 'l'), ('Card', 'l')],
+            rows=[[money(p['price']), money(p['cost']), money(be), (why, tone), p['t'][:44]]
+                  for why, tone, p, be in shown],
+            footnote=(('and %d more. ' % more if more > 0 else '') +
+                      'No automated source for sold prices exists for this inventory — '
+                      'these are the ones to check by hand, not a market verdict.')))
+
     if dead:
-        w(f"── IN THE $19.22-$26 DEAD ZONE — {len(dead)}")
-        w(f"   over the ESE cap, so the label jumps ${GA-ESE:.2f}. ${ESE_MAX_ITEM:.2f} nets more than $22 does.")
-        w("")
+        sections.append(Section(
+            f'In the {money(ESE_MAX_ITEM)}–$26 dead zone', tone='muted',
+            subtitle=plural(len(dead), 'listing'),
+            rows=[], empty=(f"Over the ESE cap, so the label jumps {money(GA - ESE)}. "
+                            f"{money(ESE_MAX_ITEM)} nets more than $22 does.")))
 
     if age >= 3:
-        w(f"!! the Shopify export is {age} days old — costs and prices above may be stale")
-        w("")
+        sections.append(Section(
+            'Stale export', tone='bad', text_prefix='!!',
+            rows=[], empty=f"The Shopify export is {age} days old — costs and prices "
+                           f"above may not match what is live."))
 
     st['last_run'] = str(today)
     st['sales_seen'] = sorted(seen)
     st['first_seen'] = first
     save_state(st)
-    return "\n".join(out)
+    return title, meta, sections, _stats(new_sales, gross, realised, overdue)
 
 
-def send(text):
+def _stats(new_sales, gross, realised, overdue):
+    """The three numbers worth seeing before the email is even opened."""
+    out = [('sold', str(len(new_sales)), None),
+           ('gross', money(gross), None)]
+    if realised is not None:
+        out.append(('realised', signed(realised), 'good' if realised >= 0 else 'bad'))
+    elif overdue:
+        out.append(('overdue', str(len(overdue)), 'bad'))
+    return out
+
+
+def send(subject, text, html):
     """POST the briefing to the site's Worker, which emails it. The key lives in
     ~/.dtp-briefing-key, outside the repo — a secret in a tracked file is a
-    secret you have published."""
+    secret you have published.
+
+    Both parts go up. The Worker sends them as multipart/alternative so a client
+    that will not render HTML still gets a readable briefing rather than a wall
+    of markup."""
     import urllib.request, urllib.error
     kp = os.path.expanduser('~/.dtp-briefing-key')
     if not os.path.exists(kp):
         print('[no ~/.dtp-briefing-key — skipping email]', file=sys.stderr)
         return
     key = open(kp).read().strip()
+    body = json.dumps({'subject': subject, 'text': text, 'html': html})
     req = urllib.request.Request(
         'https://duxburytradingpost.com/api/briefing',
-        data=text.encode('utf-8'),
-        headers={'Content-Type': 'text/plain; charset=utf-8', 'X-DTP-Key': key,
+        data=body.encode('utf-8'),
+        headers={'Content-Type': 'application/json; charset=utf-8', 'X-DTP-Key': key,
                  # Cloudflare's bot rules reject urllib's default agent with a
                  # 1010 before the request ever reaches the Worker.
                  'User-Agent': 'DuxburyTradingPost-Briefing/1.0 (+https://duxburytradingpost.com)'})
@@ -293,15 +355,24 @@ def send(text):
 
 
 if __name__ == '__main__':
-    text = build()
+    title, meta, sections, stats = build()
+    text = render_text(title, meta, sections)
     print(text)
+
+    if '--html' in sys.argv:
+        # Written next to the script so it can be opened in a browser and
+        # checked without sending anything.
+        out = os.path.join(HERE, 'briefing-preview.html')
+        with open(out, 'w') as fh:
+            fh.write(render_html(title, meta, sections, stats))
+        print(f'[preview written to {out}]', file=sys.stderr)
 
     # Email first. Saving a copy is a convenience; delivering the briefing is
     # the whole job. The original order had the write first, and when launchd
     # hit PermissionError on ~/Desktop the process died on that line and the
     # briefing was never sent — a failed nicety silently cancelled the point.
     if '--no-email' not in sys.argv:
-        send(text)
+        send(title, text, render_html(title, meta, sections, stats))
 
     try:
         with open(os.path.join(HERE, 'DTP-daily-briefing.txt'), 'w') as fh:

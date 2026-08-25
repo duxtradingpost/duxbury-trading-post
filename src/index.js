@@ -59,20 +59,43 @@ async function handleBriefing(request, env) {
     return json({ ok: false, error: 'Not authorised' }, 401);
   }
 
-  const text = (await request.text()).slice(0, 60000);
-  if (!text.trim()) return json({ ok: false, error: 'Empty briefing' }, 400);
+  // Two shapes are accepted: a JSON body carrying both a text and an HTML part,
+  // and a bare text/plain body. The plain form is what the script used to send
+  // and is kept working so an older copy of it, or a curl from a terminal, is
+  // still delivered rather than silently 400ing.
+  const body = (await request.text()).slice(0, 400000);
+  if (!body.trim()) return json({ ok: false, error: 'Empty briefing' }, 400);
+
+  let text = body;
+  let html = '';
+  let subject = '';
+  if ((request.headers.get('Content-Type') || '').includes('application/json')) {
+    let parsed;
+    try {
+      parsed = JSON.parse(body);
+    } catch {
+      return json({ ok: false, error: 'Body was not valid JSON' }, 400);
+    }
+    text = String(parsed.text || '').slice(0, 60000);
+    html = String(parsed.html || '').slice(0, 300000);
+    subject = String(parsed.subject || '').slice(0, 120);
+    if (!text.trim() && !html.trim()) {
+      return json({ ok: false, error: 'Empty briefing' }, 400);
+    }
+  }
 
   // First line of the briefing carries the date; use it as the subject so the
   // inbox threads them sensibly rather than collapsing on an identical subject.
-  const firstLine = text.split('\n', 1)[0].trim().slice(0, 120);
+  if (!subject) subject = text.split('\n', 1)[0].trim().slice(0, 120);
 
   const raw = buildMime({
     from: SELL_FROM,
     fromName: 'Duxbury Trading Post',
     to: SELL_TO,
     replyTo: SELL_TO,
-    subject: firstLine || 'DTP morning briefing',
+    subject: subject || 'DTP morning briefing',
     text,
+    html,
     attachments: []
   });
 
@@ -209,31 +232,70 @@ function base64(bytes) {
 
 // Hand-rolled rather than pulling in a MIME library — the Worker has no build
 // step, and this is a fixed, simple shape: one text part plus base64 attachments.
-function buildMime({ from, fromName, to, replyTo, subject, text, attachments }) {
-  const boundary = `dtp-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+// Headers are ASCII-only. A subject with an em dash in it — which every briefing
+// subject has — must go out as an RFC 2047 encoded word or clients render mojibake.
+function encodeHeader(value) {
+  if (/^[\x20-\x7E]*$/.test(value)) return value;
+  return `=?UTF-8?B?${base64(new TextEncoder().encode(value))}?=`;
+}
+
+function buildMime({ from, fromName, to, replyTo, subject, text, html, attachments }) {
+  const stamp = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  const outer = `dtp-mixed-${stamp}`;
+  const inner = `dtp-alt-${stamp}`;
+
   const head = [
-    `From: ${fromName} <${from}>`,
+    `From: ${encodeHeader(fromName)} <${from}>`,
     `To: ${to}`,
     `Reply-To: ${replyTo}`,
-    `Subject: ${subject}`,
-    `Message-ID: <${boundary}@${CANONICAL_HOST}>`,
+    `Subject: ${encodeHeader(subject)}`,
+    `Message-ID: <${outer}@${CANONICAL_HOST}>`,
     `Date: ${new Date().toUTCString()}`,
     'MIME-Version: 1.0',
-    `Content-Type: multipart/mixed; boundary="${boundary}"`,
+    `Content-Type: multipart/mixed; boundary="${outer}"`,
     ''
   ].join('\r\n');
 
-  const parts = [
-    `--${boundary}`,
-    'Content-Type: text/plain; charset="utf-8"',
-    'Content-Transfer-Encoding: 8bit',
-    '',
-    text
-  ];
+  // Both parts are base64'd. The HTML in particular has lines well past the
+  // 998-character SMTP limit, and an over-long line is dropped or wrapped
+  // mid-tag rather than rejected outright — which shows up as a broken layout
+  // that is very hard to trace back to line length.
+  const b64 = s => base64(new TextEncoder().encode(s)).replace(/(.{76})/g, '$1\r\n');
+
+  const parts = [];
+
+  if (html) {
+    // multipart/alternative, least-preferred part first: a client picks the
+    // last one it can render, so HTML has to come after plain text.
+    parts.push(
+      `--${outer}`,
+      `Content-Type: multipart/alternative; boundary="${inner}"`,
+      '',
+      `--${inner}`,
+      'Content-Type: text/plain; charset="utf-8"',
+      'Content-Transfer-Encoding: base64',
+      '',
+      b64(text),
+      `--${inner}`,
+      'Content-Type: text/html; charset="utf-8"',
+      'Content-Transfer-Encoding: base64',
+      '',
+      b64(html),
+      `--${inner}--`
+    );
+  } else {
+    parts.push(
+      `--${outer}`,
+      'Content-Type: text/plain; charset="utf-8"',
+      'Content-Transfer-Encoding: base64',
+      '',
+      b64(text)
+    );
+  }
 
   for (const a of attachments) {
     parts.push(
-      `--${boundary}`,
+      `--${outer}`,
       `Content-Type: ${a.type}; name="${a.filename}"`,
       `Content-Disposition: attachment; filename="${a.filename}"`,
       'Content-Transfer-Encoding: base64',
@@ -242,7 +304,7 @@ function buildMime({ from, fromName, to, replyTo, subject, text, attachments }) 
       a.data.replace(/(.{76})/g, '$1\r\n')
     );
   }
-  parts.push(`--${boundary}--`, '');
+  parts.push(`--${outer}--`, '');
 
   return head + '\r\n' + parts.join('\r\n');
 }
