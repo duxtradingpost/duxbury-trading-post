@@ -1,20 +1,23 @@
 {
  "_comment": [
-  "What the scanner sweeps. eBay has millions of listings; you cannot scan them",
-  "all, so this is a watchlist of sets where grading economics can actually work.",
+  "What the scanner sweeps. Built from Craig's own buying history rather than",
+  "guessed: Josh Allen (27 cards, $1,914), Tom Brady (24), Drake Maye (15),",
+  "Roman Anthony (8), in Chrome / Prizm / Optic — the sets he already buys most.",
   "",
-  "The rule for adding one: high print run, deep graded population, and a real",
-  "gap between PSA 9 and PSA 10 money. That is the opposite of the inventory you",
-  "normally buy — a Camo 10/25 has no PSA 10 comp because almost nobody has",
-  "graded one. Numbered parallels do not belong on this list however nice they",
-  "look.",
+  "Every target here is a BASE parallel: Silver Prizm, base Refractor, Rated",
+  "Rookie. That is deliberate and it is the opposite of what he normally buys.",
+  "Grading economics need a deep graded population to comp a PSA 10 against, and",
+  "a Camo 10/25 has none. Numbered parallels do not belong on this list however",
+  "good they look.",
   "",
-  "Each target: query is what goes to eBay. must / must_not filter the results,",
-  "because eBay's relevance ranking will happily return a Gold Prizm for a Silver",
-  "Prizm search. label is what gets matched against gem-rates.json.",
+  "must / must_not filter eBay's results, because its relevance ranking will",
+  "happily return a Gold Prizm for a Silver Prizm search. label is what gets",
+  "matched against gem-rates.json — keep it to the words that identify the SET,",
+  "since gem rate is a property of how a set was printed, not of the player.",
   "",
-  "Start narrow. Every target costs API calls and a slower run, and a scanner",
-  "that returns 400 maybes is a scanner you stop opening."
+  "CARD NUMBERS ARE UNVERIFIED. They are the scanner's search text, not a",
+  "lookup key, so a wrong one costs relevance rather than correctness — but",
+  "check them against a real listing before trusting a thin result."
  ],
 
  "costs": {
@@ -35,29 +38,57 @@
   "max_all_in": 400.0
  },
 
+ "_colours": ["gold", "orange", "green", "blue", "red", "pink", "purple",
+              "camo", "mojo", "wave", "disco", "hyper", "shimmer", "cracked",
+              "white sparkle", "choice", "no huddle", "fast break"],
+
  "targets": [
+  {
+   "label": "2018 panini prizm base silver",
+   "query": "2018 Panini Prizm Josh Allen 205 Silver Prizm Rookie",
+   "must": ["allen", "prizm", "silver"],
+   "must_not": ["gold", "orange", "green", "blue", "red", "pink", "purple",
+                "camo", "mojo", "wave", "disco", "hyper", "auto", "shimmer"],
+   "max_price": 300
+  },
+  {
+   "label": "2018 panini donruss optic rated rookie holo",
+   "query": "2018 Donruss Optic Josh Allen 154 Rated Rookie Holo",
+   "must": ["allen", "optic"],
+   "must_not": ["gold", "orange", "green", "blue", "red", "pink", "purple",
+                "auto", "prizm", "shock", "fast break"],
+   "max_price": 300
+  },
+  {
+   "label": "2024 panini prizm base silver",
+   "query": "2024 Panini Prizm Drake Maye 301 Silver Prizm Rookie",
+   "must": ["maye", "prizm", "silver"],
+   "must_not": ["gold", "orange", "green", "blue", "red", "pink", "purple",
+                "camo", "mojo", "wave", "disco", "hyper", "auto", "shimmer"],
+   "max_price": 250
+  },
+  {
+   "label": "2024 panini donruss optic rated rookie holo",
+   "query": "2024 Donruss Optic Drake Maye Rated Rookie Holo",
+   "must": ["maye", "optic"],
+   "must_not": ["gold", "orange", "green", "blue", "red", "pink", "purple",
+                "auto", "prizm", "shock", "fast break"],
+   "max_price": 250
+  },
+  {
+   "label": "2025 bowman chrome base refractor",
+   "query": "2025 Bowman Chrome Roman Anthony Refractor",
+   "must": ["anthony", "chrome"],
+   "must_not": ["gold", "orange", "green", "blue", "red", "pink", "purple",
+                "atomic", "mojo", "shimmer", "auto", "sapphire", "superfractor"],
+   "max_price": 250
+  },
   {
    "label": "2020 panini prizm silver",
    "query": "2020 Panini Prizm Jalen Hurts 343 Silver Prizm",
-   "must": ["hurts", "prizm"],
-   "must_not": ["gold", "orange", "green", "blue", "red", "pink", "purple",
-                "camo", "mojo", "wave", "disco", "auto"],
-   "max_price": 250
-  },
-  {
-   "label": "2023 panini prizm silver",
-   "query": "2023 Panini Prizm Puka Nacua 357 Silver Prizm",
-   "must": ["nacua", "prizm"],
+   "must": ["hurts", "prizm", "silver"],
    "must_not": ["gold", "orange", "green", "blue", "red", "pink", "purple",
                 "camo", "mojo", "wave", "disco", "hyper", "auto"],
-   "max_price": 250
-  },
-  {
-   "label": "2018 panini donruss optic rated rookie",
-   "query": "2018 Donruss Optic Josh Allen 154 Rated Rookie",
-   "must": ["allen", "optic"],
-   "must_not": ["gold", "orange", "green", "blue", "red", "pink", "purple",
-                "holo", "auto", "prizm"],
    "max_price": 250
   }
  ]
