@@ -8,8 +8,11 @@ are worth buying to send to PSA?
     python3 grade-scan.py --check      what data access do I actually have
     python3 grade-scan.py --dry        run without emailing
     python3 grade-scan.py              run and email the results
-    python3 grade-scan.py --gem "2020 panini prizm silver" 355 906 172
+    python3 grade-scan.py --gem "2020 panini prizm silver" 355 906 172 50
                                        record a gem rate read off GemRate
+    python3 grade-scan.py --import <file.csv>
+                                       re-rank someone else's scan on your
+                                       own costs — needs no eBay access
 
 How it decides
 --------------
@@ -43,7 +46,7 @@ from datetime import date
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
-from gradescan import ebay, model, psa                      # noqa: E402
+from gradescan import ebay, importer, model, psa           # noqa: E402
 from briefing_render import Section, render_text, render_html   # noqa: E402
 
 TARGETS = os.path.join(HERE, 'gradescan', 'targets.json')
@@ -229,6 +232,81 @@ def build_report(picks, unjudged, skipped, mode, insights):
     ]
 
 
+def cmd_import(path):
+    """Re-rank a third-party scan on your own numbers.
+
+    Their breadth, your maths. Needs no eBay API access, so it works during a
+    trial month or in place of one."""
+    with open(os.path.expanduser(path)) as fh:
+        rows, mapping, problems = importer.parse(fh.read())
+
+    for p in problems:
+        print('  ! %s' % p, file=sys.stderr)
+    if not rows:
+        sys.exit('Nothing usable in %s.' % path)
+
+    print('read %d rows, mapped: %s\n'
+          % (len(rows), ', '.join('%s<-%s' % (k, v) for k, v in sorted(mapping.items()))))
+
+    cfg = load_targets()
+    costs = model.Costs(**cfg.get('costs', {}))
+    policy = model.Policy(**cfg.get('policy', {}))
+
+    scored, rejected = [], []
+    for row in rows:
+        rates = importer.to_rates(row)
+        r = model.evaluate(row['raw'], 0.0,
+                           {'p10': row['p10'], 'p9': row['p9'], 'p8': row['p8']},
+                           rates, costs)
+        r['title'] = row['card']
+        r['their_roi'] = (r['spread'] / row['raw']) if row['raw'] else 0
+        # Comp depth is their problem, not ours — we cannot see their sample
+        # size, so that check is waived and pop stands in for it.
+        why = policy.reasons_to_skip(r, {'p10': 99, 'p9': 99}, rates['pop_total'] or 99)
+        (scored if not why else rejected).append((r, why))
+
+    scored.sort(key=lambda x: -x[0]['ev_profit'])
+    rejected.sort(key=lambda x: -x[0]['spread'])
+
+    title = 'DUXBURY TRADING POST — imported scan, re-ranked   %s' % date.today()
+    sections = []
+    if scored:
+        sections.append(Section(
+            'Survives your cost structure', tone='good',
+            subtitle='ranked by expected value, not spread',
+            cols=[('EV', 'r'), ('EV ROI', 'r'), ('Their ROI', 'r'), ('Raw', 'r'),
+                  ('All-in', 'r'), ('Gem', 'r'), ('If it 9s', 'r'), ('Card', 'l')],
+            rows=[[('{:+,.2f}'.format(r['ev_profit']), 'good'),
+                   '{:.0f}%'.format(r['ev_roi'] * 100),
+                   '{:.0f}%'.format(r['their_roi'] * 100),
+                   money(r['acquire']), money(r['all_in']),
+                   '{:.1f}%'.format(r['gem'] * 100),
+                   ('{:+,.2f}'.format(r['downside']),
+                    'bad' if r['downside'] < 0 else None),
+                   r['title'][:44]] for r, _ in scored[:20]]))
+    if rejected:
+        sections.append(Section(
+            'Looks good on spread, fails on the odds', tone='bad',
+            subtitle='%d of %d rows' % (len(rejected), len(rows)),
+            cols=[('Their ROI', 'r'), ('EV', 'r'), ('Gem', 'r'),
+                  ('Why not', 'l'), ('Card', 'l')],
+            rows=[['{:.0f}%'.format(r['their_roi'] * 100),
+                   ('{:+,.2f}'.format(r['ev_profit']),
+                    'bad' if r['ev_profit'] < 0 else None),
+                   '{:.1f}%'.format(r['gem'] * 100),
+                   '; '.join(why)[:40], r['title'][:36]]
+                  for r, why in rejected[:20]],
+            footnote=('Grade distributions below a 10 are estimated from the gem '
+                      'rate — 70/22/8 across 9, 8 and below. Record real counts '
+                      'with --gem for anything you act on.')))
+
+    text = render_text(title, '%d of %d clear the bar' % (len(scored), len(rows)),
+                       sections)
+    print(text)
+    with open(os.path.join(HERE, 'DTP-import-scan.txt'), 'w') as fh:
+        fh.write(text + '\n')
+
+
 def cmd_gem(args):
     """--gem "<set words>" <pop10> <pop9> <pop8>"""
     if len(args) < 4:
@@ -248,6 +326,12 @@ def main():
 
     if '--gem' in argv:
         return cmd_gem(argv[argv.index('--gem') + 1:])
+
+    if '--import' in argv:
+        i = argv.index('--import')
+        if i + 1 >= len(argv):
+            sys.exit('usage: --import <file.csv>')
+        return cmd_import(argv[i + 1])
 
     try:
         client = ebay.Client(verbose='--verbose' in argv)
