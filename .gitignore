@@ -19,3 +19,6 @@ reports/*.json
 # print cost, break-even and margin for live inventory. This repo is public.
 reports/*.log
 reports/*.txt
+
+# Scan output — live listing URLs and cost maths, regenerated every run.
+reports/gradescan/latest.json

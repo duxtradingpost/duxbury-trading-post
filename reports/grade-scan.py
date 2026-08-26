@@ -289,8 +289,50 @@ def main():
     with open(os.path.join(HERE, 'DTP-grade-scan.txt'), 'w') as fh:
         fh.write(text + '\n')
 
+    # Hand the result to the morning briefing rather than sending a second
+    # email. Written as data, not prose, so the briefing renders it in its own
+    # style. Decoupled on purpose: this scan makes a lot of API calls and can
+    # be slow or fail, and neither should delay or break the briefing.
+    save_latest(picks, unjudged, skipped, insights)
+
     if '--dry' not in argv:
         send(title, text, render_html(title, meta, sections, stats))
+
+
+LATEST = os.path.join(HERE, 'gradescan', 'latest.json')
+
+
+def save_latest(picks, unjudged, skipped, insights):
+    payload = {
+        'ran': date.today().isoformat(),
+        'insights': bool(insights),
+        'skipped': skipped,
+        'picks': [{k: p[k] for k in
+                   ('title', 'url', 'ev_profit', 'ev_roi', 'acquire', 'all_in',
+                    'p10', 'gem', 'downside', 'mode')} for p in picks[:15]],
+        'unjudged': [{k: u[k] for k in
+                      ('title', 'url', 'spread', 'acquire', 'p10', 'gem_url')}
+                     for u in unjudged[:8]],
+    }
+    try:
+        with open(LATEST, 'w') as fh:
+            json.dump(payload, fh, indent=1)
+    except OSError as e:
+        print('[could not save scan results: %s]' % e, file=sys.stderr)
+
+
+def load_latest(max_age_hours=18):
+    """Returns the last scan, or None if there is not a recent one. The age
+    check matters: a stale list of "buy these now" is worse than no list, since
+    good listings get bought within hours."""
+    try:
+        age = (__import__('time').time() - os.path.getmtime(LATEST)) / 3600.0
+        if age > max_age_hours:
+            return None
+        with open(LATEST) as fh:
+            return json.load(fh)
+    except (OSError, ValueError):
+        return None
 
 
 def send(subject, text, html):

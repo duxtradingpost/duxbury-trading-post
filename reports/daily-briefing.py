@@ -219,6 +219,7 @@ def build():
             'Catalogue checks skipped', tone='muted',
             rows=[], empty='No Shopify export found — export from Shopify to restore '
                            'the comping queue.'))
+        _append_grade_scan(sections)
         st['last_run'] = str(today)
         st['sales_seen'] = sorted(seen)
         save_state(st)
@@ -299,6 +300,8 @@ def build():
             rows=[], empty=(f"Over the ESE cap, so the label jumps {money(GA - ESE)}. "
                             f"{money(ESE_MAX_ITEM)} nets more than $22 does.")))
 
+    _append_grade_scan(sections)
+
     if age >= 3:
         sections.append(Section(
             'Stale export', tone='bad', text_prefix='!!',
@@ -310,6 +313,55 @@ def build():
     st['first_seen'] = first
     save_state(st)
     return title, meta, sections, _stats(new_sales, gross, realised, overdue)
+
+
+def _append_grade_scan(sections):
+    """Fold in the latest raw-to-graded scan, if there is a recent one.
+
+    Read from a file the scanner wrote rather than running it here. The scan
+    makes a lot of eBay calls and can be slow or fail; the briefing must not
+    wait on it or die with it. No recent scan simply means no section."""
+    try:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location(
+            'grade_scan', os.path.join(HERE, 'grade-scan.py'))
+        gs = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(gs)
+        latest = gs.load_latest()
+    except Exception:
+        return
+    if not latest:
+        return
+
+    picks = latest.get('picks') or []
+    if picks:
+        sections.append(Section(
+            'Worth buying to grade', tone='good',
+            subtitle=('%d candidate%s, ranked by expected value%s'
+                      % (len(picks), '' if len(picks) == 1 else 's',
+                         '' if latest.get('insights') else ' — comps are ASKING prices')),
+            cols=[('EV', 'r'), ('ROI', 'r'), ('Buy', 'r'), ('PSA 10', 'r'),
+                  ('Gem', 'r'), ('If it 9s', 'r'), ('Card', 'l')],
+            rows=[[('{:+,.2f}'.format(p['ev_profit']), 'good'),
+                   '{:.0f}%'.format(p['ev_roi'] * 100),
+                   '${:,.2f}'.format(p['acquire']),
+                   '${:,.2f}'.format(p['p10']),
+                   '{:.1f}%'.format(p['gem'] * 100),
+                   ('{:+,.2f}'.format(p['downside']),
+                    'bad' if p['downside'] < 0 else None),
+                   p['title'][:46]] for p in picks[:8]],
+            footnote=('Listings move fast — verify these are still live before '
+                      'acting. Scanned %s.' % latest.get('ran', '?'))))
+
+    unjudged = latest.get('unjudged') or []
+    if unjudged:
+        sections.append(Section(
+            'Grade scan — needs a gem rate', tone='muted',
+            subtitle='wide spreads, no population on file, so not judged',
+            cols=[('Spread', 'r'), ('Buy', 'r'), ('Card', 'l')],
+            rows=[['${:,.2f}'.format(u['spread']), '${:,.2f}'.format(u['acquire']),
+                   u['title'][:52]] for u in unjudged[:5]],
+            footnote='Look them up on gemrate.com, then: grade-scan.py --gem ...'))
 
 
 def _stats(new_sales, gross, realised, overdue):
