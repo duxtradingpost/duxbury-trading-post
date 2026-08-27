@@ -32,6 +32,10 @@ const FEATURED_COLLECTION_HANDLE = 'featured';
 const SHOP_ALL_COLLECTION_HANDLE = 'shop-all';
 const MAX_FEATURED = 8;
 const SOLD_WINDOW_DAYS = 3;   // how long a sold card stays up with a SOLD badge
+// Most slots a hand-picked card can take. Raise it to lean on the Featured
+// collection, lower it for more movement; at MAX_FEATURED the grid stops
+// rotating whenever the collection is full.
+const MAX_PICKED_PER_DAY = 3;
 
 // --- Daily rotation ---------------------------------------------------------
 // The grid used to be the eight priciest cards in stock. That is automatic but
@@ -127,19 +131,21 @@ async function loadFeaturedItems() {
     const pickedAvailable = picked.filter(isAvailable);
     const pickedSold = picked.filter(soldRecently);
 
-    // Top up with the priciest cards in stock so the grid is never sparse, skipping
-    // anything already hand-picked. Empty the Featured collection and this becomes
-    // fully automatic on its own.
+    // Hand-picked cards go first, but only MAX_PICKED_PER_DAY of them, drawn fresh
+    // each day. Exempting them from the rotation entirely sounds respectful of the
+    // choice and isn't: with seven in the collection and eight slots, the grid was
+    // frozen solid and only one slot could ever turn over. Capping them means the
+    // page still moves no matter how full that collection gets, and a pick that
+    // waits a day is still seen far more often than a card in the general pool.
     //
-    // Shuffled by today's date before it is sliced, so which of the priciest cards
-    // get the open slots changes daily. Anything hand-picked in Shopify is left
-    // alone and stays in front of these — picking a card by hand should mean it
-    // shows, not that it enters a draw.
+    // Then top up with the priciest cards in stock so the grid is never sparse,
+    // skipping anything hand-picked. Both lists are shuffled off the same daily
+    // seed, so the whole grid turns over together.
+    const rand = seededRandom(dayKey());
+    const pickedToday = shuffled(pickedAvailable, rand).slice(0, MAX_PICKED_PER_DAY);
+
     const seen = new Set(picked.map(({ node }) => node.handle));
-    const filler = shuffled(
-      topPriced.filter(e => isAvailable(e) && !seen.has(e.node.handle)),
-      seededRandom(dayKey())
-    );
+    const filler = shuffled(topPriced.filter(e => isAvailable(e) && !seen.has(e.node.handle)), rand);
 
     // Landscape (horizontal) photos go last so the grid stays visually consistent —
     // most card photos are portrait/square, and mixing in landscape ones mid-grid looks off.
@@ -150,7 +156,7 @@ async function loadFeaturedItems() {
 
     // Reserve room for the sold cards so the grid never overflows MAX_FEATURED.
     const availableSlots = Math.max(0, MAX_FEATURED - pickedSold.length);
-    const inStock = [...pickedAvailable, ...filler].slice(0, availableSlots);
+    const inStock = [...pickedToday, ...filler].slice(0, availableSlots);
     const sortedProducts = [
       ...inStock.filter(p => !isLandscape(p)),
       ...inStock.filter(isLandscape),
