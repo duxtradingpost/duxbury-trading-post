@@ -9,7 +9,10 @@
 // bar never renders, so an out-of-date "I'm away" message cannot be left up by
 // forgetting to remove it. To use it again, change the date and the copy in the
 // HTML — nothing here needs touching.
-const AWAY_UNTIL = '2026-08-28';   // inclusive; hides from the 29th
+// Set to a date in the past to take the bar down. Shipping resumed 2026-08-27,
+// a day earlier than planned. To use it again, put a future date here AND
+// update the copy in the HTML — the date alone does not change what it says.
+const AWAY_UNTIL = '2026-08-26';   // inclusive; hides from the day after
 
 (function () {
   const bar = document.getElementById('away-bar');
