@@ -218,7 +218,25 @@ function wirePhotos(scope) {
     btn.dataset.wired = '1';
     btn.addEventListener('click', () => {
       const card = [...IDX.entries()].find(([, i]) => String(i) === btn.dataset.idx)?.[0];
-      if (card) openLightbox(card);
+      if (!card) return;
+      const wrap = btn.closest('.product-image-wrap');
+
+      // On a desktop the back shows on hover and the click opens the photos —
+      // two different gestures. A phone only has the one, so it does both in
+      // order: first tap turns the card over, second opens the photos on
+      // whichever face you are looking at. Matches the home page, where the
+      // first tap turns the card rather than leaving for the listing.
+      //
+      // Cards with no back go straight to the photos; there is nothing to turn
+      // to, and .has-back is only set when there is.
+      if (window.matchMedia('(hover: none)').matches &&
+          wrap.classList.contains('has-back') &&
+          !wrap.classList.contains('is-flipped')) {
+        wrap.classList.add('is-flipped');
+        return;
+      }
+
+      openLightbox(card, wrap.classList.contains('is-flipped') ? 1 : 0);
     });
   });
 }
@@ -349,6 +367,10 @@ function closeLightbox() {
   lb.el.hidden = true;
   lbCard = null;
   document.body.style.overflow = '';
+  // Turned cards go back to their fronts. Otherwise the grid you come back to
+  // is a wall of card backs, and the next tap on one would open the photos
+  // rather than turn it — the same tap doing two different things.
+  grid.querySelectorAll('.is-flipped').forEach(w => w.classList.remove('is-flipped'));
 }
 
 lb.prev.addEventListener('click', () => stepLightbox(-1));
