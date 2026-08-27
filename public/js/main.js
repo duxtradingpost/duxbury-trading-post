@@ -258,6 +258,24 @@ async function shareListing(url, title, btn) {
 }
 
 
+// --- Tap to flip -------------------------------------------------------------
+// On a desktop the back of the card shows on hover. A phone has no hover, so
+// that same tap used to open the eBay/Shopify listing in a new tab — you lost
+// the page to see the back of a card. Here the tap turns it over instead, and
+// tapping again turns it back; Buy Now, directly underneath, is how you get to
+// the listing. Long-press still offers "Open in new tab", and cards with no
+// second image are untouched — .has-back is only set when there is a back.
+//
+// Delegated from the document so it covers cards rendered after load, and
+// re-checked per click because a hybrid device can gain or lose a mouse.
+document.addEventListener('click', (e) => {
+  if (!window.matchMedia('(hover: none)').matches) return;
+  const wrap = e.target.closest('.product-image-wrap.has-back');
+  if (!wrap || !e.target.closest('a')) return;
+  e.preventDefault();
+  wrap.classList.toggle('is-flipped');
+});
+
 // --- Copy a card title ------------------------------------------------------
 // Titles in the grid are not links, so clicking one copies it. Checking comps
 // means pasting an exact title into eBay or 130point, and selecting it by hand
