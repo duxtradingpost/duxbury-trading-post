@@ -33,6 +33,47 @@ const SHOP_ALL_COLLECTION_HANDLE = 'shop-all';
 const MAX_FEATURED = 8;
 const SOLD_WINDOW_DAYS = 3;   // how long a sold card stays up with a SOLD badge
 
+// --- Daily rotation ---------------------------------------------------------
+// The grid used to be the eight priciest cards in stock. That is automatic but
+// motionless: the same eight sit there until one sells, so a repeat visitor has
+// no reason to look twice. The pool stays the priciest cards — the query asks
+// for 24, sorted by price, so nothing from the bands that lose money can reach
+// the front page — and the eight shown are drawn from that 24 in an order that
+// turns over with the date.
+//
+// Seeded by the day, not random per load. Reshuffling on every load would move
+// the grid under anyone who reloaded or came back from a listing, which reads
+// as a glitch rather than as freshness. This way a visitor sees one stable grid
+// all day and a different one tomorrow. Local midnight, so it turns over on the
+// visitor's clock.
+const dayKey = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+};
+
+// mulberry32 off an FNV-hashed seed. Math.random cannot be seeded, and this only
+// has to be uneven, not unpredictable.
+function seededRandom(seed) {
+  let h = 2166136261;
+  for (let i = 0; i < seed.length; i++) h = Math.imul(h ^ seed.charCodeAt(i), 16777619);
+  return () => {
+    h = (h + 0x6D2B79F5) | 0;
+    let t = Math.imul(h ^ (h >>> 15), 1 | h);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// Fisher-Yates on a copy, so the caller's array is left alone.
+function shuffled(list, rand) {
+  const out = [...list];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
 async function loadFeaturedItems() {
   const grid = document.getElementById('product-grid');
   const status = document.getElementById('shop-status');
@@ -89,8 +130,16 @@ async function loadFeaturedItems() {
     // Top up with the priciest cards in stock so the grid is never sparse, skipping
     // anything already hand-picked. Empty the Featured collection and this becomes
     // fully automatic on its own.
+    //
+    // Shuffled by today's date before it is sliced, so which of the priciest cards
+    // get the open slots changes daily. Anything hand-picked in Shopify is left
+    // alone and stays in front of these — picking a card by hand should mean it
+    // shows, not that it enters a draw.
     const seen = new Set(picked.map(({ node }) => node.handle));
-    const filler = topPriced.filter(e => isAvailable(e) && !seen.has(e.node.handle));
+    const filler = shuffled(
+      topPriced.filter(e => isAvailable(e) && !seen.has(e.node.handle)),
+      seededRandom(dayKey())
+    );
 
     // Landscape (horizontal) photos go last so the grid stays visually consistent —
     // most card photos are portrait/square, and mixing in landscape ones mid-grid looks off.
