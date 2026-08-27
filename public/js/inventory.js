@@ -221,22 +221,22 @@ function wirePhotos(scope) {
       if (!card) return;
       const wrap = btn.closest('.product-image-wrap');
 
-      // On a desktop the back shows on hover and the click opens the photos —
-      // two different gestures. A phone only has the one, so it does both in
-      // order: first tap turns the card over, second opens the photos on
-      // whichever face you are looking at. Matches the home page, where the
-      // first tap turns the card rather than leaving for the listing.
+      // On a phone the tap only turns the card, back and forth, the way you
+      // would in your hands — nothing opens over the top of the grid. The
+      // lightbox holds these same two shots (the query asks for
+      // images(first: 2)), so on touch it was a heavier way to see what the
+      // turn already shows.
       //
-      // Cards with no back go straight to the photos; there is nothing to turn
-      // to, and .has-back is only set when there is.
+      // Cards with no back have nothing to turn to, so a tap on one still
+      // opens the photo — otherwise it would do nothing at all. .has-back is
+      // only set when there is a back.
       if (window.matchMedia('(hover: none)').matches &&
-          wrap.classList.contains('has-back') &&
-          !wrap.classList.contains('is-flipped')) {
-        wrap.classList.add('is-flipped');
+          wrap.classList.contains('has-back')) {
+        wrap.classList.toggle('is-flipped');
         return;
       }
 
-      openLightbox(card, wrap.classList.contains('is-flipped') ? 1 : 0);
+      openLightbox(card);
     });
   });
 }
@@ -367,10 +367,6 @@ function closeLightbox() {
   lb.el.hidden = true;
   lbCard = null;
   document.body.style.overflow = '';
-  // Turned cards go back to their fronts. Otherwise the grid you come back to
-  // is a wall of card backs, and the next tap on one would open the photos
-  // rather than turn it — the same tap doing two different things.
-  grid.querySelectorAll('.is-flipped').forEach(w => w.classList.remove('is-flipped'));
 }
 
 lb.prev.addEventListener('click', () => stepLightbox(-1));
