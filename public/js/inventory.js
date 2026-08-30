@@ -13,8 +13,20 @@ const stripPrefix = tag => tag.replace(/^(Player|Team|Brand|League|Year):\s*/i, 
 
 // Shown as one-click chips above the grid. Kept short on purpose — these are
 // the ways people actually browse cards, not an exhaustive list.
+//
+// A chip is either a plain tag, or a label with the tags it accepts. The second
+// form exists because sealed product gets tagged half a dozen ways depending on
+// what it is — a hobby box, a blaster, a loose pack, a case — and a shopper
+// browsing for sealed wants all of it behind one chip rather than four.
 const QUICK_FILTERS = ['Football', 'Baseball', 'Basketball', 'Hockey', 'Soccer',
-                       'Auto', 'Graded', 'Numbered', 'Parallel', 'Rookie', 'Relic'];
+                       'Auto', 'Graded', 'Numbered', 'Parallel', 'Rookie', 'Relic',
+                       { label: 'Sealed',
+                         tags: ['Sealed', 'Box', 'Boxes', 'Hobby Box', 'Blaster',
+                                'Mega Box', 'Pack', 'Packs', 'Case', 'Wax'] }];
+
+// Normalise both forms to {label, tags} so the rest of the code has one shape.
+const FILTERS = QUICK_FILTERS.map(f =>
+  typeof f === 'string' ? { label: f, tags: [f] } : f);
 
 const grid = document.getElementById('inv-grid');
 const status = document.getElementById('inv-status');
@@ -114,10 +126,12 @@ async function loadInventory() {
 }
 
 function buildChips() {
-  const present = QUICK_FILTERS.filter(f => CARDS.some(c => c.tags.includes(f)));
+  // A chip only exists if something in stock carries one of its tags, so the row
+  // stays honest — no chip that filters to nothing.
+  const present = FILTERS.filter(f => CARDS.some(c => f.tags.some(t => c.tags.includes(t))));
   if (!present.length) return;
   chipWrap.innerHTML = present
-    .map(f => `<button type="button" class="chip" data-term="${f}" aria-pressed="false">${f}</button>`)
+    .map(f => `<button type="button" class="chip" data-term="${f.label}" aria-pressed="false">${f.label}</button>`)
     .join('');
   chipWrap.hidden = false;
   chipWrap.querySelectorAll('.chip').forEach(btn => {
@@ -144,8 +158,11 @@ function applySearch() {
   });
 
   if (!words.length && !ACTIVE.size) return render(CARDS);
+  // A chip is satisfied by any one of its tags — "Sealed" matches a Hobby Box or
+  // a loose Pack — but every active chip still has to be satisfied.
+  const accepts = label => (FILTERS.find(f => f.label === label) || { tags: [label] }).tags;
   render(CARDS.filter(c =>
-    [...ACTIVE].every(t => c.tags.includes(t)) &&
+    [...ACTIVE].every(label => accepts(label).some(t => c.tags.includes(t))) &&
     words.every(w => c.haystack.includes(w))
   ));
 }
@@ -248,9 +265,18 @@ function wireShare(scope) {
   });
 }
 
+// "cards" stops being true the moment a sealed box is in stock, so the noun
+// follows the catalogue rather than being hard-coded. Singles only: "cards".
+// Anything sealed in the mix: "items".
+function stockNoun() {
+  const sealed = FILTERS.find(f => f.label === 'Sealed');
+  return CARDS.some(c => sealed.tags.some(t => c.tags.includes(t))) ? 'items' : 'cards';
+}
+
 function updateCount() {
   const total = CURRENT.length;
-  const scope = total === CARDS.length ? `${CARDS.length} cards in stock` : `${total} of ${CARDS.length} cards`;
+  const noun = stockNoun();
+  const scope = total === CARDS.length ? `${CARDS.length} ${noun} in stock` : `${total} of ${CARDS.length} ${noun}`;
   countEl.textContent = shown < total ? `${scope} — showing ${shown}` : scope;
   moreBtn.hidden = shown >= total;
   moreBtn.textContent = `Load ${Math.min(PAGE_SIZE, total - shown)} more`;
