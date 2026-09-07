@@ -310,6 +310,19 @@ a { color: inherit; text-decoration: none; }
   border-top: 1px solid var(--border);
 }
 
+/* Personal Collection: a card away at PSA. Driven by an "At PSA" tag on the
+   Shopify product, so it goes on and comes off without touching this file. */
+.pc-note {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--text-muted);
+}
+.pc-note::before {
+  content: "\2022\00a0";
+  font-style: normal;
+}
+
 .soon-badge {
   position: absolute;
   top: 10px;

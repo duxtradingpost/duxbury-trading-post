@@ -237,6 +237,7 @@ async function loadPersonalCollection() {
             node {
               title
               handle
+              tags
               images(first: 2) { edges { node { url altText width height } } }
             }
           }
@@ -263,6 +264,9 @@ async function loadPersonalCollection() {
       const image = product.images.edges[0]?.node;
       // Second image is the card back, same convention as the Featured grid.
       const back = product.images.edges[1]?.node?.url || '';
+      // Cards away for grading carry an "At PSA" tag in Shopify. Tag it when the
+      // card goes out, untag it when it comes back — no code change either way.
+      const atPsa = (product.tags || []).includes('At PSA');
       const subject = encodeURIComponent(`Question: ${product.title}`);
       const body = encodeURIComponent(
         `Hi Duxbury Trading Post,\r\n\r\nI have a question about:\r\n${product.title}\r\n\r\nThanks!`
@@ -280,6 +284,7 @@ async function loadPersonalCollection() {
         </div>
         <h3><button type="button" class="copy-title" data-title="${product.title.replace(/"/g, '&quot;')}"
           title="Click to copy this title">${product.title}</button></h3>
+        ${atPsa ? '<p class="pc-note">Out for grading at PSA</p>' : ''}
         <div class="product-actions">
           <a href="mailto:info@duxburytradingpost.com?subject=${subject}&body=${body}" class="btn btn-primary btn-small">Ask About This Card</a>
         </div>
