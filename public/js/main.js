@@ -27,8 +27,8 @@ const SHOPIFY_STOREFRONT_TOKEN = '6e9ad9c0de82756dc160e72ea5d6c3c5';
 const SHOPIFY_API_VERSION = '2025-10';
 const FEATURED_COLLECTION_HANDLE = 'featured';
 // Everything for sale. An automated Shopify collection (price > 0, excluding
-// Coming Soon), so unlisted cards can never leak into the Featured grid with a
-// working Buy Now button.
+// the Personal Collection), so cards that are not for sale can never leak into
+// the Featured grid with a working Buy Now button.
 const SHOP_ALL_COLLECTION_HANDLE = 'shop-all';
 const MAX_FEATURED = 8;
 const SOLD_WINDOW_DAYS = 3;   // how long a sold card stays up with a SOLD badge
@@ -214,24 +214,24 @@ async function loadFeaturedItems() {
 
 loadFeaturedItems();
 
-// --- Coming Soon ---
-// Cards that aren't listed yet: in transit, or in hand but not priced. Managed
-// entirely from the "Coming Soon" collection in Shopify — add a product to show
-// it here, remove it to take it down. No price is shown on purpose; the point is
-// to collect offers rather than anchor a number before the card is researched.
+// --- Personal Collection ---
+// Cards from the owner's own collection, shown but not for sale. Managed
+// entirely from the "Personal Collection" collection in Shopify — add a product
+// to show it here, remove it to take it down. No price is shown on purpose;
+// these are not listings.
 //
 // The whole section stays hidden unless the collection has products in it, so an
 // empty collection looks like nothing rather than like something broken.
-const COMING_SOON_HANDLE = 'coming-soon';
+const PERSONAL_COLLECTION_HANDLE = 'coming-soon';   // Shopify handle unchanged
 
-async function loadComingSoon() {
+async function loadPersonalCollection() {
   const section = document.getElementById('coming-soon');
   const grid = document.getElementById('coming-soon-grid');
   if (!section || !grid) return;
 
   const query = `
     query {
-      collectionByHandle(handle: "${COMING_SOON_HANDLE}") {
+      collectionByHandle(handle: "${PERSONAL_COLLECTION_HANDLE}") {
         products(first: 24) {
           edges {
             node {
@@ -261,9 +261,9 @@ async function loadComingSoon() {
     grid.innerHTML = '';
     products.forEach(({ node: product }) => {
       const image = product.images.edges[0]?.node;
-      const subject = encodeURIComponent(`Offer: ${product.title}`);
+      const subject = encodeURIComponent(`Question: ${product.title}`);
       const body = encodeURIComponent(
-        `Hi Duxbury Trading Post,\r\n\r\nI'd like to make an offer on:\r\n${product.title}\r\n\r\nMy offer: $\r\n\r\nThanks!`
+        `Hi Duxbury Trading Post,\r\n\r\nI have a question about:\r\n${product.title}\r\n\r\nThanks!`
       );
 
       const card = document.createElement('div');
@@ -271,12 +271,12 @@ async function loadComingSoon() {
       card.innerHTML = `
         <div class="product-image-wrap">
           <img src="${image ? image.url : ''}" alt="${image?.altText || product.title}" class="product-image">
-          <span class="soon-badge">Coming Soon</span>
+          <span class="soon-badge">Not For Sale</span>
         </div>
         <h3><button type="button" class="copy-title" data-title="${product.title.replace(/"/g, '&quot;')}"
           title="Click to copy this title">${product.title}</button></h3>
         <div class="product-actions">
-          <a href="mailto:info@duxburytradingpost.com?subject=${subject}&body=${body}" class="btn btn-primary btn-small">Make an Offer</a>
+          <a href="mailto:info@duxburytradingpost.com?subject=${subject}&body=${body}" class="btn btn-primary btn-small">Ask About This Card</a>
         </div>
       `;
       grid.appendChild(card);
@@ -284,11 +284,11 @@ async function loadComingSoon() {
 
     section.hidden = false;
   } catch (err) {
-    console.error('Coming Soon error:', err);   // stays hidden on failure
+    console.error('Personal Collection error:', err);   // stays hidden on failure
   }
 }
 
-loadComingSoon();
+loadPersonalCollection();
 
 // Shares a listing link — uses the native share sheet on mobile/supporting browsers,
 // falls back to copying the link to the clipboard with a brief confirmation.
