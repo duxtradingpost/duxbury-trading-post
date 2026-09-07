@@ -6,7 +6,7 @@ Static site (no build tools needed). Just open `index.html` in a browser, or dep
 
 - **eBay live listings** — pulls your active listings from `https://www.ebay.com/sch/i.html?_ssn=duxburytradingpost&_rss=1` and shows them under "Live on eBay". Updates automatically, no maintenance needed. If your eBay seller ID changes, update `EBAY_SELLER_ID` in `js/main.js`.
 - **Instagram / Facebook links** — pointed at `instagram.com/duxburytradingpost` and `facebook.com/duxburytradingpost`. Update the URLs in `index.html` (search for `social-links`) if those aren't your exact handles.
-- **Phone / email / address** — pulled from your promo flyer (781-217-2728, info@duxburytradingpost.com, Duxbury, MA). Update in the Contact section of `index.html` if anything's off.
+- **Email / address** — `info@duxburytradingpost.com`, Duxbury, MA. Update in the Contact section of `index.html` if anything's off. No phone number is published on the site, deliberately — the sell form and email are the contact routes.
 
 ## What you still need to do
 
