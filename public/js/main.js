@@ -237,7 +237,7 @@ async function loadPersonalCollection() {
             node {
               title
               handle
-              images(first: 1) { edges { node { url altText width height } } }
+              images(first: 2) { edges { node { url altText width height } } }
             }
           }
         }
@@ -261,6 +261,8 @@ async function loadPersonalCollection() {
     grid.innerHTML = '';
     products.forEach(({ node: product }) => {
       const image = product.images.edges[0]?.node;
+      // Second image is the card back, same convention as the Featured grid.
+      const back = product.images.edges[1]?.node?.url || '';
       const subject = encodeURIComponent(`Question: ${product.title}`);
       const body = encodeURIComponent(
         `Hi Duxbury Trading Post,\r\n\r\nI have a question about:\r\n${product.title}\r\n\r\nThanks!`
@@ -269,8 +271,11 @@ async function loadPersonalCollection() {
       const card = document.createElement('div');
       card.className = 'product-card product-card--soon';
       card.innerHTML = `
-        <div class="product-image-wrap">
-          <img src="${image ? image.url : ''}" alt="${image?.altText || product.title}" class="product-image">
+        <div class="product-image-wrap${back ? ' has-back' : ''}">
+          <span class="card-flip">
+            <img src="${image ? image.url : ''}" alt="${image?.altText || product.title}" class="product-image card-face card-face--front">
+            ${back ? `<img src="${back}" alt="" class="card-face card-face--back" loading="lazy" aria-hidden="true">` : ''}
+          </span>
           <span class="soon-badge">Not For Sale</span>
         </div>
         <h3><button type="button" class="copy-title" data-title="${product.title.replace(/"/g, '&quot;')}"
@@ -323,11 +328,15 @@ async function shareListing(url, title, btn) {
 //
 // Delegated from the document so it covers cards rendered after load, and
 // re-checked per click because a hybrid device can gain or lose a mouse.
+//
+// Only a tap that would otherwise navigate needs stopping. Personal Collection
+// cards have no link on the image — they are not listings — so there the tap
+// turns the card with nothing to prevent.
 document.addEventListener('click', (e) => {
   if (!window.matchMedia('(hover: none)').matches) return;
   const wrap = e.target.closest('.product-image-wrap.has-back');
-  if (!wrap || !e.target.closest('a')) return;
-  e.preventDefault();
+  if (!wrap) return;
+  if (e.target.closest('a')) e.preventDefault();
   wrap.classList.toggle('is-flipped');
 });
 
