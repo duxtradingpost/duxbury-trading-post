@@ -293,6 +293,71 @@ costs nothing operationally above $20, where ESE is off the table anyway. Pull a
 card out of a mag only if it's **under $20**, where a mag turns a $0.78
 shipment into $5.40.
 
+## Website pricing vs eBay
+
+**Shopify prices CAN be edited — the "locked to eBay" belief is unproven.**
+
+What is actually verified (2026-09-14): all **87** SKUs live on both sides had
+**identical** prices. That only shows nobody had ever changed one. A direct test
+the same day dropped variant 45763038675030 (Maye #329 base) from $12.99 to
+$11.43 and it **held for ~32 minutes across roughly six sync cycles**, with
+`updatedAt` never moving.
+
+**Still unproven:** whether a price push happens on a trigger the test never hit
+— revising the eBay listing, a nightly full resync, or a re-import. Before
+converting the whole catalogue, re-test over a longer window AND revise the eBay
+listing for one card to see whether that specific event re-pushes the price.
+
+**So the website discount is a discount RULE, not a price.** Discount objects are
+separate from the product record and the sync does not touch them.
+
+Live since 2026-09-14: automatic discount **"Website price - 12% off every card"**,
+12% off all items, no minimum, no end date
+(`gid://shopify/DiscountAutomaticNode/1394920390742`).
+
+### Why 12%, and why a flat rate has a ceiling
+
+The website costs 2.9% + $0.30 (Shopify Payments); eBay costs 13.25% + $0.40 +
+$4.90 postage. The discount simply hands the buyer the fees you are not paying.
+
+**The safe discount SHRINKS as price rises**, because eBay's fixed $5.30 is a big
+share of a cheap sale and a trivial share of a dear one:
+
+| Ask | Max safe discount |
+|---|---|
+| $25 | 31.3% |
+| $50 | 21.0% |
+| $100 | 15.8% |
+| $200 | 13.2% |
+| $500 | 11.7% |
+| any | **10.66% floor** |
+
+A flat **15%** is only safe to **$118.62** — 28% of the catalogue sits above that.
+Flat **12%** is safe to **$384**, covering 98% of it. Flat **10.5%** is safe at any
+price. Raise the rate only alongside a maximum-order guard, which Shopify discounts
+do not support — they take a minimum, not a maximum.
+
+### The website must DISPLAY the discount itself
+
+An automatic discount applies at checkout and **never touches
+`priceRange.minVariantPrice`** — which is the field the Storefront API returns and
+the field `public/js/inventory.js` renders. Left alone, the site shows the full
+eBay price and the shopper sees no reason to buy here; the 12% only appears once
+they are already in Shopify's checkout.
+
+So the rate is **hardcoded** in `public/js/inventory.js` as `WEBSITE_DISCOUNT`,
+and the grid shows the discounted price with the list price struck through.
+
+**Change the Shopify discount and you MUST change `WEBSITE_DISCOUNT` too**, or the
+page advertises a price the checkout will not honour.
+
+### Discount codes and Instagram
+
+An automatic discount defeats code tracking: buyers will not type a code to get a
+discount they already have. If Instagram needs to be measured separately, the code
+has to beat 12% — and above ~$119 that stops paying. Track IG another way, or accept
+the automatic rate.
+
 ## Payments
 
 All business money moves through business accounts. Personal Venmo for shop

@@ -8,6 +8,29 @@ const SHOPIFY_DOMAIN = 'duxburytradingpost.myshopify.com';
 const SHOPIFY_STOREFRONT_TOKEN = '6e9ad9c0de82756dc160e72ea5d6c3c5';
 const SHOPIFY_API_VERSION = '2025-10';
 
+// Website prices undercut the eBay listing by this much.
+//
+// It has to be hardcoded. Shopify prices are locked to eBay — InfoShore syncs
+// price eBay -> Shopify continuously, so the discount CANNOT be a price edit; it
+// is a Shopify *automatic discount* applied at checkout. But an automatic discount
+// never touches `priceRange.minVariantPrice`, which is what the Storefront API
+// returns and what this page renders. So the checkout would charge 12% less than
+// the grid displayed, and the shopper would never see a reason to buy here rather
+// than on eBay.
+//
+// MUST MATCH the live Shopify automatic discount
+// "Website price - 12% off every card"
+// gid://shopify/DiscountAutomaticNode/1394920390742
+// Change one and you must change the other, or this page lies about the price.
+//
+// The rate is capped by arithmetic, not taste: eBay's fixed $5.30 (postage +
+// per-order) is a big share of a cheap sale and a trivial share of a dear one, so
+// the fees saved shrink as price rises. 12% is safe up to a $384 ask; 15% only to
+// $118.62. See "Website pricing vs eBay" in WORKFLOW.md.
+const WEBSITE_DISCOUNT = 0.12;
+
+const webPrice = list => (list * (1 - WEBSITE_DISCOUNT)).toFixed(2);
+
 // Tag prefixes are for grouping in Shopify's admin, not for customers to read.
 const stripPrefix = tag => tag.replace(/^(Player|Team|Brand|League|Year):\s*/i, '');
 
@@ -98,7 +121,10 @@ async function loadInventory() {
         return {
           title: node.title,
           url: node.onlineStoreUrl || `https://${SHOPIFY_DOMAIN}/products/${node.handle}`,
+          // `price` stays the LIST price — it is what Shopify and eBay both show,
+          // and what the sorts compare. `web` is what this site actually charges.
           price: Number(node.priceRange.minVariantPrice.amount).toFixed(2),
+          web: webPrice(Number(node.priceRange.minVariantPrice.amount)),
           img: image ? image.url : '',
           alt: image?.altText || node.title,
           photos: imgs.map(x => x.url),
@@ -190,7 +216,11 @@ function cardHtml(c) {
       </div>
       <h3><button type="button" class="copy-title" data-title="${escapeAttr(c.title)}"
         title="Click to copy this title">${escapeHtml(c.title)}</button></h3>
-      <p class="product-price">$${c.price}</p>
+      <p class="product-price">
+        $${c.web}
+        <span class="product-price__was">$${c.price}</span>
+        <span class="product-price__off">${Math.round(WEBSITE_DISCOUNT * 100)}% off</span>
+      </p>
       <div class="product-actions">
         <a href="${c.url}" target="_blank" rel="noopener" class="btn btn-primary btn-small">Buy Now</a>
         <button type="button" class="btn btn-outline btn-small share-btn"
