@@ -71,11 +71,19 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
     "@type": "PostalAddress",
     "addressLocality": "Duxbury",
     "addressRegion": "MA",
-    "postalCode": "02331",
+    "postalCode": "02332",
     "addressCountry": "US"
   },
   "areaServed": [
     { "@type": "City",  "name": "Duxbury" },
+    { "@type": "City",  "name": "Kingston" },
+    { "@type": "City",  "name": "Pembroke" },
+    { "@type": "City",  "name": "Marshfield" },
+    { "@type": "City",  "name": "Plymouth" },
+    { "@type": "City",  "name": "Hanover" },
+    { "@type": "City",  "name": "Norwell" },
+    { "@type": "City",  "name": "Scituate" },
+    { "@type": "City",  "name": "Hingham" },
     { "@type": "State", "name": "Massachusetts" }
   ],
   "knowsAbout": ["Sports cards", "Trading cards", "Graded cards", "Pok\u00e9mon TCG", "Sports memorabilia"],
@@ -89,15 +97,11 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
 </head>
 <body>
 
-<!-- Shipping delay notice. Self-expiring — see AWAY_UNTIL in js/banner.js. -->
-<div class="away-bar" id="away-bar" hidden>
-  <div class="container away-inner">
-    <p class="away-text">
-      <strong>Shipping paused until Friday, August 28.</strong>
-      Orders are welcome and I&rsquo;m answering messages as usual &mdash; cards will go out as soon as I&rsquo;m back.
-    </p>
-  </div>
-</div>
+<!-- Shipping delay notice. The markup is removed when not in use: js/banner.js
+     hides it for visitors, but a first-pass crawler still reads the text, and a
+     three-week-old "shipping paused" line is not what should appear in a search
+     snippet. To use it again, restore this block (git history has it), set
+     AWAY_UNTIL to a future date in js/banner.js, and update the copy. -->
 
 <!-- Header -->
 <header class="site-header">
@@ -191,6 +195,9 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
   <div class="container sell-inner">
     <div class="sell-text">
       <h2 class="section-title">We Buy Sports &amp; Trading Cards</h2>
+      <p>We buy single cards and whole collections across the South Shore &mdash; Duxbury,
+        Kingston, Pembroke, Marshfield, Plymouth, Hanover, Norwell, Scituate and Hingham.
+        Local collections can be handed over in person; everywhere else, post them to us.</p>
       <p>Have graded slabs, rookie autos or numbered parallels? We pay top dollar for premium cards. Fill in the form below and include:</p>
       <ul class="sell-list">
         <li>Photos of the front and back of each item</li>
