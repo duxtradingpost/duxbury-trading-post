@@ -26,6 +26,14 @@ const SHOPIFY_DOMAIN = 'duxburytradingpost.myshopify.com';
 const SHOPIFY_STOREFRONT_TOKEN = '6e9ad9c0de82756dc160e72ea5d6c3c5';
 const SHOPIFY_API_VERSION = '2025-10';
 const FEATURED_COLLECTION_HANDLE = 'featured';
+// Website prices undercut the eBay listing by this much. MUST MATCH
+// WEBSITE_DISCOUNT in js/inventory.js and the live Shopify automatic discount
+// "Website price - 12% off every card"
+// gid://shopify/DiscountAutomaticNode/1394920390742
+// Three places, one number. Change one without the others and the site quotes a
+// price the checkout will not honour, or the two pages disagree with each other.
+const WEBSITE_DISCOUNT = 0.12;
+const webPrice = list => (list * (1 - WEBSITE_DISCOUNT)).toFixed(2);
 // Everything for sale. An automated Shopify collection (price > 0, excluding
 // the Personal Collection), so cards that are not for sale can never leak into
 // the Featured grid with a working Buy Now button.
@@ -173,7 +181,10 @@ async function loadFeaturedItems() {
       const image = product.images.edges[0]?.node;
       // Second image is the card back, used for the hover flip.
       const back = product.images.edges[1]?.node?.url || '';
+      // `price` is the LIST price (what eBay and Shopify both show); `web` is what
+      // this site actually charges after the automatic discount.
       const price = parseFloat(product.priceRange.minVariantPrice.amount).toFixed(2);
+      const web = webPrice(parseFloat(product.priceRange.minVariantPrice.amount));
       const url = product.onlineStoreUrl || `https://${SHOPIFY_DOMAIN}/products/${product.handle}`;
 
       const sold = !product.availableForSale;
@@ -192,7 +203,11 @@ async function loadFeaturedItems() {
         </div>
         <h3><button type="button" class="copy-title" data-title="${product.title.replace(/"/g, '&quot;')}"
           title="Click to copy this title">${product.title}</button></h3>
-        <p class="product-price">$${price}</p>
+        <p class="product-price">
+          $${web}
+          <span class="product-price__was">$${price}</span>
+          <span class="product-price__off">${Math.round(WEBSITE_DISCOUNT * 100)}% off</span>
+        </p>
         <div class="product-actions">
           ${sold
             ? '<span class="btn btn-small btn-sold" aria-disabled="true">Sold</span>'
