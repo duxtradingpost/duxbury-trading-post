@@ -295,18 +295,25 @@ shipment into $5.40.
 
 ## Website pricing vs eBay
 
-**Shopify prices CAN be edited — the "locked to eBay" belief is unproven.**
+**Shopify prices are overwritten whenever the eBay listing is revised.** Not on a
+timer — on the revise.
 
-What is actually verified (2026-09-14): all **87** SKUs live on both sides had
-**identical** prices. That only shows nobody had ever changed one. A direct test
-the same day dropped variant 45763038675030 (Maye #329 base) from $12.99 to
-$11.43 and it **held for ~32 minutes across roughly six sync cycles**, with
-`updatedAt` never moving.
+Tested three times on 2026-09-15. A lowered Shopify price **held for ~77 minutes
+across routine sync cycles**, which is what made it look editable. Then the eBay
+listing for the ET-7 was revised (a title fix) and **10 minutes later Shopify
+snapped back**: the corrected title arrived and the price reverted to the eBay
+value in the same write.
 
-**Still unproven:** whether a price push happens on a trigger the test never hit
-— revising the eBay listing, a nightly full resync, or a re-import. Before
-converting the whole catalogue, re-test over a longer window AND revise the eBay
-listing for one card to see whether that specific event re-pushes the price.
+    12:55  price=263.12  title=...Extraterrestrial
+    12:57  price=299.00  title=...Orange Galactic    <- both, together
+
+So a hand-edited Shopify price survives only until the next time you touch that
+eBay listing. Since revising is routine — minimum offers, title fixes, price
+changes — treat Shopify price as **read-only**. Sale and compare-at prices are the
+same field and go the same way.
+
+The upside of the same mechanism: **fixing a title on eBay does propagate down**,
+so fix listing text there and let it flow, never in Shopify.
 
 **So the website discount is a discount RULE, not a price.** Discount objects are
 separate from the product record and the sync does not touch them.
