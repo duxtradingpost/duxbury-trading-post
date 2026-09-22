@@ -14,7 +14,7 @@ const ALIAS_HOSTS = new Set(['duxtradingpost.com', 'www.duxtradingpost.com']);
 const SELL_TO = 'info@duxburytradingpost.com';
 const SELL_FROM = 'website@duxburytradingpost.com';
 
-// The browser downscales photos before upload (see js/sell-form.js), so these
+// The browser downscales photos before upload (see js/find-form.js), so these
 // ceilings are a backstop against someone posting to the endpoint directly
 // rather than a limit real submissions will approach.
 const MAX_FILES = 8;

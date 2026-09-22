@@ -120,7 +120,6 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
       <a href="#shop">Shop</a>
       <a href="inventory.html">Search Inventory</a>
       <a href="https://www.ebay.com/usr/duxburytradingpost" target="_blank" rel="noopener">eBay Store</a>
-      <a href="#sell">Sell to Us</a>
       <a href="#find">Find a Card</a>
       <a href="#contact">Contact</a>
     </nav>
@@ -138,7 +137,7 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
     <p class="hero-tagline">Sports Cards &middot; Pok&eacute;mon &amp; TCG &middot; Collector Memorabilia</p>
     <div class="hero-buttons">
       <a href="#shop" class="btn btn-primary">Shop Now</a>
-      <a href="#sell" class="btn btn-outline">Sell Your Cards</a>
+      <a href="#find" class="btn btn-outline">Find Me a Card</a>
     </div>
   </div>
 </section>
@@ -195,61 +194,6 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
     <h2 class="section-title">Personal Collection</h2>
     <p class="section-sub">Pieces from our own collection. Not for sale &mdash; just here to share.</p>
     <div class="product-grid" id="coming-soon-grid"></div>
-  </div>
-</section>
-
-<!-- Sell to Us -->
-<section class="sell" id="sell">
-  <div class="container sell-inner">
-    <div class="sell-text">
-      <h2 class="section-title">We Buy Sports &amp; Trading Cards</h2>
-      <p>We buy single cards and whole collections across the South Shore &mdash; Duxbury,
-        Kingston, Pembroke, Marshfield, Plymouth, Hanover, Norwell, Scituate and Hingham.
-        Local collections can be handed over in person; everywhere else, post them to us.</p>
-      <p>Have graded slabs, rookie autos or numbered parallels? We pay top dollar for premium cards. Fill in the form below and include:</p>
-      <ul class="sell-list">
-        <li>Photos of the front and back of each item</li>
-        <li>A brief description (set, player, year, and the parallel or insert if known)</li>
-        <li>Grade and cert number if it&rsquo;s slabbed &mdash; condition and quantity if it&rsquo;s raw</li>
-      </ul>
-      <p>We&rsquo;ll get back to you with an offer within 1&ndash;2 business days.</p>
-
-      <form id="sell-form" class="sell-form" novalidate>
-        <div class="sell-form-fields">
-          <div class="sell-row">
-            <label>Name
-              <input type="text" name="name" required autocomplete="name">
-            </label>
-            <label>Email
-              <input type="email" name="email" required autocomplete="email">
-            </label>
-          </div>
-          <label>Phone <span class="sell-optional">optional</span>
-            <input type="tel" name="phone" autocomplete="tel">
-          </label>
-          <label>What do you have?
-            <textarea name="details" rows="4" required
-              placeholder="Set, player, year, parallel, and grade if slabbed &mdash; a rough description is fine."></textarea>
-          </label>
-
-          <label class="sell-photos-label">Photos
-            <span class="sell-optional">up to 8 &middot; fronts and backs help most</span>
-            <input type="file" id="sell-photos" accept="image/*" multiple>
-          </label>
-          <ul id="sell-file-list" class="sell-file-list" hidden></ul>
-
-          <!-- Hidden from people; only a bot fills this in. See handleSell(). -->
-          <div class="sell-hp" aria-hidden="true">
-            <label>Company<input type="text" name="company" tabindex="-1" autocomplete="off"></label>
-          </div>
-
-          <button type="submit" id="sell-submit" class="btn btn-primary">Send It Over</button>
-        </div>
-        <p id="sell-status" class="sell-status" role="status" aria-live="polite" hidden></p>
-      </form>
-
-    </div>
-    <img src="images/promo-card.jpeg" alt="We buy sports and trading cards" class="sell-image">
   </div>
 </section>
 
@@ -345,8 +289,8 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
   </div>
 </footer>
 
-<script src="js/main.js?v=20260921d"></script>
-<script src="js/banner.js?v=20260921d"></script>
-<script src="js/sell-form.js?v=20260921d"></script>
+<script src="js/main.js?v=20260921e"></script>
+<script src="js/banner.js?v=20260921e"></script>
+<script src="js/find-form.js?v=20260921e"></script>
 </body>
 </html>
