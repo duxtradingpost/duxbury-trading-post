@@ -90,10 +90,15 @@ if (navToggle) {
 }
 
 async function loadInventory() {
+  // PAGINATED. The Storefront API caps a page at 250, and "Shop All" passed that
+  // on 2026-09-21 - the grid silently showed the 250 dearest cards and the
+  // header read "250 cards in stock" no matter how many were really listed.
+  // first:250 with no cursor loop is a truncation, not a limit.
   const query = `
-    query {
+    query($after: String) {
       collectionByHandle(handle: "shop-all") {
-        products(first: 250, sortKey: PRICE, reverse: true) {
+        products(first: 250, after: $after, sortKey: PRICE, reverse: true) {
+          pageInfo { hasNextPage endCursor }
           edges {
             node {
               title
@@ -115,16 +120,26 @@ async function loadInventory() {
   `;
 
   try {
-    const res = await fetch(`https://${SHOPIFY_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Shopify-Storefront-Access-Token': SHOPIFY_STOREFRONT_TOKEN
-      },
-      body: JSON.stringify({ query })
-    });
-    const data = await res.json();
-    const edges = data?.data?.collectionByHandle?.products?.edges || [];
+    const edges = [];
+    let after = null;
+    // Walk every page. Capped at 40 round trips (10,000 cards) so a bad cursor
+    // can never spin forever.
+    for (let page = 0; page < 40; page++) {
+      const res = await fetch(`https://${SHOPIFY_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Shopify-Storefront-Access-Token': SHOPIFY_STOREFRONT_TOKEN
+        },
+        body: JSON.stringify({ query, variables: { after } })
+      });
+      const data = await res.json();
+      const conn = data?.data?.collectionByHandle?.products;
+      if (!conn) break;
+      edges.push(...(conn.edges || []));
+      if (!conn.pageInfo?.hasNextPage) break;
+      after = conn.pageInfo.endCursor;
+    }
 
     CARDS = edges
       .filter(({ node }) => node.availableForSale)
