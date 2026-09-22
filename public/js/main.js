@@ -32,8 +32,16 @@ const FEATURED_COLLECTION_HANDLE = 'featured';
 // gid://shopify/DiscountAutomaticNode/1394920390742
 // Three places, one number. Change one without the others and the site quotes a
 // price the checkout will not honour, or the two pages disagree with each other.
-const WEBSITE_DISCOUNT = 0.12;
+const WEBSITE_DISCOUNT = 0;   // was 0.12 - discount switched OFF 2026-09-21
 const webPrice = list => (list * (1 - WEBSITE_DISCOUNT)).toFixed(2);
+
+// See the long note in js/inventory.js: the 12% is applied at the CART, not on
+// the product page, so Buy Now has to land on the cart or the shopper sees the
+// undiscounted price straight after this grid promised the discounted one.
+const buyUrl = (variantGid, productUrl) => {
+  const id = String(variantGid || '').split('/').pop();
+  return /^\d+$/.test(id) ? `https://${SHOPIFY_DOMAIN}/cart/${id}:1` : productUrl;
+};
 // Everything for sale. An automated Shopify collection (price > 0, excluding
 // the Personal Collection), so cards that are not for sale can never leak into
 // the Featured grid with a working Buy Now button.
@@ -99,6 +107,8 @@ async function loadFeaturedItems() {
       updatedAt
       images(first: 2) { edges { node { url altText width height } } }
       priceRange { minVariantPrice { amount currencyCode } }
+      # Needed to build the cart permalink — see buyUrl().
+      variants(first: 1) { edges { node { id } } }
     }
     query {
       featured: collectionByHandle(handle: "${FEATURED_COLLECTION_HANDLE}") {
@@ -186,6 +196,7 @@ async function loadFeaturedItems() {
       const price = parseFloat(product.priceRange.minVariantPrice.amount).toFixed(2);
       const web = webPrice(parseFloat(product.priceRange.minVariantPrice.amount));
       const url = product.onlineStoreUrl || `https://${SHOPIFY_DOMAIN}/products/${product.handle}`;
+      const buy = buyUrl(product.variants?.edges?.[0]?.node?.id, url);
 
       const sold = !product.availableForSale;
 
@@ -205,13 +216,13 @@ async function loadFeaturedItems() {
           title="Click to copy this title">${product.title}</button></h3>
         <p class="product-price">
           $${web}
-          <span class="product-price__was">$${price}</span>
-          <span class="product-price__off">${Math.round(WEBSITE_DISCOUNT * 100)}% off</span>
+          ${WEBSITE_DISCOUNT > 0 ? `<span class="product-price__was">$${price}</span>
+          <span class="product-price__off">${Math.round(WEBSITE_DISCOUNT * 100)}% off</span>` : ''}
         </p>
         <div class="product-actions">
           ${sold
             ? '<span class="btn btn-small btn-sold" aria-disabled="true">Sold</span>'
-            : `<a href="${url}" target="_blank" rel="noopener" class="btn btn-primary btn-small">Buy Now</a>`}
+            : `<a href="${buy}" target="_blank" rel="noopener" class="btn btn-primary btn-small">Buy Now</a>`}
           <button type="button" class="btn btn-outline btn-small share-btn" data-share-url="${url}" data-share-title="${product.title.replace(/"/g, '&quot;')}" aria-label="Share this listing">Share</button>
         </div>
       `;

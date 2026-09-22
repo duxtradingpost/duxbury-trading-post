@@ -27,9 +27,24 @@ const SHOPIFY_API_VERSION = '2025-10';
 // per-order) is a big share of a cheap sale and a trivial share of a dear one, so
 // the fees saved shrink as price rises. 12% is safe up to a $384 ask; 15% only to
 // $118.62. See "Website pricing vs eBay" in WORKFLOW.md.
-const WEBSITE_DISCOUNT = 0.12;
+const WEBSITE_DISCOUNT = 0;   // was 0.12 - discount switched OFF 2026-09-21
 
 const webPrice = list => (list * (1 - WEBSITE_DISCOUNT)).toFixed(2);
+
+// Buy Now must land somewhere the 12% is VISIBLE.
+//
+// The automatic discount is applied by Shopify at the CART, not on the product
+// page — so linking to /products/<handle> showed the shopper $100 right after
+// this grid promised $88. They have no reason to trust the site and every reason
+// to assume the discount is a trick. (Craig spotted this 2026-09-16.)
+//
+// A cart permalink (/cart/<variantId>:1) adds the card and lands on the cart,
+// where the discount line is rendered before any payment step. Falls back to the
+// product page when the variant id is missing, which is never worse than today.
+const buyUrl = (variantGid, productUrl) => {
+  const id = String(variantGid || '').split('/').pop();
+  return /^\d+$/.test(id) ? `https://${SHOPIFY_DOMAIN}/cart/${id}:1` : productUrl;
+};
 
 // Tag prefixes are for grouping in Shopify's admin, not for customers to read.
 const stripPrefix = tag => tag.replace(/^(Player|Team|Brand|League|Year):\s*/i, '');
@@ -90,6 +105,8 @@ async function loadInventory() {
               # Front and back only — the extra angles are for eBay, not here.
               images(first: 2) { edges { node { url altText } } }
               priceRange { minVariantPrice { amount } }
+              # Needed to build a cart permalink — see buyUrl() below.
+              variants(first: 1) { edges { node { id } } }
             }
           }
         }
@@ -118,9 +135,14 @@ async function loadInventory() {
         const haystack = [node.title, ...node.tags.map(stripPrefix), ...node.tags]
           .join(' ')
           .toLowerCase();
+        const productUrl = node.onlineStoreUrl
+          || `https://${SHOPIFY_DOMAIN}/products/${node.handle}`;
         return {
           title: node.title,
-          url: node.onlineStoreUrl || `https://${SHOPIFY_DOMAIN}/products/${node.handle}`,
+          // `url` is the shareable product page; `buy` goes to the cart so the
+          // discount the grid advertises is the first number the shopper sees.
+          url: productUrl,
+          buy: buyUrl(node.variants?.edges?.[0]?.node?.id, productUrl),
           // `price` stays the LIST price — it is what Shopify and eBay both show,
           // and what the sorts compare. `web` is what this site actually charges.
           price: Number(node.priceRange.minVariantPrice.amount).toFixed(2),
@@ -218,11 +240,11 @@ function cardHtml(c) {
         title="Click to copy this title">${escapeHtml(c.title)}</button></h3>
       <p class="product-price">
         $${c.web}
-        <span class="product-price__was">$${c.price}</span>
-        <span class="product-price__off">${Math.round(WEBSITE_DISCOUNT * 100)}% off</span>
+        ${WEBSITE_DISCOUNT > 0 ? `<span class="product-price__was">$${c.price}</span>
+        <span class="product-price__off">${Math.round(WEBSITE_DISCOUNT * 100)}% off</span>` : ''}
       </p>
       <div class="product-actions">
-        <a href="${c.url}" target="_blank" rel="noopener" class="btn btn-primary btn-small">Buy Now</a>
+        <a href="${c.buy}" target="_blank" rel="noopener" class="btn btn-primary btn-small">Buy Now</a>
         <button type="button" class="btn btn-outline btn-small share-btn"
                 data-share-url="${c.url}" data-share-title="${escapeAttr(c.title)}"
                 aria-label="Share this listing">Share</button>
@@ -395,7 +417,7 @@ function openLightbox(card, at = 0) {
   lb.title.textContent = card.title;
   lb.title.dataset.title = card.title;
   lb.title.classList.remove('copy-title--done');
-  lb.buy.href = card.url;
+  lb.buy.href = card.buy || card.url;
   paintLightbox();
   lb.el.hidden = false;
   document.body.style.overflow = 'hidden';
