@@ -127,6 +127,11 @@ async function handleSell(request, env) {
   const email = clean(form.get('email'), 200);
   const phone = clean(form.get('phone'), 40);
   const details = clean(form.get('details'), 4000, true);
+  // Two things post to this endpoint: the sell-to-us form and the card-finder
+  // form. Same pipeline, same inbox - only the labelling differs, so a request
+  // to FIND a card is never mistaken for an offer to SELL one.
+  const isSourcing = (form.get('kind') || '').toString().trim() === 'source';
+  const budget = clean(form.get('budget'), 120);
 
   if (!name || !email || !details) {
     return json({ ok: false, error: 'Please fill in your name, email and a description.' }, 400);
@@ -161,10 +166,13 @@ async function handleSell(request, env) {
   }
 
   const body =
-    `New sell-to-us submission from the website.\n\n` +
+    (isSourcing
+      ? `CARD WANTED - someone is asking us to FIND a card.\n\n`
+      : `New sell-to-us submission from the website.\n\n`) +
     `Name:   ${name}\n` +
     `Email:  ${email}\n` +
     `Phone:  ${phone || '(not given)'}\n` +
+    (isSourcing ? `Budget: ${budget || '(not given)'}\n` : '') +
     `Photos: ${photos.length}\n\n` +
     `----- what they wrote -----\n\n${details}\n\n` +
     `---------------------------\n` +
@@ -175,7 +183,7 @@ async function handleSell(request, env) {
     fromName: 'Duxbury Trading Post website',
     to: SELL_TO,
     replyTo: email,
-    subject: `Cards to sell — ${name}`,
+    subject: isSourcing ? `Card wanted — ${name}` : `Cards to sell — ${name}`,
     text: body,
     attachments
   });

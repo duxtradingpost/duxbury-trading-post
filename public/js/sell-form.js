@@ -138,3 +138,54 @@ async function shrink(file) {
 
 const escapeHtml = s =>
   String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+
+// ---------------------------------------------------------------------------
+// Card finder ("Find a Card"). Deliberately its own small handler rather than
+// generalising the sell form above: that one is built around photo downscaling
+// and a file list this form does not have, and bending it to serve both would
+// have put the riskier path at risk for no gain. Same endpoint, kind=source, so
+// the email lands labelled "Card wanted" and is never read as an offer to sell.
+const findForm = document.getElementById('find-form');
+if (findForm) {
+  const findStatus = findForm.querySelector('#find-status');
+  const findBtn = findForm.querySelector('#find-submit');
+
+  const findSay = (msg, kind) => {
+    findStatus.textContent = msg;
+    findStatus.className = 'sell-status' + (kind ? ` sell-status--${kind}` : '');
+    findStatus.hidden = false;
+  };
+
+  findForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = new FormData(findForm);
+    data.append('kind', 'source');
+
+    const name = (data.get('name') || '').toString().trim();
+    const email = (data.get('email') || '').toString().trim();
+    const details = (data.get('details') || '').toString().trim();
+    if (!name || !email || !details) {
+      return findSay('Please fill in your name, email and what you are looking for.', 'error');
+    }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      return findSay('That email address does not look right.', 'error');
+    }
+
+    findBtn.disabled = true;
+    findSay('Sending…');
+    try {
+      const res = await fetch('/api/sell', { method: 'POST', body: data });
+      const out = await res.json().catch(() => ({}));
+      if (res.ok && out.ok) {
+        findForm.querySelector('.find-form-fields').hidden = true;
+        return findSay("Got it — we'll start looking and come back to you within a day or two.", 'ok');
+      }
+      findBtn.disabled = false;
+      return findSay(out.error || 'Something went wrong. Please try again.', 'error');
+    } catch {
+      findBtn.disabled = false;
+      return findSay('Could not reach us just now. Please try again, or email info@duxburytradingpost.com.', 'error');
+    }
+  });
+}

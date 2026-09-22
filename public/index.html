@@ -121,6 +121,7 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
       <a href="inventory.html">Search Inventory</a>
       <a href="https://www.ebay.com/usr/duxburytradingpost" target="_blank" rel="noopener">eBay Store</a>
       <a href="#sell">Sell to Us</a>
+      <a href="#find">Find a Card</a>
       <a href="#contact">Contact</a>
     </nav>
     <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
@@ -252,6 +253,62 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
   </div>
 </section>
 
+<!-- Card finder. Posts to the same /api/sell endpoint as the sell form, with
+     kind=source so the email arrives subject "Card wanted" and never gets
+     mistaken for someone offering to sell. -->
+<section class="sell" id="find">
+  <div class="container sell-inner">
+    <div class="sell-text">
+      <h2 class="section-title">Looking for a Specific Card?</h2>
+      <p>Tell us what you are chasing and we will go and find it. We are at shows, breaks and
+        auctions every week, and we buy collections before they ever reach the site &mdash; so
+        plenty of what we handle never gets listed.</p>
+      <p>You can be as specific or as loose as you like:</p>
+      <ul class="sell-list">
+        <li><strong>A particular card</strong> &mdash; set, year, parallel, numbering, graded or raw</li>
+        <li><strong>A player</strong> &mdash; every Josh Allen rookie, or just his autos</li>
+        <li><strong>A team</strong> &mdash; Patriots, Bills, Red Sox, Celtics, whatever you collect</li>
+        <li><strong>A price point</strong> &mdash; tell us your budget and we will bring you options that fit</li>
+      </ul>
+      <p>No obligation and no fee for looking. If we find it, we send you photos and a price;
+        if you pass, that is fine. If we already have it in stock, we will tell you that too.</p>
+
+      <form id="find-form" class="sell-form" novalidate>
+        <div class="find-form-fields">
+          <div class="sell-row">
+            <label>Name
+              <input type="text" name="name" required autocomplete="name">
+            </label>
+            <label>Email
+              <input type="email" name="email" required autocomplete="email">
+            </label>
+          </div>
+          <div class="sell-row">
+            <label>Phone <span class="sell-optional">optional</span>
+              <input type="tel" name="phone" autocomplete="tel">
+            </label>
+            <label>Budget <span class="sell-optional">optional</span>
+              <input type="text" name="budget" placeholder="e.g. up to $200, or $50&ndash;100">
+            </label>
+          </div>
+          <label>What are you after?
+            <textarea name="details" rows="4" required
+              placeholder="A player, a team, a set, or one exact card &mdash; whatever you can tell us."></textarea>
+          </label>
+
+          <!-- Hidden from people; only a bot fills this in. -->
+          <div class="sell-hp" aria-hidden="true">
+            <label>Company<input type="text" name="company" tabindex="-1" autocomplete="off"></label>
+          </div>
+
+          <button type="submit" id="find-submit" class="btn btn-primary">Find It For Me</button>
+        </div>
+        <p id="find-status" class="sell-status" role="status" aria-live="polite" hidden></p>
+      </form>
+    </div>
+  </div>
+</section>
+
 <!-- Contact -->
 <section class="contact" id="contact">
   <div class="container">
@@ -288,8 +345,8 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
   </div>
 </footer>
 
-<script src="js/main.js?v=20260921c"></script>
-<script src="js/banner.js?v=20260921c"></script>
-<script src="js/sell-form.js"></script>
+<script src="js/main.js?v=20260921d"></script>
+<script src="js/banner.js?v=20260921d"></script>
+<script src="js/sell-form.js?v=20260921d"></script>
 </body>
 </html>
