@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=20260922c">
+<link rel="stylesheet" href="css/styles.css?v=20260923a">
 <!-- Open Graph / social share preview. Without these a shared link renders as a
      bare URL — most of our traffic arrives from Instagram and text messages. -->
 <meta property="og:type" content="website">
@@ -121,6 +121,7 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
       <a href="inventory.html">Search Inventory</a>
       <a href="https://www.ebay.com/usr/duxburytradingpost" target="_blank" rel="noopener">eBay Store</a>
       <a href="#find">Find a Card</a>
+      <a href="collection.html">My Collection</a>
       <a href="#contact">Contact</a>
     </nav>
     <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
@@ -135,6 +136,8 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
     <img src="images/logo.svg" alt="Duxbury Trading Post logo" class="hero-logo">
     <h1>Duxbury Trading Post</h1>
     <p class="hero-tagline">Sports Cards &middot; Pok&eacute;mon</p>
+    <p class="hero-trust"><span class="hero-trust__stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+      100% positive on eBay</p>
     <div class="hero-buttons">
       <a href="#shop" class="btn btn-primary">Shop Now</a>
       <a href="#find" class="btn btn-outline">Find Me a Card</a>
@@ -142,21 +145,21 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
   </div>
 </section>
 
-<!-- About / Categories -->
-<section class="categories">
+<!-- Quick shop: one tap to a pre-filtered inventory. Replaced the "What We
+     Deal In" boxes, which only repeated the tagline. Links use inventory's
+     ?q= (search words), ?f= (a filter chip) and ?max= (price ceiling). -->
+<section class="quick-shop">
   <div class="container">
-    <h2 class="section-title">What We Deal In</h2>
-    <div class="category-grid">
-      <div class="category-card">
-        <div class="category-icon">🏀</div>
-        <h3>Sports Cards</h3>
-        <p>Baseball, basketball, football, hockey &mdash; vintage to modern, singles to full sets.</p>
-      </div>
-      <div class="category-card">
-        <div class="category-icon">⚡</div>
-        <h3>Pok&eacute;mon</h3>
-        <p>Booster boxes, singles, graded slabs, and everything in between for collectors young and old.</p>
-      </div>
+    <h2 class="section-title">Shop Fast</h2>
+    <div class="quick-grid">
+      <a class="quick-tile" href="inventory.html?q=josh+allen">Josh Allen</a>
+      <a class="quick-tile" href="inventory.html?q=drake+maye">Drake Maye</a>
+      <a class="quick-tile" href="inventory.html?q=patriots">Patriots</a>
+      <a class="quick-tile" href="inventory.html?q=bills">Bills</a>
+      <a class="quick-tile" href="inventory.html?q=red+sox">Red Sox</a>
+      <a class="quick-tile" href="inventory.html?q=psa+10">PSA 10s</a>
+      <a class="quick-tile" href="inventory.html?f=Pok%C3%A9mon">Pok&eacute;mon</a>
+      <a class="quick-tile" href="inventory.html?max=25">Under $25</a>
     </div>
   </div>
 </section>
@@ -164,8 +167,8 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
 <!-- Shop / Featured Items -->
 <section class="shop" id="shop">
   <div class="container">
-    <h2 class="section-title">Featured Items</h2>
-    <p class="section-sub">A few pieces from the shop. Buy directly &mdash; secure checkout powered by Shopify.</p>
+    <h2 class="section-title">Just Added</h2>
+    <p class="section-sub">The newest cards in the shop. Buy directly &mdash; secure checkout powered by Shopify.</p>
 
     <div class="product-grid" id="product-grid">
       <p class="grid-status" id="shop-status">Loading featured items&hellip;</p>
@@ -180,15 +183,6 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
       If you'd like more photos or detail on an item, <a href="#contact">message us</a> before you buy
       and we're glad to help.
     </p>
-  </div>
-</section>
-
-<!-- Personal Collection — hidden until the Shopify "Personal Collection" collection has products -->
-<section class="coming-soon-section" id="coming-soon" hidden>
-  <div class="container">
-    <h2 class="section-title">Personal Collection</h2>
-    <p class="section-sub">Pieces from our own collection. Not for sale &mdash; just here to share.</p>
-    <div class="product-grid" id="coming-soon-grid"></div>
   </div>
 </section>
 
@@ -283,7 +277,7 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
   </div>
 </footer>
 
-<script src="js/main.js?v=20260922a"></script>
+<script src="js/main.js?v=20260923a"></script>
 <script src="js/banner.js?v=20260921e"></script>
 <script src="js/find-form.js?v=20260921e"></script>
 </body>

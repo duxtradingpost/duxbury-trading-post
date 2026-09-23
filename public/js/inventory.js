@@ -78,6 +78,10 @@ const sortSel = document.getElementById('inv-sort');
 
 let CARDS = [];
 const ACTIVE = new Set();   // chips currently toggled on
+// Homepage "Shop Fast" tiles link here with ?q= (words), ?f= (a chip label)
+// or ?max= (price ceiling, website price). MAX_PRICE has no chip of its own.
+const PARAMS = new URLSearchParams(location.search);
+let MAX_PRICE = Number(PARAMS.get('max')) || 0;
 
 document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -185,9 +189,11 @@ async function loadInventory() {
     }
 
     buildChips();
-    render(CARDS);
     input.disabled = false;
-    if (!openSharedCard()) input.focus();
+    if (PARAMS.get('q')) input.value = PARAMS.get('q');
+    if (PARAMS.get('f') && FILTERS.some(f => f.label === PARAMS.get('f'))) ACTIVE.add(PARAMS.get('f'));
+    if (PARAMS.get('q') || PARAMS.get('f') || MAX_PRICE) applySearch(); else render(CARDS);
+    if (!openSharedCard() && !PARAMS.get('q')) input.focus();
   } catch (err) {
     status.textContent = 'Couldn\'t load the inventory right now — browse our eBay store instead.';
     console.error('Inventory load error:', err);
@@ -221,20 +227,21 @@ function applySearch() {
   // "Pokemon" (which is how the listings are written).
   const q = input.value.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const words = q ? q.split(/\s+/) : [];
-  clearBtn.hidden = !q && !ACTIVE.size;
+  clearBtn.hidden = !q && !ACTIVE.size && !MAX_PRICE;
 
   chipWrap.querySelectorAll('.chip').forEach(btn => {
     btn.classList.toggle('chip--on', ACTIVE.has(btn.dataset.term));
     btn.setAttribute('aria-pressed', String(ACTIVE.has(btn.dataset.term)));
   });
 
-  if (!words.length && !ACTIVE.size) return render(CARDS);
+  const underMax = c => !MAX_PRICE || Number(c.web) <= MAX_PRICE;
+  if (!words.length && !ACTIVE.size && !MAX_PRICE) return render(CARDS);
   // A chip is satisfied by any one of its tags — "Sealed" matches a Hobby Box or
   // a loose Pack — but every active chip still has to be satisfied.
   const accepts = label => (FILTERS.find(f => f.label === label) || { tags: [label] }).tags;
   render(CARDS.filter(c =>
     [...ACTIVE].every(label => accepts(label).some(t => c.tags.includes(t))) &&
-    words.every(w => c.haystack.includes(w))
+    words.every(w => c.haystack.includes(w)) && underMax(c)
   ));
 }
 
@@ -522,6 +529,6 @@ lb.el.addEventListener('touchend', e => {
 }, { passive: true });
 
 input.addEventListener('input', applySearch);
-clearBtn.addEventListener('click', () => { input.value = ''; ACTIVE.clear(); applySearch(); input.focus(); });
+clearBtn.addEventListener('click', () => { input.value = ''; ACTIVE.clear(); MAX_PRICE = 0; applySearch(); input.focus(); });
 input.disabled = true;
 loadInventory();

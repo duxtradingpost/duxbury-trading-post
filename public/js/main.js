@@ -97,6 +97,7 @@ function shuffled(list, rand) {
 async function loadFeaturedItems() {
   const grid = document.getElementById('product-grid');
   const status = document.getElementById('shop-status');
+  if (!grid) return;   // collection.html shares this script but has no shop grid
 
   const query = `
     fragment card on Product {
@@ -116,6 +117,9 @@ async function loadFeaturedItems() {
       }
       topPriced: collectionByHandle(handle: "${SHOP_ALL_COLLECTION_HANDLE}") {
         products(first: 24, sortKey: PRICE, reverse: true) { edges { node { ...card } } }
+      }
+      newest: collectionByHandle(handle: "${SHOP_ALL_COLLECTION_HANDLE}") {
+        products(first: 24, sortKey: CREATED, reverse: true) { edges { node { ...card } } }
       }
     }
   `;
@@ -174,7 +178,11 @@ async function loadFeaturedItems() {
 
     // Reserve room for the sold cards so the grid never overflows MAX_FEATURED.
     const availableSlots = Math.max(0, MAX_FEATURED - pickedSold.length);
-    const inStock = [...pickedToday, ...filler].slice(0, availableSlots);
+    // "Just Added": the newest cards in stock, so the section changes every time
+    // something is listed. The hand-picked rotation above stays as the fallback
+    // if the newest query comes back empty.
+    const newest = (data?.data?.newest?.products?.edges || []).filter(isAvailable);
+    const inStock = (newest.length ? newest : [...pickedToday, ...filler]).slice(0, availableSlots);
     const sortedProducts = [
       ...inStock.filter(p => !isLandscape(p)),
       ...inStock.filter(isLandscape),
@@ -284,7 +292,10 @@ async function loadPersonalCollection() {
     });
     const data = await res.json();
     const products = data?.data?.collectionByHandle?.products?.edges || [];
-    if (products.length === 0) return;   // leave the section hidden
+    if (products.length === 0) {         // homepage: stays hidden; own page: say so
+      if (!section.hidden) grid.innerHTML = '<p class="grid-status">Nothing here yet — check back soon.</p>';
+      return;
+    }
 
     grid.innerHTML = '';
     products.forEach(({ node: product }) => {

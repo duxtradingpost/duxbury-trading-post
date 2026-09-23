@@ -240,6 +240,52 @@ a { color: inherit; text-decoration: none; }
 
 .category-card p { color: var(--text-muted); font-size: 0.92rem; }
 
+/* Hero trust line - one line of proof instead of a whole testimonials section */
+.hero-trust {
+  margin: -22px 0 28px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+.hero-trust__stars { color: #E8C35A; letter-spacing: 2px; margin-right: 6px; }
+
+/* Shop Fast - replaced the "What We Deal In" boxes */
+.quick-shop { padding: 56px 0 64px; }
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 28px;
+}
+.quick-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 64px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--band);
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-decoration: none;
+  text-align: center;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.quick-tile:hover, .quick-tile:focus-visible {
+  background: var(--forest);
+  color: var(--on-dark);
+  border-color: var(--forest);
+}
+@media (max-width: 640px) {
+  .quick-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .quick-shop { padding: 44px 0 48px; }
+}
+
+.coming-soon-section--page { padding-top: 48px; min-height: 60vh; }
+
 /* Shop */
 .shop { padding: 80px 0; background: var(--band); }
 
