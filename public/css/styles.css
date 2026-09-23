@@ -419,9 +419,6 @@ a { color: inherit; text-decoration: none; }
   min-height: 2.7em;
 }
 
-/* No price on these, so give the title the extra line instead.
-   Must sit after .product-card h3 — same specificity, later wins. */
-.product-card--soon h3 { min-height: 3.4em; margin-bottom: 16px; }
 
 .product-price {
   font-family: var(--font-display);
@@ -433,6 +430,14 @@ a { color: inherit; text-decoration: none; }
   justify-content: center;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+/* Personal Collection cards sit where the price would, in the same place on
+   every page, so the grid lines up; smaller, since it is a label not a number. */
+.product-price--pc {
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 /* The eBay list price, struck through. The point of the whole discount is that

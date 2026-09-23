@@ -46,6 +46,20 @@ const buyUrl = (variantGid, productUrl) => {
 // the Personal Collection), so cards that are not for sale can never leak into
 // the Featured grid with a working Buy Now button.
 const SHOP_ALL_COLLECTION_HANDLE = 'shop-all';
+
+// Personal Collection cards can ALSO be listed on eBay, at a price Craig would
+// take, and the eBay sync then drops them into Shop All with that price - so
+// Shop All does NOT keep them out, whatever it was meant to do. On this site
+// they never show a price or a Buy Now: they read "Personal Collection" and ask
+// by email. Marker: membership in the Personal Collection (handle unchanged),
+// or the `Personal` tag the report scripts use. Same rule in js/inventory.js
+// and src/index.js.
+const PERSONAL_COLLECTION_HANDLE = 'coming-soon';
+const isPersonal = node => (node.tags || []).includes('Personal') ||
+  (node.collections?.edges || []).some(e => e.node.handle === PERSONAL_COLLECTION_HANDLE);
+const askUrl = title =>
+  `mailto:info@duxburytradingpost.com?subject=${encodeURIComponent(`Question: ${title}`)}` +
+  `&body=${encodeURIComponent(`Hi Duxbury Trading Post,\r\n\r\nI have a question about:\r\n${title}\r\n\r\nThanks!`)}`;
 const MAX_FEATURED = 8;
 const SOLD_WINDOW_DAYS = 3;   // how long a sold card stays up with a SOLD badge
 // Most slots a hand-picked card can take. Raise it to lean on the Featured
@@ -106,6 +120,8 @@ async function loadFeaturedItems() {
       handle
       availableForSale
       updatedAt
+      tags
+      collections(first: 10) { edges { node { handle } } }
       images(first: 2) { edges { node { url altText width height } } }
       priceRange { minVariantPrice { amount currencyCode } }
       # Needed to build the cart permalink — see buyUrl().
@@ -209,30 +225,37 @@ async function loadFeaturedItems() {
       const buy = buyUrl(product.variants?.edges?.[0]?.node?.id, url);
 
       const sold = !product.availableForSale;
-
-      const card = document.createElement('div');
-      card.className = sold ? 'product-card product-card--sold' : 'product-card';
-      card.innerHTML = `
-        <div class="product-image-wrap${back ? ' has-back' : ''}">
-          <a href="${url}" target="_blank" rel="noopener">
+      const personal = isPersonal(product);
+      const flip = `
             <span class="card-flip">
               <img src="${image ? image.url : ''}" alt="${image?.altText || product.title}" class="product-image card-face card-face--front">
               ${back ? `<img src="${back}" alt="" class="card-face card-face--back" loading="lazy" aria-hidden="true">` : ''}
-            </span>
-          </a>
+            </span>`;
+
+      const card = document.createElement('div');
+      card.className = sold ? 'product-card product-card--sold' : 'product-card';
+      // A Personal Collection card's photo must not link to the Shopify product
+      // page either - that page would show the price.
+      card.innerHTML = `
+        <div class="product-image-wrap${back ? ' has-back' : ''}">
+          ${personal ? flip : `<a href="${url}" target="_blank" rel="noopener">${flip}</a>`}
           ${sold ? '<span class="sold-badge">Sold</span>' : ''}
         </div>
         <h3><button type="button" class="copy-title" data-title="${product.title.replace(/"/g, '&quot;')}"
           title="Click to copy this title">${product.title}</button></h3>
-        <p class="product-price">
+        ${personal
+          ? '<p class="product-price product-price--pc">Personal Collection</p>'
+          : `<p class="product-price">
           $${web}
           ${WEBSITE_DISCOUNT > 0 ? `<span class="product-price__was">$${price}</span>
           <span class="product-price__off">${Math.round(WEBSITE_DISCOUNT * 100)}% off</span>` : ''}
-        </p>
+        </p>`}
         <div class="product-actions">
           ${sold
             ? '<span class="btn btn-small btn-sold" aria-disabled="true">Sold</span>'
-            : `<a href="${buy}" target="_blank" rel="noopener" class="btn btn-primary btn-small">Buy Now</a>`}
+            : personal
+              ? `<a href="${askUrl(product.title)}" class="btn btn-primary btn-small">Ask About This Card</a>`
+              : `<a href="${buy}" target="_blank" rel="noopener" class="btn btn-primary btn-small">Buy Now</a>`}
           <button type="button" class="btn btn-outline btn-small card-send" data-share-url="https://duxburytradingpost.com/inventory?card=${encodeURIComponent(product.handle)}" data-share-title="${product.title.replace(/"/g, '&quot;')}" aria-label="Share this listing">Share</button>
         </div>
       `;
@@ -253,14 +276,15 @@ async function loadFeaturedItems() {
 loadFeaturedItems();
 
 // --- Personal Collection ---
-// Cards from the owner's own collection, shown but not for sale. Managed
-// entirely from the "Personal Collection" collection in Shopify — add a product
-// to show it here, remove it to take it down. No price is shown on purpose;
-// these are not listings.
+// Cards from the owner's own collection. Managed entirely from the "Personal
+// Collection" collection in Shopify — add a product to show it here, remove it
+// to take it down. No price is shown on purpose. Some ARE listed on eBay at a
+// price Craig would take, so the card says "Personal Collection" rather than
+// "Not For Sale", and the button asks rather than sells.
 //
 // The whole section stays hidden unless the collection has products in it, so an
 // empty collection looks like nothing rather than like something broken.
-const PERSONAL_COLLECTION_HANDLE = 'coming-soon';   // Shopify handle unchanged
+// PERSONAL_COLLECTION_HANDLE is declared near the top, beside the other handles.
 
 async function loadPersonalCollection() {
   const section = document.getElementById('coming-soon');
@@ -308,10 +332,6 @@ async function loadPersonalCollection() {
       // Cards away for grading carry an "At PSA" tag in Shopify. Tag it when the
       // card goes out, untag it when it comes back — no code change either way.
       const atPsa = (product.tags || []).includes('At PSA');
-      const subject = encodeURIComponent(`Question: ${product.title}`);
-      const body = encodeURIComponent(
-        `Hi Duxbury Trading Post,\r\n\r\nI have a question about:\r\n${product.title}\r\n\r\nThanks!`
-      );
 
       const card = document.createElement('div');
       card.className = 'product-card product-card--soon';
@@ -321,13 +341,13 @@ async function loadPersonalCollection() {
             <img src="${image ? image.url : ''}" alt="${image?.altText || product.title}" class="product-image card-face card-face--front">
             ${back ? `<img src="${back}" alt="" class="card-face card-face--back" loading="lazy" aria-hidden="true">` : ''}
           </span>
-          <span class="soon-badge">Not For Sale</span>
         </div>
         <h3><button type="button" class="copy-title" data-title="${product.title.replace(/"/g, '&quot;')}"
           title="Click to copy this title">${product.title}</button></h3>
+        <p class="product-price product-price--pc">Personal Collection</p>
         ${atPsa ? '<p class="pc-note">Out for grading at PSA</p>' : ''}
         <div class="product-actions">
-          <a href="mailto:info@duxburytradingpost.com?subject=${subject}&body=${body}" class="btn btn-primary btn-small">Ask About This Card</a>
+          <a href="${askUrl(product.title)}" class="btn btn-primary btn-small">Ask About This Card</a>
         </div>
       `;
       grid.appendChild(card);

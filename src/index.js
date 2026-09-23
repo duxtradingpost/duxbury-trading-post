@@ -75,7 +75,8 @@ async function cardPreview(request, env, handle) {
       },
       body: JSON.stringify({
         query: `query($h: String!) { product(handle: $h) {
-          title availableForSale
+          title availableForSale tags
+          collections(first: 10) { edges { node { handle } } }
           featuredImage { url width height }
           priceRange { minVariantPrice { amount } } } }`,
         variables: { h: handle }
@@ -90,9 +91,15 @@ async function cardPreview(request, env, handle) {
 
   const price = Number(product.priceRange?.minVariantPrice?.amount || 0).toFixed(2);
   const title = `${product.title} | Duxbury Trading Post`;
-  const desc = product.availableForSale
-    ? `$${price} - buy it direct from Duxbury Trading Post.`
-    : 'This card has sold. See what else is in stock at Duxbury Trading Post.';
+  // Personal Collection cards never show a price on the site, and the preview is
+  // part of the site. Same marker as public/js/main.js and inventory.js.
+  const personal = (product.tags || []).includes('Personal') ||
+    (product.collections?.edges || []).some(e => e.node.handle === 'coming-soon');
+  const desc = personal
+    ? 'From our personal collection - ask about this card at Duxbury Trading Post.'
+    : product.availableForSale
+      ? `$${price} - buy it direct from Duxbury Trading Post.`
+      : 'This card has sold. See what else is in stock at Duxbury Trading Post.';
   const shareUrl = `https://duxburytradingpost.com/inventory?card=${encodeURIComponent(handle)}`;
   const img = product.featuredImage;
 

@@ -46,6 +46,19 @@ const buyUrl = (variantGid, productUrl) => {
   return /^\d+$/.test(id) ? `https://${SHOPIFY_DOMAIN}/cart/${id}:1` : productUrl;
 };
 
+// Personal Collection cards can ALSO be listed on eBay, at a price Craig would
+// take, and the eBay sync then drops them into Shop All with that price. On this
+// site they never show a price or a Buy Now: they read "Personal Collection" and
+// ask by email instead. The marker is membership in the Shopify Personal
+// Collection (handle coming-soon, the same one collection.html shows), or the
+// `Personal` tag the report scripts use. Same rule in js/main.js and src/index.js.
+const PERSONAL_COLLECTION_HANDLE = 'coming-soon';
+const isPersonal = node => (node.tags || []).includes('Personal') ||
+  (node.collections?.edges || []).some(e => e.node.handle === PERSONAL_COLLECTION_HANDLE);
+const askUrl = title =>
+  `mailto:info@duxburytradingpost.com?subject=${encodeURIComponent(`Question: ${title}`)}` +
+  `&body=${encodeURIComponent(`Hi Duxbury Trading Post,\r\n\r\nI have a question about:\r\n${title}\r\n\r\nThanks!`)}`;
+
 // Tag prefixes are for grouping in Shopify's admin, not for customers to read.
 const stripPrefix = tag => tag.replace(/^(Player|Team|Brand|League|Year):\s*/i, '');
 
@@ -112,6 +125,7 @@ async function loadInventory() {
               tags
               createdAt
               availableForSale
+              collections(first: 10) { edges { node { handle } } }
               # Front and back only — the extra angles are for eBay, not here.
               images(first: 2) { edges { node { url altText } } }
               priceRange { minVariantPrice { amount } }
@@ -158,6 +172,7 @@ async function loadInventory() {
           .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         const productUrl = node.onlineStoreUrl
           || `https://${SHOPIFY_DOMAIN}/products/${node.handle}`;
+        const personal = isPersonal(node);
         return {
           title: node.title,
           handle: node.handle,
@@ -167,7 +182,9 @@ async function loadInventory() {
           url: shareUrl(node.handle),
           // `buy` goes to the cart so the price the grid shows is the first
           // number the shopper sees.
-          buy: buyUrl(node.variants?.edges?.[0]?.node?.id, productUrl),
+          // A Personal Collection card asks by email instead - never a cart link.
+          buy: personal ? askUrl(node.title) : buyUrl(node.variants?.edges?.[0]?.node?.id, productUrl),
+          personal,
           // `price` stays the LIST price — it is what Shopify and eBay both show,
           // and what the sorts compare. `web` is what this site actually charges.
           price: Number(node.priceRange.minVariantPrice.amount).toFixed(2),
@@ -241,7 +258,9 @@ function applySearch() {
     btn.setAttribute('aria-pressed', String(ACTIVE.has(btn.dataset.term)));
   });
 
-  const underMax = c => !MAX_PRICE || Number(c.web) <= MAX_PRICE;
+  // Personal Collection cards have no price on this site, so a price ceiling
+  // can't honestly include them.
+  const underMax = c => !MAX_PRICE || (!c.personal && Number(c.web) <= MAX_PRICE);
   if (!words.length && !ACTIVE.size && !MAX_PRICE) return render(CARDS);
   // A chip is satisfied by any one of its tags — "Sealed" matches a Hobby Box or
   // a loose Pack — but every active chip still has to be satisfied.
@@ -275,13 +294,17 @@ function cardHtml(c) {
       </div>
       <h3><button type="button" class="copy-title" data-title="${escapeAttr(c.title)}"
         title="Click to copy this title">${escapeHtml(c.title)}</button></h3>
-      <p class="product-price">
+      ${c.personal
+        ? '<p class="product-price product-price--pc">Personal Collection</p>'
+        : `<p class="product-price">
         $${c.web}
         ${WEBSITE_DISCOUNT > 0 ? `<span class="product-price__was">$${c.price}</span>
         <span class="product-price__off">${Math.round(WEBSITE_DISCOUNT * 100)}% off</span>` : ''}
-      </p>
+      </p>`}
       <div class="product-actions">
-        <a href="${c.buy}" target="_blank" rel="noopener" class="btn btn-primary btn-small">Buy Now</a>
+        ${c.personal
+          ? `<a href="${c.buy}" class="btn btn-primary btn-small">Ask About This Card</a>`
+          : `<a href="${c.buy}" target="_blank" rel="noopener" class="btn btn-primary btn-small">Buy Now</a>`}
         <button type="button" class="btn btn-outline btn-small card-send"
                 data-share-url="${c.url}" data-share-title="${escapeAttr(c.title)}"
                 aria-label="Share this listing">Share</button>
@@ -389,8 +412,10 @@ function appendPage() {
 // Sorting acts on whatever is currently matched, so it composes with search
 // rather than resetting it.
 const SORTS = {
-  'price-desc': (a, b) => Number(b.price) - Number(a.price),
-  'price-asc':  (a, b) => Number(a.price) - Number(b.price),
+  // Personal Collection cards sort after everything priced, either way round,
+  // so the order never hints at a price the page doesn't show.
+  'price-desc': (a, b) => (a.personal - b.personal) || Number(b.price) - Number(a.price),
+  'price-asc':  (a, b) => (a.personal - b.personal) || Number(a.price) - Number(b.price),
   'newest':     (a, b) => (a.created < b.created ? 1 : a.created > b.created ? -1 : 0),
   'title':      (a, b) => a.title.localeCompare(b.title)
 };
@@ -482,6 +507,10 @@ function openLightbox(card, at = 0) {
   lb.title.dataset.title = card.title;
   lb.title.classList.remove('copy-title--done');
   lb.buy.href = card.buy || card.url;
+  // Same swap as the grid: a Personal Collection card asks, it doesn't sell.
+  // mailto: in a new tab just leaves an empty tab behind, hence no target.
+  lb.buy.textContent = card.personal ? 'Ask About This Card' : 'Buy Now';
+  if (card.personal) lb.buy.removeAttribute('target'); else lb.buy.target = '_blank';
   if (lb.share) {
     lb.share.dataset.shareUrl = card.url;
     lb.share.dataset.shareTitle = card.title;
