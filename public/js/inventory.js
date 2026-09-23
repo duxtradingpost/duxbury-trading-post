@@ -57,6 +57,7 @@ const stripPrefix = tag => tag.replace(/^(Player|Team|Brand|League|Year):\s*/i, 
 // what it is — a hobby box, a blaster, a loose pack, a case — and a shopper
 // browsing for sealed wants all of it behind one chip rather than four.
 const QUICK_FILTERS = ['Football', 'Baseball', 'Basketball', 'Hockey', 'Soccer',
+                       { label: 'Pokémon', tags: ['Pokemon', 'Brand: Pokemon'] },
                        'Auto', 'Graded', 'Numbered', 'Parallel', 'Rookie', 'Relic',
                        { label: 'Sealed',
                          tags: ['Sealed', 'Box', 'Boxes', 'Hobby Box', 'Blaster',
@@ -149,7 +150,8 @@ async function loadInventory() {
         // Pre-compute the haystack once so keystrokes stay cheap.
         const haystack = [node.title, ...node.tags.map(stripPrefix), ...node.tags]
           .join(' ')
-          .toLowerCase();
+          .toLowerCase()
+          .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         const productUrl = node.onlineStoreUrl
           || `https://${SHOPIFY_DOMAIN}/products/${node.handle}`;
         return {
@@ -215,7 +217,9 @@ function buildChips() {
 // "brady" means all three must match. Chips test the tag exactly; typed words
 // match anywhere in the title or tags.
 function applySearch() {
-  const q = input.value.trim().toLowerCase();
+  // Accents are stripped on both sides, so "pokémon" finds titles spelled
+  // "Pokemon" (which is how the listings are written).
+  const q = input.value.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const words = q ? q.split(/\s+/) : [];
   clearBtn.hidden = !q && !ACTIVE.size;
 
