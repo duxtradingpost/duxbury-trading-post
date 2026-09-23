@@ -323,20 +323,49 @@ function wireCopyTitles(scope) {
   });
 }
 
-async function copyTitle(btn) {
-  const text = btn.dataset.title;
-  try {
-    await navigator.clipboard.writeText(text);
-  } catch {
-    // Clipboard blocked (no HTTPS, or permission denied) — select it instead so
-    // a long-press or ctrl-C still works.
-    const r = document.createRange();
-    r.selectNodeContents(btn);
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(r);
-    return;
+// Copy text from a tap, in every browser that matters here. Most traffic comes
+// from Instagram's in-app browser, where navigator.clipboard is missing or
+// refused - and the old fallback only SELECTED the title, which on a phone looks
+// like nothing happened (reported from mobile 2026-09-23). So the textarea +
+// execCommand route runs FIRST and synchronously, while the tap still counts as
+// a user gesture: a fallback that waits for the clipboard promise to reject has
+// already lost the gesture on iOS. Resolves true when something was copied.
+function copyText(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.setAttribute('readonly', '');                     // no keyboard on iOS
+  ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;font-size:16px';  // 16px: no zoom
+  const back = document.activeElement;
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  ta.setSelectionRange(0, text.length);                // iOS ignores select()
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch { ok = false; }
+  ta.remove();
+  if (back && back.focus) back.focus({ preventScroll: true });
+  if (ok) return Promise.resolve(true);
+  if (navigator.clipboard?.writeText) {
+    return navigator.clipboard.writeText(text).then(() => true, () => false);
   }
+  return Promise.resolve(false);
+}
+
+// Nothing could copy: select the title and say so, rather than fail silently.
+function copyFailed(btn) {
+  const r = document.createRange();
+  r.selectNodeContents(btn);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(r);
+  btn.classList.add('copy-title--manual');
+  clearTimeout(btn._t);
+  btn._t = setTimeout(() => btn.classList.remove('copy-title--manual'), 2600);
+}
+
+async function copyTitle(btn) {
+  if (!(await copyText(btn.dataset.title))) return copyFailed(btn);
+  btn.classList.remove('copy-title--manual');
   btn.classList.add('copy-title--done');
   clearTimeout(btn._t);
   btn._t = setTimeout(() => btn.classList.remove('copy-title--done'), 1400);

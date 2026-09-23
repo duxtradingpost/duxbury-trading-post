@@ -1414,6 +1414,20 @@ a { color: inherit; text-decoration: none; }
   color: var(--accent);
 }
 
+/* Neither copy route worked (a locked-down in-app browser): the title is
+   selected instead, and this says what to do next. */
+.copy-title--manual { background: var(--band); }
+.copy-title--manual::after {
+  content: "Press and hold to copy";
+  opacity: 1;
+  margin-left: 8px;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  text-transform: none;
+  color: var(--accent);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .copy-title, .copy-title::after { transition: none; }
 }
@@ -1425,7 +1439,9 @@ a { color: inherit; text-decoration: none; }
 
 .lb-stage .copy-title--done { background: rgba(255, 255, 255, 0.14); }
 
-.lb-stage .copy-title--done::after { color: #FFFFFF; }
+.lb-stage .copy-title--done::after,
+.lb-stage .copy-title--manual::after { color: #FFFFFF; }
+.lb-stage .copy-title--manual { background: rgba(255, 255, 255, 0.14); }
 
 /* --- Away / shipping delay notice -------------------------------------------
    Sits above the promo bar and reads as information rather than marketing, so
