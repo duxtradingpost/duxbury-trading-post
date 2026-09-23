@@ -154,9 +154,13 @@ async function loadInventory() {
           || `https://${SHOPIFY_DOMAIN}/products/${node.handle}`;
         return {
           title: node.title,
-          // `url` is the shareable product page; `buy` goes to the cart so the
-          // discount the grid advertises is the first number the shopper sees.
-          url: productUrl,
+          handle: node.handle,
+          // `url` is what the Share button sends: this card on OUR site, not the
+          // Shopify theme page. The Worker fills in the card's photo and price
+          // for the link preview (see cardPreview in src/index.js).
+          url: shareUrl(node.handle),
+          // `buy` goes to the cart so the price the grid shows is the first
+          // number the shopper sees.
           buy: buyUrl(node.variants?.edges?.[0]?.node?.id, productUrl),
           // `price` stays the LIST price — it is what Shopify and eBay both show,
           // and what the sorts compare. `web` is what this site actually charges.
@@ -181,7 +185,7 @@ async function loadInventory() {
     buildChips();
     render(CARDS);
     input.disabled = false;
-    input.focus();
+    if (!openSharedCard()) input.focus();
   } catch (err) {
     status.textContent = 'Couldn\'t load the inventory right now — browse our eBay store instead.';
     console.error('Inventory load error:', err);
@@ -260,7 +264,7 @@ function cardHtml(c) {
       </p>
       <div class="product-actions">
         <a href="${c.buy}" target="_blank" rel="noopener" class="btn btn-primary btn-small">Buy Now</a>
-        <button type="button" class="btn btn-outline btn-small share-btn"
+        <button type="button" class="btn btn-outline btn-small card-send"
                 data-share-url="${c.url}" data-share-title="${escapeAttr(c.title)}"
                 aria-label="Share this listing">Share</button>
       </div>
@@ -325,8 +329,12 @@ function wirePhotos(scope) {
   });
 }
 
+// The class is deliberately NOT "share-btn". Content blockers (Safari content
+// blockers, Brave, AdGuard, uBlock's annoyance lists) hide anything with that
+// name as a social-share widget, so on many phones the button simply was not
+// there. Keep "share" out of the class name.
 function wireShare(scope) {
-  scope.querySelectorAll('.share-btn:not([data-wired])').forEach(btn => {
+  scope.querySelectorAll('.card-send:not([data-wired])').forEach(btn => {
     btn.dataset.wired = '1';
     btn.addEventListener('click', () => shareListing(btn.dataset.shareUrl, btn.dataset.shareTitle, btn));
   });
@@ -385,6 +393,26 @@ function render(list) {
 const escapeHtml = s => s.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
 const escapeAttr = s => escapeHtml(s).replace(/"/g, '&quot;');
 
+// A shared link is inventory?card=<handle>. It opens that card's photos over
+// the grid so whoever tapped the link lands on the card, not on 130 others.
+function shareUrl(handle) {
+  return `https://duxburytradingpost.com/inventory?card=${encodeURIComponent(handle)}`;
+}
+
+function openSharedCard() {
+  const handle = new URLSearchParams(location.search).get('card');
+  if (!handle) return false;
+  const card = CARDS.find(c => c.handle === handle);
+  if (!card) {
+    // Sold, or pulled. Say so rather than silently showing the grid.
+    countEl.textContent = 'That card has sold — here\'s everything else in stock.';
+    return false;
+  }
+  if (!IDX.has(card)) IDX.set(card, IDX.size);
+  openLightbox(card);
+  return true;
+}
+
 async function shareListing(url, title, btn) {
   if (navigator.share) {
     try {
@@ -419,13 +447,16 @@ const lb = {
   buy: document.getElementById('lb-buy'),
   prev: document.getElementById('lb-prev'),
   next: document.getElementById('lb-next'),
-  close: document.getElementById('lb-close')
+  close: document.getElementById('lb-close'),
+  share: document.getElementById('lb-send')
 };
 let lbCard = null, lbAt = 0;
 
 // The caption title is wired once. openLightbox only refreshes the text and
 // the data attribute, so there is no handler stacking up per open.
 if (lb.title) lb.title.addEventListener('click', () => copyTitle(lb.title));
+if (lb.share) lb.share.addEventListener('click', () =>
+  shareListing(lb.share.dataset.shareUrl, lb.share.dataset.shareTitle, lb.share));
 
 function openLightbox(card, at = 0) {
   lbCard = card; lbAt = at;
@@ -433,6 +464,10 @@ function openLightbox(card, at = 0) {
   lb.title.dataset.title = card.title;
   lb.title.classList.remove('copy-title--done');
   lb.buy.href = card.buy || card.url;
+  if (lb.share) {
+    lb.share.dataset.shareUrl = card.url;
+    lb.share.dataset.shareTitle = card.title;
+  }
   paintLightbox();
   lb.el.hidden = false;
   document.body.style.overflow = 'hidden';

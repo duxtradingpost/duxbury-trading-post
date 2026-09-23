@@ -223,13 +223,14 @@ async function loadFeaturedItems() {
           ${sold
             ? '<span class="btn btn-small btn-sold" aria-disabled="true">Sold</span>'
             : `<a href="${buy}" target="_blank" rel="noopener" class="btn btn-primary btn-small">Buy Now</a>`}
-          <button type="button" class="btn btn-outline btn-small share-btn" data-share-url="${url}" data-share-title="${product.title.replace(/"/g, '&quot;')}" aria-label="Share this listing">Share</button>
+          <button type="button" class="btn btn-outline btn-small card-send" data-share-url="https://duxburytradingpost.com/inventory?card=${encodeURIComponent(product.handle)}" data-share-title="${product.title.replace(/"/g, '&quot;')}" aria-label="Share this listing">Share</button>
         </div>
       `;
       grid.appendChild(card);
     });
 
-    grid.querySelectorAll('.share-btn').forEach(btn => {
+    // Not "share-btn": content blockers hide that class. See js/inventory.js.
+    grid.querySelectorAll('.card-send').forEach(btn => {
       btn.addEventListener('click', () => shareListing(btn.dataset.shareUrl, btn.dataset.shareTitle, btn));
     });
   } catch (err) {

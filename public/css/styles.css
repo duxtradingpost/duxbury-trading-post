@@ -408,7 +408,7 @@ a { color: inherit; text-decoration: none; }
   flex-wrap: wrap;
 }
 
-.share-btn {
+.card-send {
   cursor: pointer;
   min-width: 90px;
 }

@@ -46,9 +46,78 @@ export default {
         : json({ ok: false, error: 'Method not allowed' }, 405);
     }
 
+    // A shared card link (inventory?card=<handle>) gets that card's photo, title
+    // and price in its link preview instead of the generic logo card.
+    if ((url.pathname === '/inventory' || url.pathname === '/inventory.html') &&
+        url.searchParams.get('card') && request.method === 'GET') {
+      return cardPreview(request, env, url.searchParams.get('card'));
+    }
+
     return env.ASSETS.fetch(request);
   }
 };
+
+// The Storefront token is public by design - it is already in js/inventory.js.
+const SHOPIFY_DOMAIN = 'duxburytradingpost.myshopify.com';
+const SHOPIFY_STOREFRONT_TOKEN = '6e9ad9c0de82756dc160e72ea5d6c3c5';
+
+async function cardPreview(request, env, handle) {
+  const page = await env.ASSETS.fetch(request);
+  if (!page.ok || !(page.headers.get('Content-Type') || '').includes('text/html')) return page;
+
+  let product = null;
+  try {
+    const res = await fetch(`https://${SHOPIFY_DOMAIN}/api/2025-10/graphql.json`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Shopify-Storefront-Access-Token': SHOPIFY_STOREFRONT_TOKEN
+      },
+      body: JSON.stringify({
+        query: `query($h: String!) { product(handle: $h) {
+          title availableForSale
+          featuredImage { url width height }
+          priceRange { minVariantPrice { amount } } } }`,
+        variables: { h: handle }
+      }),
+      cf: { cacheTtl: 300, cacheEverything: true }
+    });
+    product = (await res.json())?.data?.product || null;
+  } catch {
+    // Shopify down: serve the page with the generic preview rather than fail.
+  }
+  if (!product) return page;
+
+  const price = Number(product.priceRange?.minVariantPrice?.amount || 0).toFixed(2);
+  const title = `${product.title} | Duxbury Trading Post`;
+  const desc = product.availableForSale
+    ? `$${price} - buy it direct from Duxbury Trading Post.`
+    : 'This card has sold. See what else is in stock at Duxbury Trading Post.';
+  const shareUrl = `https://duxburytradingpost.com/inventory?card=${encodeURIComponent(handle)}`;
+  const img = product.featuredImage;
+
+  const set = (value) => ({ element(el) { el.setAttribute('content', value); } });
+  const drop = { element(el) { el.remove(); } };
+  let r = new HTMLRewriter()
+    .on('title', { element(el) { el.setInnerContent(title); } })
+    .on('meta[property="og:title"]', set(title))
+    .on('meta[name="twitter:title"]', set(title))
+    .on('meta[property="og:description"]', set(desc))
+    .on('meta[name="twitter:description"]', set(desc))
+    .on('meta[property="og:url"]', set(shareUrl))
+    .on('meta[property="og:image:alt"]', set(product.title));
+  if (img?.url) {
+    // A card photo is portrait, so the logo's 1200x630 hints would be wrong.
+    r = r.on('meta[property="og:image"]', set(img.url))
+      .on('meta[name="twitter:image"]', set(img.url))
+      .on('meta[name="twitter:card"]', set('summary_large_image'));
+    r = img.width && img.height
+      ? r.on('meta[property="og:image:width"]', set(String(img.width)))
+         .on('meta[property="og:image:height"]', set(String(img.height)))
+      : r.on('meta[property="og:image:width"]', drop).on('meta[property="og:image:height"]', drop);
+  }
+  return r.transform(page);
+}
 
 async function handleBriefing(request, env) {
   // Constant-time-ish compare is overkill here, but a plain !== leaks length by
