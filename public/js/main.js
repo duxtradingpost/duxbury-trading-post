@@ -190,11 +190,13 @@ async function loadFeaturedItems() {
     ];
 
     if (sortedProducts.length === 0) {
-      status.textContent = 'No featured items right now — check back soon, or browse our full inventory.';
+      grid.innerHTML = '<p class="grid-status">No new cards right now — check back soon, or browse the full inventory.</p>';
+      grid.removeAttribute('aria-busy');
       return;
     }
 
     grid.innerHTML = '';
+    grid.removeAttribute('aria-busy');
     sortedProducts.forEach(({ node: product }) => {
       const image = product.images.edges[0]?.node;
       // Second image is the card back, used for the hover flip.
@@ -242,7 +244,8 @@ async function loadFeaturedItems() {
       btn.addEventListener('click', () => shareListing(btn.dataset.shareUrl, btn.dataset.shareTitle, btn));
     });
   } catch (err) {
-    status.textContent = 'Couldn\'t load featured items right now — browse our full inventory instead.';
+    grid.innerHTML = '<p class="grid-status">Couldn\'t load the newest cards right now — browse the full inventory instead.</p>';
+    grid.removeAttribute('aria-busy');
     console.error('Shopify Featured Items error:', err);
   }
 }
@@ -404,3 +407,27 @@ document.addEventListener('click', async (e) => {
   clearTimeout(btn._t);
   btn._t = setTimeout(() => btn.classList.remove('copy-title--done'), 1400);
 });
+
+// --- Section reveal ---------------------------------------------------------
+// Homepage sections settle in as they scroll into view. First added 2026-08-20
+// (c88c10c) and lost by accident when the contact form was removed (51ac7bb) -
+// the CSS stayed, the script went, so nothing ever animated. Restored here.
+//
+// The .reveal class is added from JS on purpose: if this script never runs, or
+// the browser has no IntersectionObserver, nothing is ever hidden. The hero is
+// skipped - it is above the fold, so fading it in would look like a slow page.
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const sections = [...document.querySelectorAll('body > section')]
+    .filter(el => !el.classList.contains('hero'));
+  if (!sections.length) return;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-in');
+      io.unobserve(entry.target);   // once revealed, it stays revealed
+    });
+  }, { rootMargin: '0px 0px -10% 0px', threshold: 0.05 });
+  sections.forEach(el => { el.classList.add('reveal'); io.observe(el); });
+})();

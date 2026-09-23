@@ -272,8 +272,26 @@ a { color: inherit; text-decoration: none; }
   text-transform: uppercase;
   text-decoration: none;
   text-align: center;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
 }
+/* Tap feedback on phones, where :hover never fires. */
+.quick-tile:active { transform: scale(0.97); }
+/* The tiles fall into place one after another as Shop Fast is revealed. */
+.quick-shop.reveal .quick-tile { opacity: 0; transform: translateY(10px); }
+.quick-shop.reveal.is-in .quick-tile {
+  opacity: 1; transform: none;
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.7, 0.3, 1),
+              background 0.15s, color 0.15s, border-color 0.15s;
+}
+.quick-shop.is-in .quick-tile:nth-child(2) { transition-delay: 0.04s; }
+.quick-shop.is-in .quick-tile:nth-child(3) { transition-delay: 0.08s; }
+.quick-shop.is-in .quick-tile:nth-child(4) { transition-delay: 0.12s; }
+.quick-shop.is-in .quick-tile:nth-child(5) { transition-delay: 0.16s; }
+.quick-shop.is-in .quick-tile:nth-child(6) { transition-delay: 0.20s; }
+.quick-shop.is-in .quick-tile:nth-child(7) { transition-delay: 0.24s; }
+.quick-shop.is-in .quick-tile:nth-child(8) { transition-delay: 0.28s; }
+.quick-shop.is-in .quick-tile:hover,
+.quick-shop.is-in .quick-tile:active { transition-delay: 0s; transition-duration: 0.12s; }
 .quick-tile:hover, .quick-tile:focus-visible {
   background: var(--forest);
   color: var(--on-dark);
@@ -1442,3 +1460,16 @@ a { color: inherit; text-decoration: none; }
 }
 
 @media (max-width: 640px) { .away-text { font-size: 0.82rem; } }
+
+/* Read by screen readers, invisible on screen. */
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* Active price ceiling from a "Under $25" style link - shown as a chip so the
+   filter is visible and removable, not a silent narrowing. */
+.chip--price { display: inline-flex; align-items: center; gap: 6px; }
+@media (prefers-reduced-motion: reduce) {
+  .quick-shop.reveal .quick-tile { opacity: 1; transform: none; transition: none; }
+}

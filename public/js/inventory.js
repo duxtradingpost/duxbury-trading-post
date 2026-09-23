@@ -204,12 +204,19 @@ function buildChips() {
   // A chip only exists if something in stock carries one of its tags, so the row
   // stays honest — no chip that filters to nothing.
   const present = FILTERS.filter(f => CARDS.some(c => f.tags.some(t => c.tags.includes(t))));
-  if (!present.length) return;
-  chipWrap.innerHTML = present
+  if (!present.length && !MAX_PRICE) return;
+  // A price ceiling from a homepage link shows as its own chip, so the narrowing
+  // is visible and one tap undoes it.
+  const priceChip = MAX_PRICE
+    ? `<button type="button" class="chip chip--on chip--price" id="price-chip" aria-label="Remove price limit">Under $${MAX_PRICE} <span aria-hidden="true">&times;</span></button>`
+    : '';
+  chipWrap.innerHTML = priceChip + present
     .map(f => `<button type="button" class="chip" data-term="${f.label}" aria-pressed="false">${f.label}</button>`)
     .join('');
   chipWrap.hidden = false;
-  chipWrap.querySelectorAll('.chip').forEach(btn => {
+  const pc = document.getElementById('price-chip');
+  if (pc) pc.addEventListener('click', () => { MAX_PRICE = 0; pc.remove(); applySearch(); });
+  chipWrap.querySelectorAll('.chip[data-term]').forEach(btn => {
     btn.addEventListener('click', () => {
       // Chips stack: Football + Auto + Numbered narrows to cards with all three.
       const term = btn.dataset.term;
@@ -229,7 +236,7 @@ function applySearch() {
   const words = q ? q.split(/\s+/) : [];
   clearBtn.hidden = !q && !ACTIVE.size && !MAX_PRICE;
 
-  chipWrap.querySelectorAll('.chip').forEach(btn => {
+  chipWrap.querySelectorAll('.chip[data-term]').forEach(btn => {
     btn.classList.toggle('chip--on', ACTIVE.has(btn.dataset.term));
     btn.setAttribute('aria-pressed', String(ACTIVE.has(btn.dataset.term)));
   });
@@ -529,6 +536,6 @@ lb.el.addEventListener('touchend', e => {
 }, { passive: true });
 
 input.addEventListener('input', applySearch);
-clearBtn.addEventListener('click', () => { input.value = ''; ACTIVE.clear(); MAX_PRICE = 0; applySearch(); input.focus(); });
+clearBtn.addEventListener('click', () => { input.value = ''; ACTIVE.clear(); MAX_PRICE = 0; document.getElementById('price-chip')?.remove(); applySearch(); input.focus(); });
 input.disabled = true;
 loadInventory();
