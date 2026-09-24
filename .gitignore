@@ -22,3 +22,27 @@ reports/*.txt
 
 # Scan output — live listing URLs and cost maths, regenerated every run.
 reports/gradescan/latest.json
+
+# Added 2026-09-23. Working files that are private or pure noise in a PUBLIC repo:
+# dated backups of scripts, API/response caches, action notes naming sellers and
+# amounts, generated Instagram/card images, comp test fixtures, and old archives.
+reports/*.backup*
+reports/*.bak
+reports/*.bak-*
+reports/*.apibak
+reports/.item-cache/
+reports/scp-cache/
+reports/fixtures/
+reports/ACTIONS-*.md
+reports/_archive/
+reports/ig-cards/
+reports/ig-story-*/
+reports/ig-sale-story-*/
+marketing/*.pdf
+marketing/*.png
+marketing/*.zip
+marketing/logos/*.eps
+marketing/logos/*.ai
+marketing/logos/*.pdf
+marketing/sticker/*.png
+marketing/sticker/*.pdf
