@@ -294,7 +294,7 @@ async function loadPersonalCollection() {
   const query = `
     query {
       collectionByHandle(handle: "${PERSONAL_COLLECTION_HANDLE}") {
-        products(first: 24) {
+        products(first: 100) {
           edges {
             node {
               title
@@ -335,6 +335,7 @@ async function loadPersonalCollection() {
 
       const card = document.createElement('div');
       card.className = 'product-card product-card--soon';
+      card.id = `pc-${product.handle}`;
       card.innerHTML = `
         <div class="product-image-wrap${back ? ' has-back' : ''}">
           <span class="card-flip">
@@ -348,15 +349,42 @@ async function loadPersonalCollection() {
         ${atPsa ? '<p class="pc-note">Out for grading at PSA</p>' : ''}
         <div class="product-actions">
           <a href="${askUrl(product.title)}" class="btn btn-primary btn-small">Ask About This Card</a>
+          <button type="button" class="btn btn-outline btn-small card-send" data-share-url="${collectionShareUrl(product.handle)}" data-share-title="${product.title.replace(/"/g, '&quot;')}" aria-label="Share this card">Share</button>
         </div>
       `;
       grid.appendChild(card);
     });
 
+    // Not "share-btn": content blockers hide that class. See js/inventory.js.
+    grid.querySelectorAll('.card-send').forEach(btn => {
+      btn.addEventListener('click', () => shareListing(btn.dataset.shareUrl, btn.dataset.shareTitle, btn));
+    });
+
     section.hidden = false;
+    showSharedCollectionCard();
   } catch (err) {
     console.error('Personal Collection error:', err);   // stays hidden on failure
   }
+}
+
+// A shared collection card is collection.html?card=<handle>. There is no photo
+// viewer on this page, so the link scrolls to that card and outlines it for a
+// few seconds. If the card has left the collection the page just loads as normal.
+function collectionShareUrl(handle) {
+  return `https://duxburytradingpost.com/collection.html?card=${encodeURIComponent(handle)}`;
+}
+
+function showSharedCollectionCard() {
+  const handle = new URLSearchParams(location.search).get('card');
+  if (!handle) return;
+  const card = document.getElementById(`pc-${handle}`);
+  if (!card) return;
+  // Instant, and again once photos above it have loaded and shifted the layout.
+  const go = () => card.scrollIntoView({ block: 'center', behavior: 'instant' });
+  go();
+  setTimeout(go, 900);
+  card.classList.add('is-linked');
+  setTimeout(() => card.classList.remove('is-linked'), 4000);
 }
 
 loadPersonalCollection();
