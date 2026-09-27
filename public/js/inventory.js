@@ -112,9 +112,13 @@ async function loadInventory() {
   // on 2026-09-21 - the grid silently showed the 250 dearest cards and the
   // header read "250 cards in stock" no matter how many were really listed.
   // first:250 with no cursor loop is a truncation, not a limit.
+  //
+  // Craig's Personal Collection (handle coming-soon) is loaded too, so his
+  // collection cards come up in search. They read "Personal Collection" with an
+  // Ask button, never a price or a cart link, and sort after everything priced.
   const query = `
-    query($after: String) {
-      collectionByHandle(handle: "shop-all") {
+    query($after: String, $handle: String!) {
+      collectionByHandle(handle: $handle) {
         products(first: 250, after: $after, sortKey: PRICE, reverse: true) {
           pageInfo { hasNextPage endCursor }
           edges {
@@ -138,11 +142,11 @@ async function loadInventory() {
     }
   `;
 
-  try {
+  // Walk every page. Capped at 40 round trips (10,000 cards) so a bad cursor
+  // can never spin forever.
+  const fetchCollection = async handle => {
     const edges = [];
     let after = null;
-    // Walk every page. Capped at 40 round trips (10,000 cards) so a bad cursor
-    // can never spin forever.
     for (let page = 0; page < 40; page++) {
       const res = await fetch(`https://${SHOPIFY_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`, {
         method: 'POST',
@@ -150,7 +154,7 @@ async function loadInventory() {
           'Content-Type': 'application/json',
           'X-Shopify-Storefront-Access-Token': SHOPIFY_STOREFRONT_TOKEN
         },
-        body: JSON.stringify({ query, variables: { after } })
+        body: JSON.stringify({ query, variables: { after, handle } })
       });
       const data = await res.json();
       const conn = data?.data?.collectionByHandle?.products;
@@ -159,9 +163,23 @@ async function loadInventory() {
       if (!conn.pageInfo?.hasNextPage) break;
       after = conn.pageInfo.endCursor;
     }
+    return edges;
+  };
+
+  try {
+    const [shop, pc] = await Promise.all([
+      fetchCollection('shop-all'),
+      // A failed collection fetch must not take the shop down with it.
+      fetchCollection(PERSONAL_COLLECTION_HANDLE).catch(() => [])
+    ]);
+    // A PC card listed on eBay is in both collections; keep one copy.
+    const seen = new Set();
+    const edges = [...shop, ...pc].filter(({ node }) =>
+      !seen.has(node.handle) && seen.add(node.handle));
 
     CARDS = edges
-      .filter(({ node }) => node.availableForSale)
+      // PC cards are never buyable here (0 stock), so they skip the sale check.
+      .filter(({ node }) => node.availableForSale || isPersonal(node))
       .map(({ node }) => {
         const imgs = node.images.edges.map(e => e.node);
         const image = imgs[0];
@@ -421,7 +439,11 @@ function stockNoun() {
 function updateCount() {
   const total = CURRENT.length;
   const noun = stockNoun();
-  const scope = total === CARDS.length ? `${CARDS.length} ${noun} in stock` : `${total} of ${CARDS.length} ${noun}`;
+  // "In stock" counts what can be bought; collection cards are named separately.
+  const pc = CARDS.filter(c => c.personal).length;
+  const scope = total === CARDS.length
+    ? `${CARDS.length - pc} ${noun} in stock` + (pc ? ` + ${pc} from our collection` : '')
+    : `${total} of ${CARDS.length} ${noun}`;
   countEl.textContent = shown < total ? `${scope} — showing ${shown}` : scope;
   moreBtn.hidden = shown >= total;
   moreBtn.textContent = `Load ${Math.min(PAGE_SIZE, total - shown)} more`;
