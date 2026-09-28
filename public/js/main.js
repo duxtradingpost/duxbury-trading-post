@@ -134,9 +134,6 @@ async function loadFeaturedItems() {
       topPriced: collectionByHandle(handle: "${SHOP_ALL_COLLECTION_HANDLE}") {
         products(first: 24, sortKey: PRICE, reverse: true) { edges { node { ...card } } }
       }
-      newest: collectionByHandle(handle: "${SHOP_ALL_COLLECTION_HANDLE}") {
-        products(first: 24, sortKey: CREATED, reverse: true) { edges { node { ...card } } }
-      }
     }
   `;
 
@@ -194,11 +191,10 @@ async function loadFeaturedItems() {
 
     // Reserve room for the sold cards so the grid never overflows MAX_FEATURED.
     const availableSlots = Math.max(0, MAX_FEATURED - pickedSold.length);
-    // "Just Added": the newest cards in stock, so the section changes every time
-    // something is listed. The hand-picked rotation above stays as the fallback
-    // if the newest query comes back empty.
-    const newest = (data?.data?.newest?.products?.edges || []).filter(isAvailable);
-    const inStock = (newest.length ? newest : [...pickedToday, ...filler]).slice(0, availableSlots);
+    // Back to Featured (28 Sept): "Just Added" filled the front page with the
+    // newest listings, which were mostly $9.99 cards. The grid is the daily
+    // rotation of hand-picks plus the priciest cards in stock again.
+    const inStock = [...pickedToday, ...filler].slice(0, availableSlots);
     const sortedProducts = [
       ...inStock.filter(p => !isLandscape(p)),
       ...inStock.filter(isLandscape),
@@ -206,7 +202,7 @@ async function loadFeaturedItems() {
     ];
 
     if (sortedProducts.length === 0) {
-      grid.innerHTML = '<p class="grid-status">No new cards right now — check back soon, or browse the full inventory.</p>';
+      grid.innerHTML = '<p class="grid-status">No featured cards right now — check back soon, or browse the full inventory.</p>';
       grid.removeAttribute('aria-busy');
       return;
     }
@@ -267,7 +263,7 @@ async function loadFeaturedItems() {
       btn.addEventListener('click', () => shareListing(btn.dataset.shareUrl, btn.dataset.shareTitle, btn));
     });
   } catch (err) {
-    grid.innerHTML = '<p class="grid-status">Couldn\'t load the newest cards right now — browse the full inventory instead.</p>';
+    grid.innerHTML = '<p class="grid-status">Couldn\'t load featured items right now — browse the full inventory instead.</p>';
     grid.removeAttribute('aria-busy');
     console.error('Shopify Featured Items error:', err);
   }
