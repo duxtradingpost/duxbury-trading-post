@@ -338,10 +338,12 @@ async function loadPersonalCollection() {
       card.id = `pc-${product.handle}`;
       card.innerHTML = `
         <div class="product-image-wrap${back ? ' has-back' : ''}">
-          <span class="card-flip">
-            <img src="${image ? image.url : ''}" alt="${image?.altText || product.title}" class="product-image card-face card-face--front">
-            ${back ? `<img src="${back}" alt="" class="card-face card-face--back" loading="lazy" aria-hidden="true">` : ''}
-          </span>
+          <button type="button" class="photo-btn" aria-label="View photos of ${product.title.replace(/"/g, '&quot;')}">
+            <span class="card-flip">
+              <img src="${image ? image.url : ''}" alt="${image?.altText || product.title}" class="product-image card-face card-face--front">
+              ${back ? `<img src="${back}" alt="" class="card-face card-face--back" loading="lazy" aria-hidden="true">` : ''}
+            </span>
+          </button>
         </div>
         <h3><button type="button" class="copy-title" data-title="${product.title.replace(/"/g, '&quot;')}"
           title="Click to copy this title">${product.title}</button></h3>
@@ -353,6 +355,16 @@ async function loadPersonalCollection() {
         </div>
       `;
       grid.appendChild(card);
+
+      // Photo viewer, same rule as the inventory grid: a click opens it; on a phone
+      // a tap turns a two-sided card (the document-level flip handler below) and
+      // only a card with no back opens the viewer.
+      const shots = product.images.edges.map(e => e.node.url);
+      card.querySelector('.photo-btn').addEventListener('click', () => {
+        if (window.matchMedia('(hover: none)').matches && back) return;
+        openPcViewer({ title: product.title, photos: shots,
+                       url: collectionShareUrl(product.handle), ask: askUrl(product.title) });
+      });
     });
 
     // Not "share-btn": content blockers hide that class. See js/inventory.js.
@@ -385,6 +397,67 @@ function showSharedCollectionCard() {
   setTimeout(go, 900);
   card.classList.add('is-linked');
   setTimeout(() => card.classList.remove('is-linked'), 4000);
+}
+
+// --- Collection photo viewer -----------------------------------------------
+// The inventory page's lightbox (js/inventory.js), for collection.html. Only
+// wired where the #lightbox markup exists, so the homepage is unaffected.
+const pcLb = document.getElementById('lightbox') ? {
+  el: document.getElementById('lightbox'), img: document.getElementById('lb-img'),
+  title: document.getElementById('lb-title'), counter: document.getElementById('lb-counter'),
+  ask: document.getElementById('lb-buy'), share: document.getElementById('lb-send'),
+  prev: document.getElementById('lb-prev'), next: document.getElementById('lb-next'),
+  close: document.getElementById('lb-close')
+} : null;
+let pcCard = null, pcAt = 0;
+
+function openPcViewer(card) {
+  if (!pcLb) return;
+  pcCard = card; pcAt = 0;
+  pcLb.title.textContent = card.title;
+  pcLb.title.dataset.title = card.title;
+  pcLb.ask.href = card.ask;
+  pcLb.share.dataset.shareUrl = card.url;
+  pcLb.share.dataset.shareTitle = card.title;
+  paintPcViewer();
+  pcLb.el.hidden = false;
+  document.body.style.overflow = 'hidden';
+  pcLb.close.focus();
+}
+
+function paintPcViewer() {
+  const shots = pcCard.photos.length ? pcCard.photos : [''];
+  pcAt = (pcAt + shots.length) % shots.length;
+  pcLb.img.src = shots[pcAt];
+  pcLb.img.alt = `${pcCard.title} — photo ${pcAt + 1} of ${shots.length}`;
+  pcLb.counter.textContent = shots.length > 1 ? `${pcAt + 1} / ${shots.length}` : '';
+  pcLb.prev.hidden = pcLb.next.hidden = shots.length < 2;
+}
+
+function stepPcViewer(d) { if (pcCard) { pcAt += d; paintPcViewer(); } }
+function closePcViewer() { pcLb.el.hidden = true; pcCard = null; document.body.style.overflow = ''; }
+
+if (pcLb) {
+  pcLb.prev.addEventListener('click', () => stepPcViewer(-1));
+  pcLb.next.addEventListener('click', () => stepPcViewer(1));
+  pcLb.close.addEventListener('click', closePcViewer);
+  pcLb.el.addEventListener('click', e => { if (e.target === pcLb.el) closePcViewer(); });
+  pcLb.share.addEventListener('click', () =>
+    shareListing(pcLb.share.dataset.shareUrl, pcLb.share.dataset.shareTitle, pcLb.share));
+  document.addEventListener('keydown', e => {
+    if (pcLb.el.hidden) return;
+    if (e.key === 'Escape') closePcViewer();
+    if (e.key === 'ArrowLeft') stepPcViewer(-1);
+    if (e.key === 'ArrowRight') stepPcViewer(1);
+  });
+  let tx = null;
+  pcLb.el.addEventListener('touchstart', e => { tx = e.changedTouches[0].clientX; }, { passive: true });
+  pcLb.el.addEventListener('touchend', e => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 45) stepPcViewer(dx < 0 ? 1 : -1);
+    tx = null;
+  }, { passive: true });
 }
 
 loadPersonalCollection();
