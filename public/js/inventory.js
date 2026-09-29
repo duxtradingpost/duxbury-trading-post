@@ -70,6 +70,7 @@ const stripPrefix = tag => tag.replace(/^(Player|Team|Brand|League|Year):\s*/i, 
 // what it is — a hobby box, a blaster, a loose pack, a case — and a shopper
 // browsing for sealed wants all of it behind one chip rather than four.
 const QUICK_FILTERS = ['Football', 'Baseball', 'Basketball', 'Hockey', 'Soccer',
+                       { label: 'Tennis', tags: ['Tennis', 'League: ATP', 'League: WTA'] },
                        { label: 'Pokémon', tags: ['Pokemon', 'Brand: Pokemon'] },
                        'Auto', 'Graded', 'Numbered', 'Parallel', 'Rookie', 'Relic',
                        { label: 'Sealed',
