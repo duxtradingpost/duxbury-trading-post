@@ -160,8 +160,10 @@ async function loadFeaturedItems() {
     // little longer than SOLD_WINDOW_DAYS. Harmless, just not exact.
     const soldCutoff = Date.now() - SOLD_WINDOW_DAYS * 24 * 60 * 60 * 1000;
     const isAvailable = ({ node }) => node.availableForSale;
+    // A `Coming Soon` card is at 0 stock on purpose - it has not sold.
     const soldRecently = ({ node }) =>
-      !node.availableForSale && new Date(node.updatedAt).getTime() >= soldCutoff;
+      !node.availableForSale && !(node.tags || []).includes('Coming Soon') &&
+      new Date(node.updatedAt).getTime() >= soldCutoff;
 
     const pickedAvailable = picked.filter(isAvailable);
     const pickedSold = picked.filter(soldRecently);

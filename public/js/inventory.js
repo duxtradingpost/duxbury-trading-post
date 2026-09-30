@@ -55,6 +55,12 @@ const buyUrl = (variantGid, productUrl) => {
 const PERSONAL_COLLECTION_HANDLE = 'coming-soon';
 const isPersonal = node => (node.tags || []).includes('Personal') ||
   (node.collections?.edges || []).some(e => e.node.handle === PERSONAL_COLLECTION_HANDLE);
+// Cards pulled from eBay to wait for comps (Craig, 30 Sept) carry a `Coming Soon`
+// tag and 0 stock. They stay on the site like a collection card - no price, no
+// cart link, an Ask button - but read "Coming Soon". Same tag in js/main.js and
+// src/index.js.
+const SOON_COLLECTION_HANDLE = 'coming-soon-listings';
+const isSoon = node => (node.tags || []).includes('Coming Soon');
 const askUrl = title =>
   `mailto:info@duxburytradingpost.com?subject=${encodeURIComponent(`Question: ${title}`)}` +
   `&body=${encodeURIComponent(`Hi Duxbury Trading Post,\r\n\r\nI have a question about:\r\n${title}\r\n\r\nThanks!`)}`;
@@ -168,19 +174,21 @@ async function loadInventory() {
   };
 
   try {
-    const [shop, pc] = await Promise.all([
+    const [shop, pc, soonCards] = await Promise.all([
       fetchCollection('shop-all'),
       // A failed collection fetch must not take the shop down with it.
-      fetchCollection(PERSONAL_COLLECTION_HANDLE).catch(() => [])
+      fetchCollection(PERSONAL_COLLECTION_HANDLE).catch(() => []),
+      // Shop All drops a card at 0 stock, so Coming Soon cards live in their own.
+      fetchCollection(SOON_COLLECTION_HANDLE).catch(() => [])
     ]);
     // A PC card listed on eBay is in both collections; keep one copy.
     const seen = new Set();
-    const edges = [...shop, ...pc].filter(({ node }) =>
+    const edges = [...shop, ...pc, ...soonCards].filter(({ node }) =>
       !seen.has(node.handle) && seen.add(node.handle));
 
     CARDS = edges
       // PC cards are never buyable here (0 stock), so they skip the sale check.
-      .filter(({ node }) => node.availableForSale || isPersonal(node))
+      .filter(({ node }) => node.availableForSale || isPersonal(node) || isSoon(node))
       .map(({ node }) => {
         const imgs = node.images.edges.map(e => e.node);
         const image = imgs[0];
@@ -191,7 +199,9 @@ async function loadInventory() {
           .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         const productUrl = node.onlineStoreUrl
           || `https://${SHOPIFY_DOMAIN}/products/${node.handle}`;
-        const personal = isPersonal(node);
+        // A Coming Soon card behaves like a collection card (no price, asks by email).
+        const soon = isSoon(node) && !isPersonal(node);
+        const personal = isPersonal(node) || soon;
         return {
           title: node.title,
           handle: node.handle,
@@ -204,6 +214,7 @@ async function loadInventory() {
           // A Personal Collection card asks by email instead - never a cart link.
           buy: personal ? askUrl(node.title) : buyUrl(node.variants?.edges?.[0]?.node?.id, productUrl),
           personal,
+          soon,
           // `price` stays the LIST price — it is what Shopify and eBay both show,
           // and what the sorts compare. `web` is what this site actually charges.
           price: Number(node.priceRange.minVariantPrice.amount).toFixed(2),
@@ -314,7 +325,7 @@ function cardHtml(c) {
       <h3><button type="button" class="copy-title" data-title="${escapeAttr(c.title)}"
         title="Click to copy this title">${escapeHtml(c.title)}</button></h3>
       ${c.personal
-        ? '<p class="product-price product-price--pc">Personal Collection</p>'
+        ? `<p class="product-price product-price--pc">${c.soon ? 'Coming Soon' : 'Personal Collection'}</p>`
         : `<p class="product-price">
         $${c.web}
         ${WEBSITE_DISCOUNT > 0 ? `<span class="product-price__was">$${c.price}</span>
@@ -441,9 +452,11 @@ function updateCount() {
   const total = CURRENT.length;
   const noun = stockNoun();
   // "In stock" counts what can be bought; collection cards are named separately.
-  const pc = CARDS.filter(c => c.personal).length;
+  const pc = CARDS.filter(c => c.personal && !c.soon).length;
+  const soon = CARDS.filter(c => c.soon).length;
   const scope = total === CARDS.length
-    ? `${CARDS.length - pc} ${noun} in stock` + (pc ? ` + ${pc} from our collection` : '')
+    ? `${CARDS.length - pc - soon} ${noun} in stock` + (pc ? ` + ${pc} from our collection` : '') +
+      (soon ? ` + ${soon} coming soon` : '')
     : `${total} of ${CARDS.length} ${noun}`;
   countEl.textContent = shown < total ? `${scope} — showing ${shown}` : scope;
   moreBtn.hidden = shown >= total;

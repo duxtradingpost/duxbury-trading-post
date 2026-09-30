@@ -97,7 +97,9 @@ async function cardPreview(request, env, handle) {
     (product.collections?.edges || []).some(e => e.node.handle === 'coming-soon');
   const desc = personal
     ? 'From our personal collection - ask about this card at Duxbury Trading Post.'
-    : product.availableForSale
+    : (product.tags || []).includes('Coming Soon')
+      ? 'Coming soon to Duxbury Trading Post - ask about this card.'
+      : product.availableForSale
       ? `$${price} - buy it direct from Duxbury Trading Post.`
       : 'This card has sold. See what else is in stock at Duxbury Trading Post.';
   const shareUrl = `https://duxburytradingpost.com/inventory?card=${encodeURIComponent(handle)}`;
