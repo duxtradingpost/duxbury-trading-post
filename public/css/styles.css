@@ -1502,3 +1502,34 @@ a { color: inherit; text-decoration: none; }
   outline-offset: 4px;
   transition: outline-color 0.4s;
 }
+
+/* Tap and hold to zoom (js/hold-zoom.js). The wrap clips the magnified photo
+   to the card's own footprint; the button or link inside it scales around the
+   finger. Scaling the wrapper rather than .card-flip keeps it clear of the
+   flip's rotateY, so a turned card zooms on its back. */
+@media (hover: none) {
+  /* iOS raises its save-image / open-link sheet from the img AND from the link
+     around it, so the whole wrap opts out, not just the photo. */
+  .product-image-wrap,
+  .product-image-wrap * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  .product-image-wrap > a,
+  .product-image-wrap > .photo-btn {
+    display: block;
+    transform-origin: var(--zoom-x, 50%) var(--zoom-y, 50%);
+    transition: transform 0.18s ease-out;
+  }
+  .product-image-wrap.is-zoomed {
+    overflow: hidden;
+    z-index: 3;
+  }
+  .product-image-wrap.is-zoomed > a,
+  .product-image-wrap.is-zoomed > .photo-btn {
+    transform: scale(2.5);
+  }
+  .product-image-wrap.is-zoomed::after { opacity: 0; }
+}
