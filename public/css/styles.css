@@ -1533,3 +1533,6 @@ a { color: inherit; text-decoration: none; }
   }
   .product-image-wrap.is-zoomed::after { opacity: 0; }
 }
+
+/* My Collection Graded / Raw filter (js/main.js wireCollectionFilters) */
+.product-card[hidden] { display: none; }

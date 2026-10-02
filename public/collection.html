@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=20261001b">
+<link rel="stylesheet" href="css/styles.css?v=20261002a">
 <!-- Open Graph / social share preview. Without these a shared link renders as a
      bare URL — most of our traffic arrives from Instagram and text messages. -->
 <meta property="og:type" content="website">
@@ -136,6 +136,10 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
   <div class="container">
     <h1 class="section-title">My Collection</h1>
     <p class="section-sub">Pieces from our own collection. Curious about one? Ask about any card.</p>
+    <div class="quick-filters" id="pc-filters" role="group" aria-label="Filter the collection">
+      <button type="button" class="chip" data-pc-filter="graded" aria-pressed="false">Graded</button>
+      <button type="button" class="chip" data-pc-filter="raw" aria-pressed="false">Raw</button>
+    </div>
     <div class="product-grid" id="coming-soon-grid">
       <div class="skeleton-card" aria-hidden="true">
         <div class="sk-img"></div><div class="sk-line"></div><div class="sk-line sk-line--short"></div>
@@ -183,7 +187,7 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
   </div>
 </footer>
 
-<script src="js/main.js?v=20261002a"></script>
+<script src="js/main.js?v=20261002b"></script>
 <script src="js/banner.js?v=20260921e"></script>
 <script src="js/hold-zoom.js?v=20261001b"></script>
 </body>

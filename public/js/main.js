@@ -284,6 +284,31 @@ loadFeaturedItems();
 // empty collection looks like nothing rather than like something broken.
 // PERSONAL_COLLECTION_HANDLE is declared near the top, beside the other handles.
 
+// Graded / Raw buttons above the My Collection grid (collection.html only). Each
+// is a toggle: tap Graded to see only slabs, tap it again (or tap Raw) to switch.
+function wireCollectionFilters(grid) {
+  const bar = document.getElementById('pc-filters');
+  if (!bar || bar.dataset.wired) return;
+  bar.dataset.wired = '1';
+  const cards = () => [...grid.querySelectorAll('.product-card')];
+  const counts = { graded: cards().filter(c => c.dataset.graded === '1').length };
+  counts.raw = cards().length - counts.graded;
+  bar.querySelectorAll('[data-pc-filter]').forEach(btn => {
+    btn.textContent = `${btn.textContent} (${counts[btn.dataset.pcFilter]})`;
+    btn.addEventListener('click', () => {
+      const on = btn.getAttribute('aria-pressed') !== 'true';
+      bar.querySelectorAll('[data-pc-filter]').forEach(b => {
+        b.setAttribute('aria-pressed', String(b === btn && on));
+        b.classList.toggle('chip--on', b === btn && on);
+      });
+      const want = on ? btn.dataset.pcFilter : null;
+      cards().forEach(c => {
+        c.hidden = !!want && (c.dataset.graded === '1') !== (want === 'graded');
+      });
+    });
+  });
+}
+
 async function loadPersonalCollection() {
   const section = document.getElementById('coming-soon');
   const grid = document.getElementById('coming-soon-grid');
@@ -334,6 +359,9 @@ async function loadPersonalCollection() {
       const card = document.createElement('div');
       card.className = 'product-card product-card--soon';
       card.id = `pc-${product.handle}`;
+      // Graded = a slab: the Graded tag, or a grader and grade in the title.
+      card.dataset.graded = ((product.tags || []).includes('Graded') ||
+        /\b(PSA|BGS|SGC|CGC)\s*(10|9\.5|9|8\.5|8|7|Auth)/i.test(product.title)) ? '1' : '0';
       card.innerHTML = `
         <div class="product-image-wrap${back ? ' has-back' : ''}">
           <button type="button" class="photo-btn" aria-label="View photos of ${product.title.replace(/"/g, '&quot;')}">
@@ -371,6 +399,7 @@ async function loadPersonalCollection() {
     });
 
     section.hidden = false;
+    wireCollectionFilters(grid);
     showSharedCollectionCard();
   } catch (err) {
     console.error('Personal Collection error:', err);   // stays hidden on failure
