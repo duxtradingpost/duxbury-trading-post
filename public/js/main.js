@@ -122,7 +122,7 @@ async function loadFeaturedItems() {
       updatedAt
       tags
       collections(first: 10) { edges { node { handle } } }
-      images(first: 2) { edges { node { url altText width height } } }
+      images(first: 2) { edges { node { url(transform: { maxWidth: 900 }) altText width height } } }
       priceRange { minVariantPrice { amount currencyCode } }
       # Needed to build the cart permalink — see buyUrl().
       variants(first: 1) { edges { node { id } } }
@@ -298,7 +298,7 @@ async function loadPersonalCollection() {
               title
               handle
               tags
-              images(first: 2) { edges { node { url altText width height } } }
+              images(first: 2) { edges { node { url(transform: { maxWidth: 900 }) altText width height } } }
             }
           }
         }

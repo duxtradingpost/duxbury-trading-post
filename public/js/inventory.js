@@ -138,7 +138,7 @@ async function loadInventory() {
               availableForSale
               collections(first: 10) { edges { node { handle } } }
               # Front and back only — the extra angles are for eBay, not here.
-              images(first: 2) { edges { node { url altText } } }
+              images(first: 2) { edges { node { url(transform: { maxWidth: 900 }) altText } } }
               priceRange { minVariantPrice { amount } }
               # Needed to build a cart permalink — see buyUrl() below.
               variants(first: 1) { edges { node { id } } }
