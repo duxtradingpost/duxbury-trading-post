@@ -716,6 +716,10 @@ a { color: inherit; text-decoration: none; }
 .search-input::placeholder { color: var(--text-muted); }
 .search-input:focus { outline: none; border-color: var(--accent); }
 .search-input:disabled { opacity: 0.6; }
+/* type="search" gets the browser's own blue clear "x" in Chrome/Safari, which sat
+   next to our .search-clear button (Craig, 9 Oct: "double X"). Keep only ours. */
+.search-input::-webkit-search-cancel-button,
+.search-input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; display: none; }
 
 .search-clear {
   position: absolute;
