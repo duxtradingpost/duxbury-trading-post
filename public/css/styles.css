@@ -1565,3 +1565,23 @@ a { color: inherit; text-decoration: none; }
   }
   .product-image-wrap.is-zoomed .card-dl { opacity: 0; }
 }
+
+/* Josh Allen Color Blast set checklist on My Collection (reports/build-cb-checklist.py) */
+.cb-set { padding: 48px 0 64px; background: var(--band); border-top: 1px solid var(--border); }
+.cb-progress { display: grid; gap: 8px; max-width: 520px; margin: 0 auto 28px; text-align: center; }
+.cb-count { color: var(--text-muted); font-size: 0.95rem; }
+.cb-count b { font-family: var(--font-display); font-size: 1.6rem; color: var(--text-dark); margin-right: 4px; }
+.cb-bar { height: 10px; border-radius: 5px; background: var(--border); overflow: hidden; }
+.cb-bar i { display: block; height: 100%; background: linear-gradient(90deg, #ff3d6e, #ff9a2e 22%, #ffe14a 40%, #3fd38a 58%, #2fa3ff 76%, #a35bff); }
+.cb-group { font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.04em; font-size: 1.15rem; color: var(--text-dark); margin: 28px 0 10px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.cb-group span { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-muted); letter-spacing: 0; text-transform: none; }
+.cb-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
+.cb-list li { display: flex; align-items: baseline; gap: 10px; min-width: 0; padding: 10px 12px; background: var(--page); border: 1px solid var(--border); border-radius: 8px; color: var(--text-dark); font-size: 0.92rem; line-height: 1.35; }
+.cb-list li.is-owned { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.cb-check { flex: none; width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid var(--text-muted); display: inline-grid; place-items: center; font-size: 12px; line-height: 1; align-self: center; }
+.cb-list li.is-owned .cb-check { background: var(--forest); border-color: var(--forest); color: var(--on-dark); }
+.cb-yr { flex: none; font-family: var(--font-display); color: var(--accent); }
+.cb-name { min-width: 0; }
+.cb-num { color: var(--text-muted); white-space: nowrap; }
+.cb-eyebrow { text-align: center; margin: 0 0 6px; font-weight: 600; font-size: 0.78rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
+.cb-set .section-sub a { color: var(--accent); font-weight: 600; }
