@@ -1,26 +1,26 @@
 #!/usr/bin/env python3
-"""Rebuild the Josh Allen Color Blast checklist on public/collection.html.
+"""Rebuild the Josh Allen Color Blast checklist on public/in-search-of.html (its own page, nav tab "In Search Of").
 
     python3 reports/build-cb-checklist.py
 
 Craig, 11 Oct 2026: an "In Search Of" section - "add this check list to my website under my collection.
 Don't include prices." The cards and what is owned live in
 reports/color-blast-set.json; this rewrites the block between the
-CB-CHECKLIST markers. No prices on the website.
+CB-CHECKLIST markers. No prices on the website. Moved from My Collection to its own page 11 Oct.
 """
 import html, json, os, re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-PAGE = os.path.join(HERE, '..', 'public', 'collection.html')
+PAGE = os.path.join(HERE, '..', 'public', 'in-search-of.html')
 data = json.load(open(os.path.join(HERE, 'color-blast-set.json')))
 
 cards = [c for s in data['sets'] for c in s['cards']]
 have = sum(c['owned'] for c in cards)
 e = html.escape
-out = [f'''<section class="cb-set" id="color-blast-set" aria-labelledby="cb-set-title">
+out = [f'''<section class="cb-set cb-set--page" id="color-blast-set" aria-labelledby="cb-set-title">
   <div class="container">
     <p class="cb-eyebrow">In Search Of</p>
-    <h2 class="section-title" id="cb-set-title">Josh Allen Color Blast Set</h2>
+    <h1 class="section-title" id="cb-set-title">Josh Allen Color Blast Set</h1>
     <p class="section-sub">We are building the complete set: every Josh Allen Color Blast, printing plate and Phoenix Burst. Have one we still need? <a href="index.html#contact">Get in touch</a>.</p>
     <div class="cb-progress"><span class="cb-count"><b>{have}</b> of {len(cards)} in the collection</span>
       <div class="cb-bar" role="progressbar" aria-label="Set progress" aria-valuemin="0" aria-valuemax="{len(cards)}" aria-valuenow="{have}"><i style="width:{have / len(cards) * 100:.1f}%"></i></div></div>''']
@@ -40,8 +40,6 @@ page = open(PAGE).read()
 if 'CB-CHECKLIST:START' in page:
     page = re.sub(r'<!-- CB-CHECKLIST:START.*?CB-CHECKLIST:END -->', lambda m: block, page, flags=re.S)
 else:
-    anchor = '<!-- Photo viewer: same markup and styles as inventory.html -->'
-    assert anchor in page
-    page = page.replace(anchor, block + '\n\n' + anchor, 1)
+    raise SystemExit('CB-CHECKLIST markers missing from ' + PAGE)
 open(PAGE, 'w').write(page)
-print(f'{have} of {len(cards)} owned; collection.html updated')
+print(f'{have} of {len(cards)} owned; {os.path.basename(PAGE)} updated')
