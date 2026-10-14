@@ -21,7 +21,7 @@ out = [f'''<section class="cb-set cb-set--page" id="color-blast-set" aria-labell
   <div class="container">
     <p class="cb-eyebrow">In Search Of</p>
     <h1 class="section-title" id="cb-set-title">Josh Allen Color Blast Set</h1>
-    <p class="section-sub">We are building the complete set: every Josh Allen Color Blast and Phoenix Burst. Have one we still need? <a href="index.html#contact">Get in touch</a>.</p>
+    <p class="section-sub">We are building the complete set: every Josh Allen Color Blast. Have one we still need? <a href="index.html#contact">Get in touch</a>.</p>
     <div class="cb-progress"><span class="cb-count"><b>{have}</b> of {len(cards)} in the collection</span>
       <div class="cb-bar" role="progressbar" aria-label="Set progress" aria-valuemin="0" aria-valuemax="{len(cards)}" aria-valuenow="{have}"><i style="width:{have / len(cards) * 100:.1f}%"></i></div></div>''']
 for s in data['sets']:
