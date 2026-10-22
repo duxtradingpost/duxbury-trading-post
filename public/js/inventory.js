@@ -63,7 +63,7 @@ const SOON_COLLECTION_HANDLE = 'coming-soon-listings';
 const isSoon = node => (node.tags || []).includes('Coming Soon');
 const askUrl = title =>
   `mailto:info@duxburytradingpost.com?subject=${encodeURIComponent(`Question: ${title}`)}` +
-  `&body=${encodeURIComponent(`Hi Duxbury Trading Post,\r\n\r\nI have a question about:\r\n${title}\r\n\r\nThanks!`)}`;
+  `&body=${encodeURIComponent(`Hi DTP Cards,\r\n\r\nI have a question about:\r\n${title}\r\n\r\nThanks!`)}`;
 
 // Tag prefixes are for grouping in Shopify's admin, not for customers to read.
 const stripPrefix = tag => tag.replace(/^(Player|Team|Brand|League|Year):\s*/i, '');
@@ -504,7 +504,7 @@ const escapeAttr = s => escapeHtml(s).replace(/"/g, '&quot;');
 // A shared link is inventory?card=<handle>. It opens that card's photos over
 // the grid so whoever tapped the link lands on the card, not on 130 others.
 function shareUrl(handle) {
-  return `https://duxburytradingpost.com/inventory?card=${encodeURIComponent(handle)}`;
+  return `https://dtpcards.com/inventory?card=${encodeURIComponent(handle)}`;
 }
 
 function openSharedCard() {

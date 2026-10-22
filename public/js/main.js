@@ -59,7 +59,7 @@ const isPersonal = node => (node.tags || []).includes('Personal') ||
   (node.collections?.edges || []).some(e => e.node.handle === PERSONAL_COLLECTION_HANDLE);
 const askUrl = title =>
   `mailto:info@duxburytradingpost.com?subject=${encodeURIComponent(`Question: ${title}`)}` +
-  `&body=${encodeURIComponent(`Hi Duxbury Trading Post,\r\n\r\nI have a question about:\r\n${title}\r\n\r\nThanks!`)}`;
+  `&body=${encodeURIComponent(`Hi DTP Cards,\r\n\r\nI have a question about:\r\n${title}\r\n\r\nThanks!`)}`;
 const MAX_FEATURED = 8;
 const SOLD_WINDOW_DAYS = 3;   // how long a sold card stays up with a SOLD badge
 // Most slots a hand-picked card can take. Raise it to lean on the Featured
@@ -254,7 +254,7 @@ async function loadFeaturedItems() {
             : personal
               ? `<a href="${askUrl(product.title)}" class="btn btn-primary btn-small">Ask About This Card</a>`
               : `<a href="${buy}" target="_blank" rel="noopener" class="btn btn-primary btn-small">Buy Now</a>`}
-          <button type="button" class="btn btn-outline btn-small card-send" data-share-url="https://duxburytradingpost.com/inventory?card=${encodeURIComponent(product.handle)}" data-share-title="${product.title.replace(/"/g, '&quot;')}" aria-label="Share this listing">Share</button>
+          <button type="button" class="btn btn-outline btn-small card-send" data-share-url="https://dtpcards.com/inventory?card=${encodeURIComponent(product.handle)}" data-share-title="${product.title.replace(/"/g, '&quot;')}" aria-label="Share this listing">Share</button>
         </div>
       `;
       grid.appendChild(card);
@@ -410,7 +410,7 @@ async function loadPersonalCollection() {
 // viewer on this page, so the link scrolls to that card and outlines it for a
 // few seconds. If the card has left the collection the page just loads as normal.
 function collectionShareUrl(handle) {
-  return `https://duxburytradingpost.com/collection.html?card=${encodeURIComponent(handle)}`;
+  return `https://dtpcards.com/collection.html?card=${encodeURIComponent(handle)}`;
 }
 
 function showSharedCollectionCard() {

@@ -1,5 +1,5 @@
-// duxtradingpost.com is a shorter alias registered to catch people who type it
-// from memory. It should never serve the site itself — two domains with identical
+// dtpcards.com is the canonical domain (rebrand 22 Oct 2026). duxburytradingpost.com,
+// duxtradingpost.com and www.* are aliases. It should never serve the site itself — two domains with identical
 // content splits search ranking — so everything 301s to the canonical domain.
 //
 // Worth knowing: assets are normally served before Worker code runs, which would
@@ -8,8 +8,11 @@
 
 import { EmailMessage } from 'cloudflare:email';
 
-const CANONICAL_HOST = 'duxburytradingpost.com';
-const ALIAS_HOSTS = new Set(['duxtradingpost.com', 'www.duxtradingpost.com']);
+const CANONICAL_HOST = 'dtpcards.com';
+const ALIAS_HOSTS = new Set([
+  'duxtradingpost.com', 'www.duxtradingpost.com',
+  'duxburytradingpost.com', 'www.duxburytradingpost.com', 'www.dtpcards.com'
+]);
 
 const SELL_TO = 'info@duxburytradingpost.com';
 const SELL_FROM = 'website@duxburytradingpost.com';
@@ -25,7 +28,9 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    if (ALIAS_HOSTS.has(url.hostname)) {
+    // /api/* is exempt: the Mac scripts POST to duxburytradingpost.com/api/... and a
+    // 301 would turn those POSTs into GETs.
+    if (ALIAS_HOSTS.has(url.hostname) && !url.pathname.startsWith('/api/')) {
       url.hostname = CANONICAL_HOST;
       // 301, not 302 — a permanent redirect passes search ranking to the
       // canonical domain. Path and query are preserved by reusing the URL.
@@ -90,19 +95,19 @@ async function cardPreview(request, env, handle) {
   if (!product) return page;
 
   const price = Number(product.priceRange?.minVariantPrice?.amount || 0).toFixed(2);
-  const title = `${product.title} | Duxbury Trading Post`;
+  const title = `${product.title} | DTP Cards`;
   // Personal Collection cards never show a price on the site, and the preview is
   // part of the site. Same marker as public/js/main.js and inventory.js.
   const personal = (product.tags || []).includes('Personal') ||
     (product.collections?.edges || []).some(e => e.node.handle === 'coming-soon');
   const desc = personal
-    ? 'From our personal collection - ask about this card at Duxbury Trading Post.'
+    ? 'From our personal collection - ask about this card at DTP Cards.'
     : (product.tags || []).includes('Coming Soon')
-      ? 'Coming soon to Duxbury Trading Post - ask about this card.'
+      ? 'Coming soon to DTP Cards - ask about this card.'
       : product.availableForSale
-      ? `$${price} - buy it direct from Duxbury Trading Post.`
-      : 'This card has sold. See what else is in stock at Duxbury Trading Post.';
-  const shareUrl = `https://duxburytradingpost.com/inventory?card=${encodeURIComponent(handle)}`;
+      ? `$${price} - buy it direct from DTP Cards.`
+      : 'This card has sold. See what else is in stock at DTP Cards.';
+  const shareUrl = `https://dtpcards.com/inventory?card=${encodeURIComponent(handle)}`;
   const img = product.featuredImage;
 
   const set = (value) => ({ element(el) { el.setAttribute('content', value); } });
@@ -168,7 +173,7 @@ async function handleBriefing(request, env) {
 
   const raw = buildMime({
     from: SELL_FROM,
-    fromName: 'Duxbury Trading Post',
+    fromName: 'DTP Cards',
     to: SELL_TO,
     replyTo: SELL_TO,
     subject: subject || 'DTP morning briefing',
@@ -258,7 +263,7 @@ async function handleSell(request, env) {
 
   const raw = buildMime({
     from: SELL_FROM,
-    fromName: 'Duxbury Trading Post website',
+    fromName: 'DTP Cards website',
     to: SELL_TO,
     replyTo: email,
     subject: isSourcing ? `Card wanted — ${name}` : `Cards to sell — ${name}`,
