@@ -95,7 +95,7 @@ async function cardPreview(request, env, handle) {
   if (!product) return page;
 
   const price = Number(product.priceRange?.minVariantPrice?.amount || 0).toFixed(2);
-  const title = `${product.title} | DTP Cards`;
+  const title = `${product.title} | DTP Sports Cards`;
   // Personal Collection cards never show a price on the site, and the preview is
   // part of the site. Same marker as public/js/main.js and inventory.js.
   const personal = (product.tags || []).includes('Personal') ||
