@@ -49,7 +49,7 @@ if (findForm) {
       return findSay(out.error || 'Something went wrong. Please try again.', 'error');
     } catch {
       findBtn.disabled = false;
-      return findSay('Could not reach us just now. Please try again, or email info@duxburytradingpost.com.', 'error');
+      return findSay('Could not reach us just now. Please try again in a minute.', 'error');
     }
   });
 }
