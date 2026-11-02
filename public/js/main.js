@@ -357,7 +357,10 @@ async function loadPersonalCollection() {
       const atPsa = (product.tags || []).includes('At PSA');
 
       const card = document.createElement('div');
-      card.className = 'product-card product-card--soon';
+      // A horizontal card's slab photo is landscape: give it a double-wide tile
+      // so the card reads the right way up at a useful size (Craig, 2 Nov 2026).
+      const wide = image && image.width > image.height * 1.15;
+      card.className = 'product-card product-card--soon' + (wide ? ' product-card--wide' : '');
       card.id = `pc-${product.handle}`;
       // Graded = a slab: the Graded tag, or a grader and grade in the title.
       card.dataset.graded = ((product.tags || []).includes('Graded') ||
