@@ -254,7 +254,7 @@ async function loadFeaturedItems() {
             : personal
               ? `<a href="${askUrl(product.title)}" class="btn btn-primary btn-small">Ask About This Card</a>`
               : `<a href="${buy}" target="_blank" rel="noopener" class="btn btn-primary btn-small">Buy Now</a>`}
-          <button type="button" class="btn btn-outline btn-small card-send" data-share-url="https://dtpcards.com/inventory?card=${encodeURIComponent(product.handle)}" data-share-title="${product.title.replace(/"/g, '&quot;')}" aria-label="Share this listing">Share</button>
+          <button type="button" class="btn btn-outline btn-small card-send" data-share-url="https://duxtradingpost.com/inventory?card=${encodeURIComponent(product.handle)}" data-share-title="${product.title.replace(/"/g, '&quot;')}" aria-label="Share this listing">Share</button>
         </div>
       `;
       grid.appendChild(card);
@@ -413,7 +413,7 @@ async function loadPersonalCollection() {
 // viewer on this page, so the link scrolls to that card and outlines it for a
 // few seconds. If the card has left the collection the page just loads as normal.
 function collectionShareUrl(handle) {
-  return `https://dtpcards.com/collection.html?card=${encodeURIComponent(handle)}`;
+  return `https://duxtradingpost.com/collection.html?card=${encodeURIComponent(handle)}`;
 }
 
 function showSharedCollectionCard() {

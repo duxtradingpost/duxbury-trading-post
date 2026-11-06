@@ -504,7 +504,7 @@ const escapeAttr = s => escapeHtml(s).replace(/"/g, '&quot;');
 // A shared link is inventory?card=<handle>. It opens that card's photos over
 // the grid so whoever tapped the link lands on the card, not on 130 others.
 function shareUrl(handle) {
-  return `https://dtpcards.com/inventory?card=${encodeURIComponent(handle)}`;
+  return `https://duxtradingpost.com/inventory?card=${encodeURIComponent(handle)}`;
 }
 
 function openSharedCard() {

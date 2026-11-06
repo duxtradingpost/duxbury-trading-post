@@ -1,5 +1,5 @@
-// dtpcards.com is the canonical domain (rebrand 22 Oct 2026). duxburytradingpost.com,
-// duxtradingpost.com and www.* are aliases. It should never serve the site itself — two domains with identical
+// duxtradingpost.com is the canonical domain again (6 Nov 2026: other businesses use "dtpcards").
+// dtpcards.com, duxburytradingpost.com and www.* are aliases. It should never serve the site itself — two domains with identical
 // content splits search ranking — so everything 301s to the canonical domain.
 //
 // Worth knowing: assets are normally served before Worker code runs, which would
@@ -8,10 +8,10 @@
 
 import { EmailMessage } from 'cloudflare:email';
 
-const CANONICAL_HOST = 'dtpcards.com';
+const CANONICAL_HOST = 'duxtradingpost.com';
 const ALIAS_HOSTS = new Set([
-  'duxtradingpost.com', 'www.duxtradingpost.com',
-  'duxburytradingpost.com', 'www.duxburytradingpost.com', 'www.dtpcards.com'
+  'dtpcards.com', 'www.dtpcards.com', 'www.duxtradingpost.com',
+  'duxburytradingpost.com', 'www.duxburytradingpost.com'
 ]);
 
 const SELL_TO = 'info@duxburytradingpost.com';
@@ -107,7 +107,7 @@ async function cardPreview(request, env, handle) {
       : product.availableForSale
       ? `$${price} - buy it direct from DTP Cards.`
       : 'This card has sold. See what else is in stock at DTP Cards.';
-  const shareUrl = `https://dtpcards.com/inventory?card=${encodeURIComponent(handle)}`;
+  const shareUrl = `https://duxtradingpost.com/inventory?card=${encodeURIComponent(handle)}`;
   const img = product.featuredImage;
 
   const set = (value) => ({ element(el) { el.setAttribute('content', value); } });
