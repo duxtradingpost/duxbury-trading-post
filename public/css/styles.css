@@ -1586,6 +1586,13 @@ a { color: inherit; text-decoration: none; }
 .cb-eyebrow { text-align: center; margin: 0 0 6px; font-weight: 600; font-size: 0.78rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
 .cb-set .section-sub a { color: var(--accent); font-weight: 600; }
 .cb-set--page { padding-top: 48px; border-top: 0; min-height: 60vh; }
+/* In Search Of: card names link to an eBay search; Copy button copies the name (js/isearch-links.js). */
+.cb-link { min-width: 0; flex: 1; color: inherit; text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 3px; }
+.cb-link:hover, .cb-link:focus-visible { text-decoration-color: var(--accent); color: var(--accent); }
+.cb-link:hover .cb-num, .cb-link:focus-visible .cb-num { color: var(--accent); }
+.cb-copy { flex: none; align-self: center; margin-left: auto; padding: 4px 9px; border: 1px solid var(--border); border-radius: 6px; background: transparent; color: var(--text-muted); font: 600 0.72rem/1.2 var(--font-body); letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; }
+.cb-copy:hover, .cb-copy:focus-visible { border-color: var(--accent); color: var(--accent); }
+.cb-copy.is-done { background: var(--forest); border-color: var(--forest); color: var(--on-dark); }
 
 /* My Collection: horizontal cards. Their slab photos are landscape, so the tile
    spans two columns with a 3:2 photo box - the same height as its 3:4 neighbours,
