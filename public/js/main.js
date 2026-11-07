@@ -122,7 +122,7 @@ async function loadFeaturedItems() {
       updatedAt
       tags
       collections(first: 10) { edges { node { handle } } }
-      images(first: 2) { edges { node { url(transform: { maxWidth: 900 }) altText width height } } }
+      images(first: 2) { edges { node { url(transform: { maxWidth: 700 }) altText width height } } }
       priceRange { minVariantPrice { amount currencyCode } }
       # Needed to build the cart permalink — see buyUrl().
       variants(first: 1) { edges { node { id } } }
@@ -226,7 +226,7 @@ async function loadFeaturedItems() {
       const personal = isPersonal(product);
       const flip = `
             <span class="card-flip">
-              <img src="${image ? image.url : ''}" alt="${image?.altText || product.title}" class="product-image card-face card-face--front">
+              <img src="${image ? image.url : ''}" alt="${image?.altText || product.title}" class="product-image card-face card-face--front" loading="lazy" decoding="async">
               ${back ? `<img src="${back}" alt="" class="card-face card-face--back" loading="lazy" aria-hidden="true">` : ''}
             </span>`;
 
@@ -323,7 +323,7 @@ async function loadPersonalCollection() {
               title
               handle
               tags
-              images(first: 2) { edges { node { url(transform: { maxWidth: 900 }) altText width height } } }
+              images(first: 2) { edges { node { url(transform: { maxWidth: 700 }) altText width height } } }
             }
           }
         }
@@ -369,7 +369,7 @@ async function loadPersonalCollection() {
         <div class="product-image-wrap${back ? ' has-back' : ''}">
           <button type="button" class="photo-btn" aria-label="View photos of ${product.title.replace(/"/g, '&quot;')}">
             <span class="card-flip">
-              <img src="${image ? image.url : ''}" alt="${image?.altText || product.title}" class="product-image card-face card-face--front">
+              <img src="${image ? image.url : ''}" alt="${image?.altText || product.title}" class="product-image card-face card-face--front" loading="lazy" decoding="async">
               ${back ? `<img src="${back}" alt="" class="card-face card-face--back" loading="lazy" aria-hidden="true">` : ''}
             </span>
           </button>
