@@ -32,9 +32,18 @@ export default {
     // 301 would turn those POSTs into GETs.
     if (ALIAS_HOSTS.has(url.hostname) && !url.pathname.startsWith('/api/')) {
       url.hostname = CANONICAL_HOST;
+      // Browsers that visited 22 Oct - 6 Nov cached a permanent duxtradingpost.com ->
+      // dtpcards.com redirect, so sending them back to the same duxtradingpost.com URL
+      // loops. The `fresh` param makes the target a URL they have never cached; the
+      // page's canonical tag keeps search ranking on the plain URL.
+      url.searchParams.set('fresh', '1');
       // 301, not 302 — a permanent redirect passes search ranking to the
-      // canonical domain. Path and query are preserved by reusing the URL.
-      return Response.redirect(url.toString(), 301);
+      // canonical domain. Path and query are preserved by reusing the URL. A short
+      // cache lifetime means a future domain change can't strand visitors again.
+      return new Response(null, {
+        status: 301,
+        headers: { Location: url.toString(), 'Cache-Control': 'max-age=3600' }
+      });
     }
 
     // The morning briefing posts itself here from the Mac. Guarded by a shared
