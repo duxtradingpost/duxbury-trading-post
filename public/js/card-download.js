@@ -22,8 +22,8 @@
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'card-dl';
-    b.setAttribute('aria-label', 'Download this photo');
-    b.title = 'Download this photo';
+    b.setAttribute('aria-label', 'Save this photo');
+    b.title = 'Save this photo';
     b.innerHTML = ICON;
     wrap.appendChild(b);
   }
@@ -49,32 +49,104 @@
     return `${slug || 'card'}-${side}.jpg`;
   }
 
-  async function download(wrap) {
+  // iPhone Safari only opens the share sheet straight from a tap. Awaiting the
+  // photo download first used up the tap, so the sheet was refused and the
+  // photo opened in a new tab instead (Craig, 16 Nov 2026: "pop up option to
+  // save to my camera roll"). So the photo starts loading the moment a finger
+  // touches the button, the sheet opens on the tap itself when the file is
+  // ready, and otherwise a "Save to Photos" button appears whose own tap opens
+  // it. In-app browsers (Instagram, Facebook) cannot share files at all, so
+  // they get the full photo with press-and-hold instructions instead.
+  const isPhone = () => window.matchMedia('(hover: none)').matches;
+  const cache = new Map();   // url -> {promise, file}
+
+  function target(wrap) {
     const flipped = wrap.classList.contains('is-flipped');
     const img = (flipped && wrap.querySelector('.card-face--back')) ||
                 wrap.querySelector('.card-face--front, img');
-    if (!img) return;
-    const url = fullSize(img.currentSrc || img.src);
-    const name = fileName(wrap.closest('.product-card'), flipped ? 'back' : 'front');
-    try {
-      const blob = await (await fetch(url, { mode: 'cors' })).blob();
-      const file = new File([blob], name, { type: blob.type || 'image/jpeg' });
-      if (window.matchMedia('(hover: none)').matches && navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file] });
-        return;
-      }
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = name;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-    } catch (err) {
-      if (err && err.name === 'AbortError') return;   // share sheet dismissed
-      window.open(url, '_blank', 'noopener');
-    }
+    if (!img) return null;
+    return { url: fullSize(img.currentSrc || img.src),
+             name: fileName(wrap.closest('.product-card'), flipped ? 'back' : 'front') };
   }
+
+  function load(t) {
+    let c = cache.get(t.url);
+    if (!c) {
+      c = { file: null };
+      c.promise = fetch(t.url, { mode: 'cors' }).then(r => r.blob()).then(blob => {
+        c.file = new File([blob], t.name, { type: blob.type || 'image/jpeg' });
+        return c.file;
+      });
+      c.promise.catch(() => cache.delete(t.url));
+      cache.set(t.url, c);
+    }
+    return c;
+  }
+
+  const canShareFile = f => !!(navigator.canShare && navigator.share && navigator.canShare({ files: [f] }));
+
+  function share(file) {
+    return navigator.share({ files: [file] }).catch(err => {
+      if (err && err.name !== 'AbortError') pressAndHold(URL.createObjectURL(file));
+    });
+  }
+
+  function sheet(inner) {
+    const o = document.createElement('div');
+    o.className = 'card-dl-sheet';
+    o.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.86);display:flex;' +
+      'flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px 16px;' +
+      'color:#fff;font:600 16px/1.35 system-ui,sans-serif;text-align:center';
+    o.innerHTML = inner + '<button type="button" data-close style="background:none;border:1px solid rgba(255,255,255,.5);' +
+      'color:#fff;border-radius:999px;padding:9px 22px;font:inherit;font-weight:500">Close</button>';
+    o.addEventListener('click', e => { if (e.target === o || e.target.closest('[data-close]')) o.remove(); });
+    document.body.appendChild(o);
+    return o;
+  }
+
+  function readyButton(file) {
+    const o = sheet('<div>Your photo is ready</div><button type="button" data-save style="background:#fff;color:#111;' +
+      'border:0;border-radius:999px;padding:14px 28px;font:inherit;font-size:17px">Save to Photos</button>');
+    o.querySelector('[data-save]').addEventListener('click', () => { o.remove(); share(file); });
+  }
+
+  function pressAndHold(src) {
+    sheet('<img alt="" src="' + src + '" style="max-width:100%;max-height:68vh;border-radius:6px;' +
+      '-webkit-touch-callout:default;user-select:auto">' +
+      '<div style="max-width:30ch">Press and hold the photo, then tap <b>Save to Photos</b>.</div>');
+  }
+
+  function desktopDownload(file) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(file);
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }
+
+  function download(wrap) {
+    const t = wrap && target(wrap);
+    if (!t) return;
+    const c = load(t);
+    if (c.file) {                       // ready: open the sheet on this very tap
+      if (isPhone() && canShareFile(c.file)) return share(c.file);
+      return isPhone() ? pressAndHold(t.url) : desktopDownload(c.file);
+    }
+    c.promise.then(file => {
+      if (isPhone() && canShareFile(file)) readyButton(file);
+      else if (isPhone()) pressAndHold(t.url);
+      else desktopDownload(file);
+    }).catch(() => isPhone() ? pressAndHold(t.url) : window.open(t.url, '_blank', 'noopener'));
+  }
+
+  // Start loading as soon as a finger (or mouse) lands on the button.
+  ['touchstart', 'pointerdown'].forEach(ev => document.addEventListener(ev, e => {
+    const b = e.target.closest && e.target.closest('.card-dl');
+    const t = b && target(b.closest('.product-image-wrap'));
+    if (t) load(t);
+  }, { capture: true, passive: true }));
 
   document.addEventListener('click', e => {
     const b = e.target.closest('.card-dl');
