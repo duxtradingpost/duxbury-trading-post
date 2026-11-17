@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cards For Sale | DTP Cards</title>
+<meta name="description" content="Graded Josh Allen, Jayson Tatum and Roman Anthony cards for sale from DTP Cards.">
+<!-- Shared by link only: kept out of search results and the sitemap. -->
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="images/logo.svg">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="apple-touch-icon" href="images/favicon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="DTP Cards">
+<meta property="og:title" content="Cards For Sale | DTP Cards">
+<meta property="og:description" content="Josh Allen, Jayson Tatum and Roman Anthony PSA 10s. Tap any card to say you're interested.">
+<meta property="og:url" content="https://duxtradingpost.com/for-sale.html">
+<meta property="og:image" content="https://duxtradingpost.com/images/og.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Same palette and type as css/styles.css, kept inline so this page never
+   depends on in-progress edits to the main stylesheet. */
+:root{--page:#FFFFFF;--band:#F7F4EB;--forest:#0F3C1F;--forest-dark:#0A2814;--accent:#0F3C1F;--on-dark:#FFFFFF;
+--text-dark:#16281C;--text-muted:#4A5750;--border:#DCD6C4;--field:#FFFFFF;--ok:#1B7A43;--err:#B3261E;
+--font-display:'Oswald','Arial Narrow',sans-serif;--font-body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif}
+@media (prefers-color-scheme:dark){:root{--page:#0D1B12;--band:#12261A;--forest:#1E5C36;--forest-dark:#0A2814;--accent:#7FBF95;
+--text-dark:#E7EDE8;--text-muted:#A0B0A6;--border:#27402F;--field:#162C1E;--ok:#7FD39E;--err:#FF8A80;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text-dark);font-family:var(--font-body);font-size:15px;line-height:1.5}
+a{color:var(--accent)}
+.top{background:var(--forest);color:var(--on-dark)}
+.top .in{max-width:1180px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
+.top img{height:38px;width:auto}
+.top a{color:var(--on-dark);text-decoration:none;font-family:var(--font-display);font-size:20px;letter-spacing:.04em}
+.top .home{margin-left:auto;font-family:var(--font-body);font-size:14px;opacity:.9}
+.hero{background:var(--band);border-bottom:1px solid var(--border)}
+.hero .in{max-width:1180px;margin:0 auto;padding:26px 16px 22px}
+h1{font-family:var(--font-display);font-weight:700;font-size:clamp(28px,5vw,40px);letter-spacing:.02em;margin:0;text-transform:uppercase}
+.hero p{margin:6px 0 0;color:var(--text-muted);max-width:62ch}
+.terms{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px;font-size:13.5px;color:var(--text-muted)}
+.terms b{color:var(--text-dark);font-weight:600}
+main{max-width:1180px;margin:0 auto;padding:18px 16px 60px}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.filters button{font:inherit;font-size:14px;border:1px solid var(--border);background:var(--page);color:var(--text-dark);border-radius:999px;padding:6px 14px;cursor:pointer}
+.filters button[aria-pressed=true]{background:var(--forest);border-color:var(--forest);color:var(--on-dark)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.card{border:1px solid var(--border);border-radius:10px;background:var(--page);display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.card .ph{display:block;background:var(--band);aspect-ratio:3/4;max-width:100%}
+.card .ph img{width:100%;height:100%;object-fit:contain;display:block}
+.card .body{padding:12px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card h2{font-size:14.5px;font-weight:600;margin:0;line-height:1.35}
+.card h2 a{color:inherit;text-decoration:none}
+.card h2 a:hover{text-decoration:underline}
+.price{font-family:var(--font-display);font-size:26px;font-weight:600;letter-spacing:.02em}
+.price small{font-family:var(--font-body);font-size:12px;font-weight:500;color:var(--text-muted);letter-spacing:0;margin-left:4px}
+.actions{display:flex;gap:8px;margin-top:auto}
+.btn{font:inherit;font-weight:600;font-size:14px;border-radius:6px;padding:9px 12px;cursor:pointer;text-align:center;text-decoration:none;flex:1}
+.btn-main{background:var(--forest);color:var(--on-dark);border:1px solid var(--forest)}
+.btn-main:hover{background:var(--forest-dark)}
+.btn-line{background:transparent;color:var(--accent);border:1px solid var(--border)}
+.card.sent .btn-main{background:transparent;color:var(--ok);border-color:var(--ok);cursor:default}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+dialog{border:1px solid var(--border);border-radius:12px;padding:0;max-width:440px;width:calc(100% - 32px);background:var(--page);color:var(--text-dark)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.dlg{padding:20px}
+.dlg h3{font-family:var(--font-display);font-size:22px;margin:0 0 2px;text-transform:uppercase;letter-spacing:.02em}
+.dlg .which{color:var(--text-muted);font-size:14px;margin:0 0 14px}
+.dlg label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px}
+.dlg input,.dlg textarea{width:100%;font:inherit;color:var(--text-dark);background:var(--field);border:1px solid var(--border);border-radius:6px;padding:9px 10px}
+.dlg textarea{min-height:76px;resize:vertical}
+.dlg .row{display:flex;gap:8px;margin-top:16px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.msg{font-size:14px;margin-top:10px;min-height:1.2em}
+.msg.err{color:var(--err)} .msg.ok{color:var(--ok)}
+footer{border-top:1px solid var(--border);color:var(--text-muted);font-size:13px}
+footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
+@media (prefers-reduced-motion:no-preference){.card{transition:box-shadow .15s}.card:hover{box-shadow:0 4px 18px rgba(0,0,0,.08)}}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+  <a href="/"><img src="images/logo.png" alt="DTP Cards"></a>
+  <a href="/">DTP CARDS</a>
+  <a class="home" href="/">Visit the full site</a>
+</div></header>
+
+<section class="hero"><div class="in">
+  <h1>Cards For Sale</h1>
+  <p>A short list of graded Josh Allen, Jayson Tatum and Roman Anthony cards available direct. Tap a card's title or photo to see it on our site, and tap <b>I'm interested</b> to let us know. We'll email you back.</p>
+  <div class="terms">
+    <span><b>Prices include shipping</b> &middot; USPS, tracked and insured (US)</span>
+    <span><b>Payment</b> &middot; PayPal Goods &amp; Services or Venmo</span>
+    <span><b>Offers</b> &middot; welcome, add yours in the note</span>
+  </div>
+</div></section>
+
+<main>
+  <div class="filters" id="filters" role="group" aria-label="Filter by player"></div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<footer><div class="in">DTP Cards &middot; PO Box 1076, Duxbury MA 02331 &middot; <a href="mailto:info@duxburytradingpost.com">info@duxburytradingpost.com</a></div></footer>
+
+<dialog id="dlg" aria-labelledby="dlg-title">
+  <form class="dlg" id="form" method="dialog" novalidate>
+    <h3 id="dlg-title">I'm interested</h3>
+    <p class="which" id="which"></p>
+    <label for="f-name">Your name</label>
+    <input id="f-name" name="name" autocomplete="name" required maxlength="120">
+    <label for="f-email">Email</label>
+    <input id="f-email" name="email" type="email" autocomplete="email" required maxlength="200">
+    <label for="f-note">Note or offer (optional)</label>
+    <textarea id="f-note" name="note" maxlength="1500" placeholder="Questions, an offer, or other cards you want bundled"></textarea>
+    <div class="hp" aria-hidden="true"><label for="f-company">Company</label><input id="f-company" name="company" tabindex="-1" autocomplete="off"></div>
+    <div class="msg" id="msg" role="status"></div>
+    <div class="row">
+      <button type="button" class="btn btn-line" id="cancel">Cancel</button>
+      <button type="submit" class="btn btn-main" id="send">Send</button>
+    </div>
+  </form>
+</dialog>
+
+<script id="cards" type="application/json">[
+{
+"h": "2021-panini-prizm-josh-allen-cb-3-color-blast-psa-10-bills",
+"t": "2021 Panini Prizm Josh Allen #CB-3 Color Blast PSA 10",
+"p": 4825,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10354584682582_0.jpg?v=1793639336"
+},
+{
+"h": "2025-topps-cosmic-chrome-josh-allen-stn-12-stars-in-the-night-orange-galactic-09-25-psa-10-pop-2",
+"t": "2025 Topps Cosmic Chrome Josh Allen #STN-12 Stars in the Night Orange Galactic 09/25 PSA 10 Pop 2",
+"p": 3600,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10365938597974_0.jpg?v=1793639462"
+},
+{
+"h": "2022-panini-prizm-josh-allen-cb-4-color-blast-psa-10-bills",
+"t": "2022 Panini Prizm Josh Allen #CB-4 Color Blast PSA 10",
+"p": 3575,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10352421830742_0.jpg?v=1793639363"
+},
+{
+"h": "2025-topps-chrome-josh-allen-kai-7-kaiju-ssp-case-hit-bills",
+"t": "2025 Topps Chrome Josh Allen #KAI-7 Kaiju SSP Case Hit",
+"p": 3525,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/clip-164749881-1.jpg?v=1794849304"
+},
+{
+"h": "2026-bowman-football-josh-allen-arctic-allen-nflg-ja-garbage-pail-kids-refractor-bills",
+"t": "2026 Bowman Josh Allen Arctic Allen #NFLG-JA Garbage Pail Kids SSP PSA 10 Pop 1",
+"p": 3475,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/179411637-1.jpg?v=1792763706"
+},
+{
+"h": "2024-panini-donruss-optic-josh-allen-16-uptown-white-pandora-25-bills-psa-10",
+"t": "2024 Panini Donruss Optic Josh Allen #16 Uptown White Pandora /25 Bills PSA 10",
+"p": 2875,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/K90RKRvq5kq274g3965_sw.jpg?v=1793762263"
+},
+{
+"h": "2021-panini-donruss-optic-downtown-dt-1-josh-allen-psa-10-bills",
+"t": "2021 Panini Donruss Optic Downtown! #DT-1 Josh Allen PSA 10",
+"p": 2550,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/allen-dt1-optic-psa10-front.jpg?v=1794008438"
+},
+{
+"h": "2018-panini-prizm-205-josh-allen-red-white-blue-prizm-rc-psa-10",
+"t": "2018 Panini Prizm #205 Josh Allen Red White Blue Prizm RC PSA 10",
+"p": 2300,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/68440453-1.jpg?v=1793840910"
+},
+{
+"h": "2025-topps-cosmic-chrome-josh-allen-stn-12-stars-in-the-night-green-space-dust-72-75-psa-10-pop-1",
+"t": "2025 Topps Cosmic Chrome Josh Allen #STN-12 Stars in the Night Green Space Dust 72/75 PSA 10 Pop 1",
+"p": 2300,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10356664795222_0.jpg?v=1793639433"
+},
+{
+"h": "2021-panini-donruss-downtown-josh-allen-dt-1",
+"t": "2021 Panini Donruss Downtown #DT-1 Josh Allen PSA 10",
+"p": 2050,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/175464394-1.jpg?v=1793644610"
+},
+{
+"h": "2023-panini-one-color-blast-8-josh-allen-psa-10",
+"t": "2023 Panini One Color Blast #8 Josh Allen PSA 10",
+"p": 2050,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156291408-1.jpg?v=1794846856"
+},
+{
+"h": "2024-panini-donruss-optic-downtown-2-josh-allen-psa-10-bills",
+"t": "2024 Panini Donruss Optic Downtown! #2 Josh Allen PSA 10",
+"p": 2025,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/VMFoITPX4EKmJORfsWHk7g.jpg?v=1794265389"
+},
+{
+"h": "2024-panini-donruss-downtown-2-josh-allen-psa-10-bills",
+"t": "2024 Panini Donruss Downtown! #2 Josh Allen PSA 10",
+"p": 1900,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/TUAnesXvoECQxZp0VGHo2g.jpg?v=1793632546"
+},
+{
+"h": "2024-panini-phoenix-color-blast-cb-jan-josh-allen-psa-10",
+"t": "2024 Panini Phoenix Color Blast #CB-JAN Josh Allen PSA 10",
+"p": 1775,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/2gYSOgSz5EmdmsnrSxAZqA.jpg?v=1793668760"
+},
+{
+"h": "2024-panini-obsidian-black-color-blast-25-josh-allen-psa-10",
+"t": "2024 Panini Obsidian Black Color Blast #25 Josh Allen PSA 10",
+"p": 1675,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/kQEjIQ5UjUeHO_FnbirmnQ.jpg?v=1793371129"
+},
+{
+"h": "2022-panini-obsidian-josh-allen-cbb-jal-color-blast-black-psa-10-bills",
+"t": "2022 Panini Obsidian Josh Allen #CBB-JAL Color Blast Black PSA 10",
+"p": 1600,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10357964996694_0.jpg?v=1793639390"
+},
+{
+"h": "2024-panini-prizm-color-blast-duals-8-josh-allen-keon-coleman-rc-psa-10",
+"t": "2024 Panini Prizm Color Blast Duals #8 Josh Allen / Keon Coleman RC PSA 10",
+"p": 1275,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10385664344150_0.jpg?v=1793639532"
+},
+{
+"h": "2025-topps-finest-josh-allen-226-black-refractor-10-bills-psa-10",
+"t": "2025 Topps Finest Josh Allen #226 Black Refractor /10 Bills PSA 10",
+"p": 1025,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/IY1-koKa5U6lIcrc_I3lMQ_2b145747-b647-498b-b67d-49e2e3b3d431.jpg?v=1791817720"
+},
+{
+"h": "2025-topps-cosmic-chrome-josh-allen-cd-9-cosmic-dust-psa-10-bills",
+"t": "2025 Topps Cosmic Chrome Josh Allen #CD-9 Cosmic Dust PSA 10",
+"p": 1025,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/ed--1l1LSEya8GO7tLRwNw_e51bee57-77ea-4f42-9828-34882dd2fa5e.jpg?v=1791817730"
+},
+{
+"h": "2024-panini-donruss-optic-josh-allen-16-uptown-ssp-bills-psa-11",
+"t": "2024 Panini Donruss Optic Josh Allen #16 Uptown SSP Bills PSA 10",
+"p": 790,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/SLSTRcpWOE2j-CTII-W95w_6776e8b9-2047-4477-bcef-8235d7ff0fda.jpg?v=1791817733"
+},
+{
+"h": "2025-panini-mosaic-josh-allen-24-micro-mosaic-psa-10-bills",
+"t": "2025 Panini Mosaic Josh Allen #24 Micro Mosaic PSA 10",
+"p": 710,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/2QBz5hkShEyTBACuSAbx3g_88e59510-3e29-43bb-ad4e-7d397fc7ea80.jpg?v=1791817723"
+},
+{
+"h": "2025-panini-prizm-draft-picks-josh-allen-25-black-color-blast-psa-10",
+"t": "2025 Panini Prizm Draft Picks Josh Allen #25 Black Color Blast PSA 10",
+"p": 655,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_9606317965398_0.jpg?v=1793639404"
+},
+{
+"h": "2018-panini-donruss-rated-rookie-304-josh-allen-rc-psa-10",
+"t": "2018 Panini Donruss Rated Rookie #304 Josh Allen RC PSA 10",
+"p": 500,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/77717709-1.jpg?v=1793840906"
+},
+{
+"h": "2023-panini-select-concourse-josh-allen-13-blue-disco-prizm-01-25-psa-10",
+"t": "2023 Panini Select Concourse Josh Allen #13 Blue Disco Prizm 01/25 PSA 10",
+"p": 295,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156897634-1.jpg?v=1792266706"
+},
+{
+"h": "2024-25-panini-prizm-black-prizmania-10-jayson-tatum-psa-10-celtics",
+"t": "2024-25 Panini Prizm Black Prizmania #10 Jayson Tatum PSA 10",
+"p": 1100,
+"pl": "Jayson Tatum",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/G_U8IuYOBU25n-slISC_hw.jpg?v=1794289708"
+},
+{
+"h": "2025-26-bowman-chrome-jayson-tatum-cnb-6-crystallized-ssp-celtics-psa-10",
+"t": "2025-26 Bowman Chrome Jayson Tatum #CNB-6 Crystallized SSP Celtics PSA 10",
+"p": 800,
+"pl": "Jayson Tatum",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land-168434335-1.jpg?v=1794847026"
+},
+{
+"h": "2025-topps-chrome-jayson-tatum-h-7-helix-psa-10-celtics",
+"t": "2025 Topps Chrome Jayson Tatum #H-7 Helix PSA 10",
+"p": 515,
+"pl": "Jayson Tatum",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/tatumhx-front.jpg?v=1793885476"
+},
+{
+"h": "2026-topps-chrome-roman-anthony-hx-15-helix-rc-ssp-psa-10-red-sox",
+"t": "2026 Topps Chrome Roman Anthony #HX-15 Helix RC SSP PSA 10",
+"p": 2000,
+"pl": "Roman Anthony",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/ra0_land.jpg?v=1793648175"
+}
+]</script>
+<script>
+(() => {
+  const CARDS = JSON.parse(document.getElementById('cards').textContent);
+  const grid = document.getElementById('grid');
+  const filters = document.getElementById('filters');
+  const money = n => '$' + n.toLocaleString('en-US');
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  // Each card opens its own spot on the collection page, which scrolls to it and
+  // outlines it (see showSharedCollectionCard in js/main.js).
+  const link = h => '/collection.html?card=' + encodeURIComponent(h);
+  const sent = new Set();
+  let player = '';
+
+  const players = [...new Set(CARDS.map(c => c.pl))];
+  filters.innerHTML = ['All', ...players].map((p, i) =>
+    `<button type="button" data-p="${i ? esc(p) : ''}" aria-pressed="${i === 0}">${esc(p)}</button>`).join('');
+  filters.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    player = b.dataset.p;
+    filters.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    render();
+  });
+
+  function render() {
+    grid.innerHTML = CARDS.filter(c => !player || c.pl === player).map(c => `
+      <article class="card${sent.has(c.h) ? ' sent' : ''}">
+        <a class="ph" href="${link(c.h)}" aria-label="See ${esc(c.t)} on our site"><img src="${esc(c.img)}&width=600" alt="${esc(c.t)}" loading="lazy" decoding="async"></a>
+        <div class="body">
+          <h2><a href="${link(c.h)}">${esc(c.t)}</a></h2>
+          <div class="price">${money(c.p)}<small>shipped</small></div>
+          <div class="actions">
+            <a class="btn btn-line" href="${link(c.h)}">See it</a>
+            <button type="button" class="btn btn-main" data-h="${esc(c.h)}" ${sent.has(c.h) ? 'disabled' : ''}>${sent.has(c.h) ? 'Sent' : "I'm interested"}</button>
+          </div>
+        </div>
+      </article>`).join('');
+  }
+  render();
+
+  const dlg = document.getElementById('dlg'), form = document.getElementById('form'), msg = document.getElementById('msg');
+  const sendBtn = document.getElementById('send');
+  let current = null;
+  grid.addEventListener('click', e => {
+    const b = e.target.closest('button[data-h]'); if (!b || b.disabled) return;
+    current = CARDS.find(c => c.h === b.dataset.h);
+    document.getElementById('which').textContent = `${current.t} \u2014 ${money(current.p)} shipped`;
+    msg.textContent = ''; msg.className = 'msg';
+    sendBtn.disabled = false;
+    try { const saved = JSON.parse(localStorage.getItem('dtp-buyer') || '{}');
+      if (saved.name) form.name.value = saved.name; if (saved.email) form.email.value = saved.email; } catch (e) {}
+    dlg.showModal();
+    (form.name.value ? form.note : form.name).focus();
+  });
+  document.getElementById('cancel').addEventListener('click', () => dlg.close());
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const name = form.name.value.trim(), email = form.email.value.trim();
+    if (!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      msg.textContent = 'Please add your name and a valid email so we can reply.'; msg.className = 'msg err'; return;
+    }
+    sendBtn.disabled = true; msg.textContent = 'Sending\u2026'; msg.className = 'msg';
+    try {
+      const res = await fetch('/api/interest', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ handle: current.h, name, email, note: form.note.value.trim(), company: form.company.value }) });
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok || !out.ok) throw new Error(out.error || 'Something went wrong sending that.');
+      try { localStorage.setItem('dtp-buyer', JSON.stringify({ name, email })); } catch (e) {}
+      sent.add(current.h); form.note.value = '';
+      msg.textContent = "Thanks! We got it and will email you shortly."; msg.className = 'msg ok';
+      render();
+      setTimeout(() => dlg.close(), 1600);
+    } catch (err) {
+      msg.textContent = err.message + ' You can also email info@duxburytradingpost.com.'; msg.className = 'msg err';
+      sendBtn.disabled = false;
+    }
+  });
+})();
+</script>
+</body>
+</html>

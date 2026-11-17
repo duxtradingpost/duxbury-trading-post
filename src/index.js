@@ -54,6 +54,13 @@ export default {
         : json({ ok: false, error: 'Method not allowed' }, 405);
     }
 
+    // "I'm interested" clicks from for-sale.html - one email per click to the shop inbox.
+    if (url.pathname === '/api/interest') {
+      return request.method === 'POST'
+        ? handleInterest(request, env)
+        : json({ ok: false, error: 'Method not allowed' }, 405);
+    }
+
     if (url.pathname === '/api/sell') {
       return request.method === 'POST'
         ? handleSell(request, env)
@@ -292,6 +299,73 @@ async function handleSell(request, env) {
     }, 502);
   }
 
+  return json({ ok: true });
+}
+
+// The card list lives in for-sale.html itself. Title and price are read from that
+// page, never from the request, so a buyer cannot email us a made-up price.
+async function saleCards(request, env) {
+  // Assets may 307 /for-sale.html to /for-sale, so ask for the clean path first.
+  let page = await env.ASSETS.fetch(new Request(new URL('/for-sale', request.url)));
+  if (!page.ok) page = await env.ASSETS.fetch(new Request(new URL('/for-sale.html', request.url)));
+  const html = await page.text();
+  const m = html.match(/<script id="cards" type="application\/json">([\s\S]*?)<\/script>/);
+  return m ? JSON.parse(m[1]) : [];   // '<\/' in the JSON is a valid escape
+}
+
+async function handleInterest(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ ok: false, error: 'Could not read that request.' }, 400);
+  }
+  if (clean(body.company, 200)) return json({ ok: true });   // honeypot: bots only
+
+  const name = clean(body.name, 120);
+  const email = clean(body.email, 200);
+  const note = clean(body.note, 1500, true);
+  const handle = clean(body.handle, 200);
+  if (!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    return json({ ok: false, error: 'Please add your name and a valid email.' }, 400);
+  }
+
+  let card;
+  try {
+    card = (await saleCards(request, env)).find(c => c.h === handle);
+  } catch (err) {
+    console.error('interest: could not read card list:', err && err.message);
+  }
+  if (!card) return json({ ok: false, error: 'That card is no longer listed.' }, 404);
+
+  const price = '$' + Number(card.p).toLocaleString('en-US');
+  const link = `https://duxtradingpost.com/collection.html?card=${encodeURIComponent(card.h)}`;
+  const text =
+    `Someone is interested in a card on the For Sale page.\n\n` +
+    `Card:   ${card.t}\n` +
+    `Price:  ${price} shipped\n` +
+    `Link:   ${link}\n\n` +
+    `Name:   ${name}\n` +
+    `Email:  ${email}\n\n` +
+    `----- their note -----\n\n${note || '(none)'}\n\n` +
+    `----------------------\n` +
+    `Reply straight to this email - it goes back to ${email}.\n`;
+
+  const raw = buildMime({
+    from: SELL_FROM,
+    fromName: 'DTP Cards website',
+    to: SELL_TO,
+    replyTo: email,
+    subject: `Interested: ${card.t} (${price}) - ${name}`,
+    text,
+    attachments: []
+  });
+  try {
+    await env.SELL_EMAIL.send(new EmailMessage(SELL_FROM, SELL_TO, raw));
+  } catch (err) {
+    console.error('interest send failed:', err && err.message);
+    return json({ ok: false, error: 'Something went wrong sending that.' }, 502);
+  }
   return json({ ok: true });
 }
 
