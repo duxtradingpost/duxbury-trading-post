@@ -17,6 +17,9 @@ const ALIAS_HOSTS = new Set([
 const SELL_TO = 'info@duxburytradingpost.com';
 const SELL_FROM = 'website@duxburytradingpost.com';
 
+// Pauses every alert email from the Mac jobs (/api/briefing). Buyer and sell-form emails are unaffected.
+const ALERTS_PAUSED = true;
+
 // The browser downscales photos before upload (see js/find-form.js), so these
 // ceilings are a backstop against someone posting to the endpoint directly
 // rather than a limit real submissions will approach.
@@ -157,6 +160,11 @@ async function handleBriefing(request, env) {
   if (!want || given.length !== want.length || given !== want) {
     return json({ ok: false, error: 'Not authorised' }, 401);
   }
+
+  // Craig, 17 Nov 2026: "stop ALL email alerts for the time being". Every Mac job's
+  // email comes through here, so this one switch silences them all while the jobs
+  // keep running. Set back to false to resume.
+  if (ALERTS_PAUSED) return json({ ok: true, paused: true });
 
   // Two shapes are accepted: a JSON body carrying both a text and an HTML part,
   // and a bare text/plain body. The plain form is what the script used to send
