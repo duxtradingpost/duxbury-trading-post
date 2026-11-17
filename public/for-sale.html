@@ -42,7 +42,11 @@ h1{font-family:var(--font-display);font-weight:700;font-size:clamp(28px,5vw,40px
 .terms{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px;font-size:13.5px;color:var(--text-muted)}
 .terms b{color:var(--text-dark);font-weight:600}
 main{max-width:1180px;margin:0 auto;padding:18px 16px 60px}
-.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.toolbar input,.toolbar select{font:inherit;font-size:14px;color:var(--text-dark);background:var(--field);border:1px solid var(--border);border-radius:6px;padding:8px 10px;min-width:0}
+.toolbar input{flex:1 1 220px}
+.count{font-size:13.5px;color:var(--text-muted);margin:0 0 14px}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
 .filters button{font:inherit;font-size:14px;border:1px solid var(--border);background:var(--page);color:var(--text-dark);border-radius:999px;padding:6px 14px;cursor:pointer}
 .filters button[aria-pressed=true]{background:var(--forest);border-color:var(--forest);color:var(--on-dark)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
@@ -116,16 +120,31 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
 
 <section class="hero"><div class="in">
   <h1>Cards For Sale</h1>
-  <p>A short list of graded Josh Allen, Jayson Tatum and Roman Anthony cards available direct. Tap a card's title or photo to see it on our site, and tap <b>I'm interested</b> on as many cards as you like. When you're done, tap <b>Add notes &amp; send</b> at the bottom of the screen to add your details, any notes or an offer, and send them to us in one go.</p>
+  <p>Everything we have available direct, from PSA 10 Josh Allens to rookies and inserts. Sort and filter below, tap a card's photo or <b>See it</b> for a closer look, and tap <b>I'm interested</b> on as many cards as you like. When you're done, tap <b>Add notes &amp; send</b> at the bottom of the screen to add your details, any notes or an offer, and send them to us in one go.</p>
   <div class="terms">
-    <span><b>Prices include shipping</b> &middot; UPS, tracked and insured (US)</span>
+    <span><b>Shipping</b> &middot; included on cards $50 and up (UPS, tracked and insured, US). Orders under $50 add $5.</span>
     <span><b>Payment</b> &middot; PayPal or Venmo</span>
     <span><b>Offers</b> &middot; welcome, add yours in the notes (bundles too)</span>
   </div>
 </div></section>
 
 <main>
-  <div class="filters" id="filters" role="group" aria-label="Filter by player"></div>
+  <div class="toolbar">
+    <input type="search" id="q" placeholder="Search player, set, card number" aria-label="Search cards">
+    <select id="sort" aria-label="Sort">
+      <option value="pd">Price: high to low</option>
+      <option value="pa">Price: low to high</option>
+      <option value="yd">Year: newest first</option>
+      <option value="ya">Year: oldest first</option>
+      <option value="n">Player A–Z</option>
+    </select>
+    <select id="fPlayer" aria-label="Player"></select>
+    <select id="fBrand" aria-label="Brand"></select>
+    <select id="fGrade" aria-label="Graded or raw"><option value="">Graded &amp; raw</option><option>Graded</option><option>Raw</option></select>
+    <select id="fPrice" aria-label="Price range"><option value="">Any price</option><option value="0-50">Under $50</option><option value="50-250">$50 – $250</option><option value="250-1000">$250 – $1,000</option><option value="1000-1e9">$1,000+</option></select>
+  </div>
+  <div class="filters" id="filters" role="group" aria-label="Filter by sport"></div>
+  <p class="count" id="count"></p>
   <div class="grid" id="grid"></div>
 </main>
 
@@ -170,6 +189,22 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
 
 <script id="cards" type="application/json">[
 {
+"h": "2026-topps-series-1-roman-anthony-ak-14-all-kings-rc-ssp-red-sox-psa-10",
+"t": "2026 Topps Series 1 Roman Anthony #AK-14 All Kings RC SSP PSA 10",
+"p": 5000,
+"pl": "Roman Anthony",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/t1oW6dzDeEOl30_GNtV3aA_dbf2e_1481d090-815f-4fd8-8dca-3769e11763b0.jpg?v=1791817735",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/t1oW6dzDeEOl30_GNtV3aA_dbf2e_1481d090-815f-4fd8-8dca-3769e11763b0.jpg?v=1791817735",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/8Z8Rgvnw80irixxzC4Pgdw_78db5_b130e628-1dfc-4c9b-bbe2-1a13f74317b9.jpg?v=1791817735"
+],
+"l": "/collection.html?card=2026-topps-series-1-roman-anthony-ak-14-all-kings-rc-ssp-red-sox-psa-10",
+"sp": "Baseball",
+"y": 2026,
+"br": "Topps",
+"g": "Graded"
+},
+{
 "h": "2021-panini-prizm-josh-allen-cb-3-color-blast-psa-10-bills",
 "t": "2021 Panini Prizm Josh Allen #CB-3 Color Blast PSA 10",
 "p": 4825,
@@ -178,7 +213,12 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
 "imgs": [
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10354584682582_0.jpg?v=1793639336",
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10354584682582_1.jpg?v=1793639342"
-]
+],
+"l": "/collection.html?card=2021-panini-prizm-josh-allen-cb-3-color-blast-psa-10-bills",
+"sp": "Football",
+"y": 2021,
+"br": "Panini",
+"g": "Graded"
 },
 {
 "h": "2026-bowman-football-josh-allen-arctic-allen-nflg-ja-garbage-pail-kids-refractor-bills",
@@ -189,7 +229,12 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
 "imgs": [
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/179411637-1.jpg?v=1792763706",
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/179411637-2.jpg?v=1792763706"
-]
+],
+"l": "/collection.html?card=2026-bowman-football-josh-allen-arctic-allen-nflg-ja-garbage-pail-kids-refractor-bills",
+"sp": "Football",
+"y": 2026,
+"br": "Topps",
+"g": "Graded"
 },
 {
 "h": "2025-topps-cosmic-chrome-josh-allen-stn-12-stars-in-the-night-orange-galactic-09-25-psa-10-pop-2",
@@ -200,7 +245,12 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
 "imgs": [
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10365938597974_0.jpg?v=1793639462",
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10365938597974_1.jpg?v=1793639469"
-]
+],
+"l": "/collection.html?card=2025-topps-cosmic-chrome-josh-allen-stn-12-stars-in-the-night-orange-galactic-09-25-psa-10-pop-2",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Graded"
 },
 {
 "h": "2022-panini-prizm-josh-allen-cb-4-color-blast-psa-10-bills",
@@ -211,7 +261,12 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
 "imgs": [
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10352421830742_0.jpg?v=1793639363",
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10352421830742_1.jpg?v=1793639370"
-]
+],
+"l": "/collection.html?card=2022-panini-prizm-josh-allen-cb-4-color-blast-psa-10-bills",
+"sp": "Football",
+"y": 2022,
+"br": "Panini",
+"g": "Graded"
 },
 {
 "h": "2025-topps-chrome-josh-allen-kai-7-kaiju-ssp-case-hit-bills",
@@ -222,7 +277,12 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
 "imgs": [
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/clip-164749881-1.jpg?v=1794849304",
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/clip-164749881-2.jpg?v=1794849304"
-]
+],
+"l": "/collection.html?card=2025-topps-chrome-josh-allen-kai-7-kaiju-ssp-case-hit-bills",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
 },
 {
 "h": "2024-panini-donruss-optic-josh-allen-16-uptown-white-pandora-25-bills-psa-10",
@@ -233,7 +293,12 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
 "imgs": [
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/K90RKRvq5kq274g3965_sw.jpg?v=1793762263",
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/lbaez3MkT0WdfVzOxKamNQ.jpg?v=1793762262"
-]
+],
+"l": "/collection.html?card=2024-panini-donruss-optic-josh-allen-16-uptown-white-pandora-25-bills-psa-10",
+"sp": "Football",
+"y": 2024,
+"br": "Panini",
+"g": "Graded"
 },
 {
 "h": "2021-panini-donruss-optic-downtown-dt-1-josh-allen-psa-10-bills",
@@ -244,7 +309,12 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
 "imgs": [
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/allen-dt1-optic-psa10-front.jpg?v=1794008438",
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/allen-dt1-optic-psa10-back.jpg?v=1794008438"
-]
+],
+"l": "/collection.html?card=2021-panini-donruss-optic-downtown-dt-1-josh-allen-psa-10-bills",
+"sp": "Football",
+"y": 2021,
+"br": "Panini",
+"g": "Graded"
 },
 {
 "h": "2018-panini-prizm-205-josh-allen-red-white-blue-prizm-rc-psa-10",
@@ -255,7 +325,12 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
 "imgs": [
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/68440453-1.jpg?v=1793840910",
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/68440453-2.jpg?v=1793840910"
-]
+],
+"l": "/collection.html?card=2018-panini-prizm-205-josh-allen-red-white-blue-prizm-rc-psa-10",
+"sp": "Football",
+"y": 2018,
+"br": "Panini",
+"g": "Graded"
 },
 {
 "h": "2025-topps-cosmic-chrome-josh-allen-stn-12-stars-in-the-night-green-space-dust-72-75-psa-10-pop-1",
@@ -266,215 +341,12 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
 "imgs": [
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10356664795222_0.jpg?v=1793639433",
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10356664795222_1.jpg?v=1793639440"
-]
-},
-{
-"h": "2021-panini-donruss-downtown-josh-allen-dt-1",
-"t": "2021 Panini Donruss Downtown #DT-1 Josh Allen PSA 10",
-"p": 2050,
-"pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/175464394-1.jpg?v=1793644610",
-"imgs": [
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/175464394-1.jpg?v=1793644610",
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/175464394-2.jpg?v=1793644611"
-]
-},
-{
-"h": "2023-panini-one-color-blast-8-josh-allen-psa-10",
-"t": "2023 Panini One Color Blast #8 Josh Allen PSA 10",
-"p": 2050,
-"pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156291408-1.jpg?v=1794846856",
-"imgs": [
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156291408-1.jpg?v=1794846856",
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156291408-2.jpg?v=1794846856"
-]
-},
-{
-"h": "2024-panini-donruss-optic-downtown-2-josh-allen-psa-10-bills",
-"t": "2024 Panini Donruss Optic Downtown! #2 Josh Allen PSA 10",
-"p": 2025,
-"pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/VMFoITPX4EKmJORfsWHk7g.jpg?v=1794265389",
-"imgs": [
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/VMFoITPX4EKmJORfsWHk7g.jpg?v=1794265389",
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/FxZG5IuZZkeWydRkmKcGug.jpg?v=1794265389"
-]
-},
-{
-"h": "2024-panini-donruss-downtown-2-josh-allen-psa-10-bills",
-"t": "2024 Panini Donruss Downtown! #2 Josh Allen PSA 10",
-"p": 1900,
-"pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/TUAnesXvoECQxZp0VGHo2g.jpg?v=1793632546",
-"imgs": [
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/TUAnesXvoECQxZp0VGHo2g.jpg?v=1793632546",
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/MRacxWmLTUuNNqn_J32-3w.jpg?v=1793632546"
-]
-},
-{
-"h": "2024-panini-phoenix-color-blast-cb-jan-josh-allen-psa-10",
-"t": "2024 Panini Phoenix Color Blast #CB-JAN Josh Allen PSA 10",
-"p": 1775,
-"pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/2gYSOgSz5EmdmsnrSxAZqA.jpg?v=1793668760",
-"imgs": [
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/2gYSOgSz5EmdmsnrSxAZqA.jpg?v=1793668760",
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/53jJAQxA_UKfLpKysK4mhg.jpg?v=1793668761"
-]
-},
-{
-"h": "2024-panini-obsidian-black-color-blast-25-josh-allen-psa-10",
-"t": "2024 Panini Obsidian Black Color Blast #25 Josh Allen PSA 10",
-"p": 1675,
-"pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/kQEjIQ5UjUeHO_FnbirmnQ.jpg?v=1793371129",
-"imgs": [
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/kQEjIQ5UjUeHO_FnbirmnQ.jpg?v=1793371129",
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/xOCNiLwrKE67K9fNVUXPSw.jpg?v=1793371129"
-]
-},
-{
-"h": "2022-panini-obsidian-josh-allen-cbb-jal-color-blast-black-psa-10-bills",
-"t": "2022 Panini Obsidian Josh Allen #CBB-JAL Color Blast Black PSA 10",
-"p": 1600,
-"pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10357964996694_0.jpg?v=1793639390",
-"imgs": [
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10357964996694_0.jpg?v=1793639390",
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10357964996694_1.jpg?v=1793639397"
-]
-},
-{
-"h": "2024-panini-prizm-color-blast-duals-8-josh-allen-keon-coleman-rc-psa-10",
-"t": "2024 Panini Prizm Color Blast Duals #8 Josh Allen / Keon Coleman RC PSA 10",
-"p": 1275,
-"pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10385664344150_0.jpg?v=1793639532",
-"imgs": [
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10385664344150_0.jpg?v=1793639532"
-]
-},
-{
-"h": "2025-topps-finest-josh-allen-226-black-refractor-10-bills-psa-10",
-"t": "2025 Topps Finest Josh Allen #226 Black Refractor /10 Bills PSA 10",
-"p": 1025,
-"pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/IY1-koKa5U6lIcrc_I3lMQ_2b145747-b647-498b-b67d-49e2e3b3d431.jpg?v=1791817720",
-"imgs": [
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/IY1-koKa5U6lIcrc_I3lMQ_2b145747-b647-498b-b67d-49e2e3b3d431.jpg?v=1791817720",
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/YxBUu8N0zESWJAWs4I-sjQ_d11500b4-3bc4-426f-b150-3e37f6f833a2.jpg?v=1791817720"
-]
-},
-{
-"h": "2025-topps-cosmic-chrome-josh-allen-cd-9-cosmic-dust-psa-10-bills",
-"t": "2025 Topps Cosmic Chrome Josh Allen #CD-9 Cosmic Dust PSA 10",
-"p": 1025,
-"pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/ed--1l1LSEya8GO7tLRwNw_e51bee57-77ea-4f42-9828-34882dd2fa5e.jpg?v=1791817730",
-"imgs": [
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/ed--1l1LSEya8GO7tLRwNw_e51bee57-77ea-4f42-9828-34882dd2fa5e.jpg?v=1791817730",
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/ZYQy2fWFUE2A2MN8D3fXBQ_fb57d2a8-64e9-4eaf-98d0-ca383137bf1e.jpg?v=1791817729"
-]
-},
-{
-"h": "2024-panini-donruss-optic-josh-allen-16-uptown-ssp-bills-psa-11",
-"t": "2024 Panini Donruss Optic Josh Allen #16 Uptown SSP Bills PSA 10",
-"p": 790,
-"pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/SLSTRcpWOE2j-CTII-W95w_6776e8b9-2047-4477-bcef-8235d7ff0fda.jpg?v=1791817733",
-"imgs": [
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/SLSTRcpWOE2j-CTII-W95w_6776e8b9-2047-4477-bcef-8235d7ff0fda.jpg?v=1791817733",
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/3mdLYAz0Skuxikm0EImphA_68812_b5c54069-6639-4a3a-9d30-02745b90771b.jpg?v=1791817733"
-]
-},
-{
-"h": "2025-panini-mosaic-josh-allen-24-micro-mosaic-psa-10-bills",
-"t": "2025 Panini Mosaic Josh Allen #24 Micro Mosaic PSA 10",
-"p": 710,
-"pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/2QBz5hkShEyTBACuSAbx3g_88e59510-3e29-43bb-ad4e-7d397fc7ea80.jpg?v=1791817723",
-"imgs": [
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/2QBz5hkShEyTBACuSAbx3g_88e59510-3e29-43bb-ad4e-7d397fc7ea80.jpg?v=1791817723",
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/FpGop-Dy8UOvQnx9OAQevA_efe69b41-4f7e-40f5-bd1c-e6462f62f35a.jpg?v=1791817723"
-]
-},
-{
-"h": "2025-panini-prizm-draft-picks-josh-allen-25-black-color-blast-psa-10",
-"t": "2025 Panini Prizm Draft Picks Josh Allen #25 Black Color Blast PSA 10",
-"p": 655,
-"pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_9606317965398_0.jpg?v=1793639404",
-"imgs": [
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_9606317965398_0.jpg?v=1793639404",
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_9606317965398_1.jpg?v=1793639411"
-]
-},
-{
-"h": "2018-panini-donruss-rated-rookie-304-josh-allen-rc-psa-10",
-"t": "2018 Panini Donruss Rated Rookie #304 Josh Allen RC PSA 10",
-"p": 500,
-"pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/77717709-1.jpg?v=1793840906",
-"imgs": [
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/77717709-1.jpg?v=1793840906",
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/77717709-2.jpg?v=1793840907"
-]
-},
-{
-"h": "2023-panini-select-concourse-josh-allen-13-blue-disco-prizm-01-25-psa-10",
-"t": "2023 Panini Select Concourse Josh Allen #13 Blue Disco Prizm 01/25 PSA 10",
-"p": 295,
-"pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156897634-1.jpg?v=1792266706",
-"imgs": [
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156897634-1.jpg?v=1792266706",
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156897634-2.jpg?v=1792266706"
-]
-},
-{
-"h": "2024-25-panini-prizm-black-prizmania-10-jayson-tatum-psa-10-celtics",
-"t": "2024-25 Panini Prizm Black Prizmania #10 Jayson Tatum PSA 10",
-"p": 1100,
-"pl": "Jayson Tatum",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/G_U8IuYOBU25n-slISC_hw.jpg?v=1794289708",
-"imgs": [
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/G_U8IuYOBU25n-slISC_hw.jpg?v=1794289708",
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/5OW-t_5LE0qDZmY_xpGDSA.jpg?v=1794289708"
-]
-},
-{
-"h": "2025-26-bowman-chrome-jayson-tatum-cnb-6-crystallized-ssp-celtics-psa-10",
-"t": "2025-26 Bowman Chrome Jayson Tatum #CNB-6 Crystallized SSP Celtics PSA 10",
-"p": 875,
-"pl": "Jayson Tatum",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land-168434335-1.jpg?v=1794847026",
-"imgs": [
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land-168434335-1.jpg?v=1794847026",
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land-168434335-2.jpg?v=1794847026"
-]
-},
-{
-"h": "2025-topps-chrome-jayson-tatum-h-7-helix-psa-10-celtics",
-"t": "2025 Topps Chrome Jayson Tatum #H-7 Helix PSA 10",
-"p": 550,
-"pl": "Jayson Tatum",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/tatumhx-front.jpg?v=1793885476",
-"imgs": [
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/tatumhx-front.jpg?v=1793885476",
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/tatumhx-back.jpg?v=1793885477"
-]
-},
-{
-"h": "2026-topps-series-1-roman-anthony-ak-14-all-kings-rc-ssp-red-sox-psa-10",
-"t": "2026 Topps Series 1 Roman Anthony #AK-14 All Kings RC SSP PSA 10",
-"p": 5000,
-"pl": "Roman Anthony",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/t1oW6dzDeEOl30_GNtV3aA_dbf2e_1481d090-815f-4fd8-8dca-3769e11763b0.jpg?v=1791817735",
-"imgs": [
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/t1oW6dzDeEOl30_GNtV3aA_dbf2e_1481d090-815f-4fd8-8dca-3769e11763b0.jpg?v=1791817735",
-"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/8Z8Rgvnw80irixxzC4Pgdw_78db5_b130e628-1dfc-4c9b-bbe2-1a13f74317b9.jpg?v=1791817735"
-]
+],
+"l": "/collection.html?card=2025-topps-cosmic-chrome-josh-allen-stn-12-stars-in-the-night-green-space-dust-72-75-psa-10-pop-1",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Graded"
 },
 {
 "h": "2026-topps-chrome-roman-anthony-hx-15-helix-rc-ssp-psa-10-red-sox",
@@ -485,7 +357,1832 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
 "imgs": [
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/ra0_land.jpg?v=1793648175",
 "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/ra1_land.jpg?v=1793648175"
-]
+],
+"l": "/collection.html?card=2026-topps-chrome-roman-anthony-hx-15-helix-rc-ssp-psa-10-red-sox",
+"sp": "Baseball",
+"y": 2026,
+"br": "Topps",
+"g": "Graded"
+},
+{
+"h": "2021-panini-donruss-downtown-josh-allen-dt-1",
+"t": "2021 Panini Donruss Downtown #DT-1 Josh Allen PSA 10",
+"p": 2050,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/175464394-1.jpg?v=1793644610",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/175464394-1.jpg?v=1793644610",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/175464394-2.jpg?v=1793644611"
+],
+"l": "/collection.html?card=2021-panini-donruss-downtown-josh-allen-dt-1",
+"sp": "Football",
+"y": 2021,
+"br": "Panini",
+"g": "Graded"
+},
+{
+"h": "2023-panini-one-color-blast-8-josh-allen-psa-10",
+"t": "2023 Panini One Color Blast #8 Josh Allen PSA 10",
+"p": 2050,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156291408-1.jpg?v=1794846856",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156291408-1.jpg?v=1794846856",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156291408-2.jpg?v=1794846856"
+],
+"l": "/collection.html?card=2023-panini-one-color-blast-8-josh-allen-psa-10",
+"sp": "Football",
+"y": 2023,
+"br": "Panini",
+"g": "Graded"
+},
+{
+"h": "2024-panini-donruss-optic-downtown-2-josh-allen-psa-10-bills",
+"t": "2024 Panini Donruss Optic Downtown! #2 Josh Allen PSA 10",
+"p": 2025,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/VMFoITPX4EKmJORfsWHk7g.jpg?v=1794265389",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/VMFoITPX4EKmJORfsWHk7g.jpg?v=1794265389",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/FxZG5IuZZkeWydRkmKcGug.jpg?v=1794265389"
+],
+"l": "/collection.html?card=2024-panini-donruss-optic-downtown-2-josh-allen-psa-10-bills",
+"sp": "Football",
+"y": 2024,
+"br": "Panini",
+"g": "Graded"
+},
+{
+"h": "2024-panini-donruss-downtown-2-josh-allen-psa-10-bills",
+"t": "2024 Panini Donruss Downtown! #2 Josh Allen PSA 10",
+"p": 1900,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/TUAnesXvoECQxZp0VGHo2g.jpg?v=1793632546",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/TUAnesXvoECQxZp0VGHo2g.jpg?v=1793632546",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/MRacxWmLTUuNNqn_J32-3w.jpg?v=1793632546"
+],
+"l": "/collection.html?card=2024-panini-donruss-downtown-2-josh-allen-psa-10-bills",
+"sp": "Football",
+"y": 2024,
+"br": "Panini",
+"g": "Graded"
+},
+{
+"h": "2024-panini-phoenix-color-blast-cb-jan-josh-allen-psa-10",
+"t": "2024 Panini Phoenix Color Blast #CB-JAN Josh Allen PSA 10",
+"p": 1775,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/2gYSOgSz5EmdmsnrSxAZqA.jpg?v=1793668760",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/2gYSOgSz5EmdmsnrSxAZqA.jpg?v=1793668760",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/53jJAQxA_UKfLpKysK4mhg.jpg?v=1793668761"
+],
+"l": "/collection.html?card=2024-panini-phoenix-color-blast-cb-jan-josh-allen-psa-10",
+"sp": "Football",
+"y": 2024,
+"br": "Panini",
+"g": "Graded"
+},
+{
+"h": "2024-panini-obsidian-black-color-blast-25-josh-allen-psa-10",
+"t": "2024 Panini Obsidian Black Color Blast #25 Josh Allen PSA 10",
+"p": 1675,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/kQEjIQ5UjUeHO_FnbirmnQ.jpg?v=1793371129",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/kQEjIQ5UjUeHO_FnbirmnQ.jpg?v=1793371129",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/xOCNiLwrKE67K9fNVUXPSw.jpg?v=1793371129"
+],
+"l": "/collection.html?card=2024-panini-obsidian-black-color-blast-25-josh-allen-psa-10",
+"sp": "Football",
+"y": 2024,
+"br": "Panini",
+"g": "Graded"
+},
+{
+"h": "2022-panini-obsidian-josh-allen-cbb-jal-color-blast-black-psa-10-bills",
+"t": "2022 Panini Obsidian Josh Allen #CBB-JAL Color Blast Black PSA 10",
+"p": 1600,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10357964996694_0.jpg?v=1793639390",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10357964996694_0.jpg?v=1793639390",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10357964996694_1.jpg?v=1793639397"
+],
+"l": "/collection.html?card=2022-panini-obsidian-josh-allen-cbb-jal-color-blast-black-psa-10-bills",
+"sp": "Football",
+"y": 2022,
+"br": "Panini",
+"g": "Graded"
+},
+{
+"h": "2024-panini-prizm-color-blast-duals-8-josh-allen-keon-coleman-rc-psa-10",
+"t": "2024 Panini Prizm Color Blast Duals #8 Josh Allen / Keon Coleman RC PSA 10",
+"p": 1275,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10385664344150_0.jpg?v=1793639532",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10385664344150_0.jpg?v=1793639532"
+],
+"l": "/collection.html?card=2024-panini-prizm-color-blast-duals-8-josh-allen-keon-coleman-rc-psa-10",
+"sp": "Football",
+"y": 2024,
+"br": "Panini",
+"g": "Graded"
+},
+{
+"h": "2024-25-panini-prizm-black-prizmania-10-jayson-tatum-psa-10-celtics",
+"t": "2024-25 Panini Prizm Black Prizmania #10 Jayson Tatum PSA 10",
+"p": 1100,
+"pl": "Jayson Tatum",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/G_U8IuYOBU25n-slISC_hw.jpg?v=1794289708",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/G_U8IuYOBU25n-slISC_hw.jpg?v=1794289708",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/5OW-t_5LE0qDZmY_xpGDSA.jpg?v=1794289708"
+],
+"l": "/collection.html?card=2024-25-panini-prizm-black-prizmania-10-jayson-tatum-psa-10-celtics",
+"sp": "Basketball",
+"y": 2024,
+"br": "Panini",
+"g": "Graded"
+},
+{
+"h": "2025-topps-finest-josh-allen-226-black-refractor-10-bills-psa-10",
+"t": "2025 Topps Finest Josh Allen #226 Black Refractor /10 Bills PSA 10",
+"p": 1025,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/IY1-koKa5U6lIcrc_I3lMQ_2b145747-b647-498b-b67d-49e2e3b3d431.jpg?v=1791817720",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/IY1-koKa5U6lIcrc_I3lMQ_2b145747-b647-498b-b67d-49e2e3b3d431.jpg?v=1791817720",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/YxBUu8N0zESWJAWs4I-sjQ_d11500b4-3bc4-426f-b150-3e37f6f833a2.jpg?v=1791817720"
+],
+"l": "/collection.html?card=2025-topps-finest-josh-allen-226-black-refractor-10-bills-psa-10",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Graded"
+},
+{
+"h": "2025-topps-cosmic-chrome-josh-allen-cd-9-cosmic-dust-psa-10-bills",
+"t": "2025 Topps Cosmic Chrome Josh Allen #CD-9 Cosmic Dust PSA 10",
+"p": 1025,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/ed--1l1LSEya8GO7tLRwNw_e51bee57-77ea-4f42-9828-34882dd2fa5e.jpg?v=1791817730",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/ed--1l1LSEya8GO7tLRwNw_e51bee57-77ea-4f42-9828-34882dd2fa5e.jpg?v=1791817730",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/ZYQy2fWFUE2A2MN8D3fXBQ_fb57d2a8-64e9-4eaf-98d0-ca383137bf1e.jpg?v=1791817729"
+],
+"l": "/collection.html?card=2025-topps-cosmic-chrome-josh-allen-cd-9-cosmic-dust-psa-10-bills",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Graded"
+},
+{
+"h": "2025-26-bowman-chrome-jayson-tatum-cnb-6-crystallized-ssp-celtics-psa-10",
+"t": "2025-26 Bowman Chrome Jayson Tatum #CNB-6 Crystallized SSP Celtics PSA 10",
+"p": 875,
+"pl": "Jayson Tatum",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land-168434335-1.jpg?v=1794847026",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land-168434335-1.jpg?v=1794847026",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land-168434335-2.jpg?v=1794847026"
+],
+"l": "/collection.html?card=2025-26-bowman-chrome-jayson-tatum-cnb-6-crystallized-ssp-celtics-psa-10",
+"sp": "Basketball",
+"y": 2025,
+"br": "Topps",
+"g": "Graded"
+},
+{
+"h": "2024-panini-donruss-optic-josh-allen-16-uptown-ssp-bills-psa-11",
+"t": "2024 Panini Donruss Optic Josh Allen #16 Uptown SSP Bills PSA 10",
+"p": 790,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/SLSTRcpWOE2j-CTII-W95w_6776e8b9-2047-4477-bcef-8235d7ff0fda.jpg?v=1791817733",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/SLSTRcpWOE2j-CTII-W95w_6776e8b9-2047-4477-bcef-8235d7ff0fda.jpg?v=1791817733",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/3mdLYAz0Skuxikm0EImphA_68812_b5c54069-6639-4a3a-9d30-02745b90771b.jpg?v=1791817733"
+],
+"l": "/collection.html?card=2024-panini-donruss-optic-josh-allen-16-uptown-ssp-bills-psa-11",
+"sp": "Football",
+"y": 2024,
+"br": "Panini",
+"g": "Graded"
+},
+{
+"h": "2025-panini-mosaic-josh-allen-24-micro-mosaic-psa-10-bills",
+"t": "2025 Panini Mosaic Josh Allen #24 Micro Mosaic PSA 10",
+"p": 710,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/2QBz5hkShEyTBACuSAbx3g_88e59510-3e29-43bb-ad4e-7d397fc7ea80.jpg?v=1791817723",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/2QBz5hkShEyTBACuSAbx3g_88e59510-3e29-43bb-ad4e-7d397fc7ea80.jpg?v=1791817723",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/FpGop-Dy8UOvQnx9OAQevA_efe69b41-4f7e-40f5-bd1c-e6462f62f35a.jpg?v=1791817723"
+],
+"l": "/collection.html?card=2025-panini-mosaic-josh-allen-24-micro-mosaic-psa-10-bills",
+"sp": "Football",
+"y": 2025,
+"br": "Panini",
+"g": "Graded"
+},
+{
+"h": "2025-panini-prizm-draft-picks-josh-allen-25-black-color-blast-psa-10",
+"t": "2025 Panini Prizm Draft Picks Josh Allen #25 Black Color Blast PSA 10",
+"p": 655,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_9606317965398_0.jpg?v=1793639404",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_9606317965398_0.jpg?v=1793639404",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_9606317965398_1.jpg?v=1793639411"
+],
+"l": "/collection.html?card=2025-panini-prizm-draft-picks-josh-allen-25-black-color-blast-psa-10",
+"sp": "Football",
+"y": 2025,
+"br": "Panini",
+"g": "Graded"
+},
+{
+"h": "2025-topps-chrome-jayson-tatum-h-7-helix-psa-10-celtics",
+"t": "2025 Topps Chrome Jayson Tatum #H-7 Helix PSA 10",
+"p": 550,
+"pl": "Jayson Tatum",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/tatumhx-front.jpg?v=1793885476",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/tatumhx-front.jpg?v=1793885476",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/tatumhx-back.jpg?v=1793885477"
+],
+"l": "/collection.html?card=2025-topps-chrome-jayson-tatum-h-7-helix-psa-10-celtics",
+"sp": "Basketball",
+"y": 2025,
+"br": "Topps",
+"g": "Graded"
+},
+{
+"h": "2018-panini-donruss-rated-rookie-304-josh-allen-rc-psa-10",
+"t": "2018 Panini Donruss Rated Rookie #304 Josh Allen RC PSA 10",
+"p": 500,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/77717709-1.jpg?v=1793840906",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/77717709-1.jpg?v=1793840906",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/77717709-2.jpg?v=1793840907"
+],
+"l": "/collection.html?card=2018-panini-donruss-rated-rookie-304-josh-allen-rc-psa-10",
+"sp": "Football",
+"y": 2018,
+"br": "Panini",
+"g": "Graded"
+},
+{
+"h": "2023-panini-select-concourse-josh-allen-13-blue-disco-prizm-01-25-psa-10",
+"t": "2023 Panini Select Concourse Josh Allen #13 Blue Disco Prizm 01/25 PSA 10",
+"p": 295,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156897634-1.jpg?v=1792266706",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156897634-1.jpg?v=1792266706",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156897634-2.jpg?v=1792266706"
+],
+"l": "/collection.html?card=2023-panini-select-concourse-josh-allen-13-blue-disco-prizm-01-25-psa-10",
+"sp": "Football",
+"y": 2023,
+"br": "Panini",
+"g": "Graded"
+},
+{
+"h": "2025-topps-cosmic-chrome-treveyon-henderson-cca-tvh-auto-orange-galactic-25-rc",
+"t": "2025 Topps Cosmic Chrome TreVeyon Henderson #CCA-TVH Auto Orange Galactic /25 RC",
+"p": 212,
+"pl": "TreVeyon Henderson",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_4fa20e4c-ad1c-4d50-95a5-6a88339ccb0e.jpg?v=1792612520",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_4fa20e4c-ad1c-4d50-95a5-6a88339ccb0e.jpg?v=1792612520",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_ef6692fb-7ddb-4a0e-9460-79b480ace675.jpg?v=1792612520"
+],
+"l": "/inventory?card=2025-topps-cosmic-chrome-treveyon-henderson-cca-tvh-auto-orange-galactic-25-rc",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-topps-chrome-tennis-alexandra-eala-yq-ae-youthquake-orange-refractor-13-25",
+"t": "2026 Topps Chrome Tennis Alexandra Eala #YQ-AE YouthQuake Orange Refractor 13/25",
+"p": 201,
+"pl": "Alexandra Eala",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_f94054b6-be95-434e-b89b-923697052176.jpg?v=1792612514",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_f94054b6-be95-434e-b89b-923697052176.jpg?v=1792612514",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_65898489-db09-40e2-8b33-1e4d2fa40d64.jpg?v=1792612514"
+],
+"l": "/inventory?card=2026-topps-chrome-tennis-alexandra-eala-yq-ae-youthquake-orange-refractor-13-25",
+"sp": "Tennis",
+"y": 2026,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "1994-95-skybox-e-motion-shaquille-oneal-tense-magic-10",
+"t": "1994-95 SkyBox E-Motion Shaquille O'Neal #7 N-Tense Insert Magic",
+"p": 191,
+"pl": "Shaquille O'Neal",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_11798b8f-9350-484a-810d-95f81234f430.jpg?v=1793202042",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_11798b8f-9350-484a-810d-95f81234f430.jpg?v=1793202042",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_ebe1c043-be3a-4f29-b5ff-b80c827a884a.jpg?v=1793202042"
+],
+"l": "/inventory?card=1994-95-skybox-e-motion-shaquille-oneal-tense-magic-10",
+"sp": "Basketball",
+"y": 1994,
+"br": "Skybox",
+"g": "Raw"
+},
+{
+"h": "2025-topps-resurgence-josh-allen-10-orange-power-surge-refractor-25-bills-2",
+"t": "2025 Topps Resurgence Josh Allen #10 Orange Power Surge Refractor /25",
+"p": 174,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_f3c14ef0-3642-4bf8-85dc-6f105719f6e9.jpg?v=1793201749",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_f3c14ef0-3642-4bf8-85dc-6f105719f6e9.jpg?v=1793201749",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_1eeb3c7d-b10f-4ded-a08b-445d42125573.jpg?v=1793201749"
+],
+"l": "/inventory?card=2025-topps-resurgence-josh-allen-10-orange-power-surge-refractor-25-bills-2",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2025-panini-donruss-road-to-fifa-world-cup-cristiano-ronaldo-91-red-cubic-50",
+"t": "2025 Panini Donruss Road to FIFA World Cup Cristiano Ronaldo #91 Red Cubic /50",
+"p": 161,
+"pl": "Cristiano Ronaldo",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_63ea3939-0b82-4890-b04b-5e58f846d0ef.jpg?v=1793202036",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_63ea3939-0b82-4890-b04b-5e58f846d0ef.jpg?v=1793202036",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_6a96d1bc-6dc3-4786-b23c-4307129e4546.jpg?v=1793202037"
+],
+"l": "/inventory?card=2025-panini-donruss-road-to-fifa-world-cup-cristiano-ronaldo-91-red-cubic-50",
+"sp": "Soccer",
+"y": 2025,
+"br": "Panini",
+"g": "Raw"
+},
+{
+"h": "2024-bowmans-best-roman-anthony-b24-ra-best-of-auto-red-sox",
+"t": "2024 Bowman's Best Roman Anthony #B24-RA Best of Auto",
+"p": 120,
+"pl": "Roman Anthony",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_0dc5da40-6c54-4695-a781-a08a52930b60.jpg?v=1793305938",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_0dc5da40-6c54-4695-a781-a08a52930b60.jpg?v=1793305938",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_0b3c8237-2d37-49f2-ad34-35a739d54407.jpg?v=1793305938"
+],
+"l": "/inventory?card=2024-bowmans-best-roman-anthony-b24-ra-best-of-auto-red-sox",
+"sp": "Baseball",
+"y": 2024,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2024-bowman-roman-anthony-bcp-22-chrome-prospects-orange-shimmer-refractor-25",
+"t": "2024 Bowman Roman Anthony #BCP-22 Chrome Prospects Orange Refractor /25",
+"p": 116,
+"pl": "Roman Anthony",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_2e7cabcc-8310-4efc-b33d-7040421dcbd2.jpg?v=1792703446",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_2e7cabcc-8310-4efc-b33d-7040421dcbd2.jpg?v=1792703446",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_727959c8-61a2-454f-b54b-df839c915631.jpg?v=1792703445"
+],
+"l": "/inventory?card=2024-bowman-roman-anthony-bcp-22-chrome-prospects-orange-shimmer-refractor-25",
+"sp": "Baseball",
+"y": 2024,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2023-topps-pedro-martinez-aa-5-all-aces-black-5-299-red-sox",
+"t": "2023 Topps Pedro Martinez #AA-5 All Aces Black 5/299",
+"p": 111,
+"pl": "Pedro Martinez",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_01f18fef-4552-4103-930c-a3a93120d617.jpg?v=1794868506",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_01f18fef-4552-4103-930c-a3a93120d617.jpg?v=1794868506",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_c9202dc9-cb66-4ef3-869d-3f88463fe769.jpg?v=1794868506"
+],
+"l": "/inventory?card=2023-topps-pedro-martinez-aa-5-all-aces-black-5-299-red-sox",
+"sp": "Baseball",
+"y": 2023,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2024-panini-prizm-drake-maye-12-rookie-variations-rc-var-patriots",
+"t": "2024 Panini Prizm Drake Maye #12 Rookie Variations Silver Prizm RC VAR",
+"p": 110,
+"pl": "Drake Maye",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_d7b05699-3386-421b-a876-31e8b02774b4.jpg?v=1794323723",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_d7b05699-3386-421b-a876-31e8b02774b4.jpg?v=1794323723"
+],
+"l": "/inventory?card=2024-panini-prizm-drake-maye-12-rookie-variations-rc-var-patriots",
+"sp": "Football",
+"y": 2024,
+"br": "Panini",
+"g": "Raw"
+},
+{
+"h": "1995-96-skybox-premium-michael-jordan-278-electrified-bulls",
+"t": "1995-96 Skybox Premium Michael Jordan #278 Electrified Bulls",
+"p": 107,
+"pl": "Michael Jordan",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_1b0f38ca-a976-49ea-81de-b4d3586cc7cd.jpg?v=1793305947",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_1b0f38ca-a976-49ea-81de-b4d3586cc7cd.jpg?v=1793305947",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_3502ec62-d1b2-462a-94de-7d10fd32a6c4.jpg?v=1793305947"
+],
+"l": "/inventory?card=1995-96-skybox-premium-michael-jordan-278-electrified-bulls",
+"sp": "Basketball",
+"y": 1995,
+"br": "Skybox",
+"g": "Raw"
+},
+{
+"h": "2026-topps-buffalo-bills-279-black-diamante-foil-10-team-card",
+"t": "2026 Topps Buffalo Bills #279 Black Diamante Foil /10 Team Card",
+"p": 104,
+"pl": "Other",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_012b56f1-a7c3-4ab5-940f-7b3ada3fd698.jpg?v=1793201762",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_012b56f1-a7c3-4ab5-940f-7b3ada3fd698.jpg?v=1793201762",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_83efeeef-9ee3-4fd0-ba2f-ed3e4ee0f70c.jpg?v=1793201762"
+],
+"l": "/inventory?card=2026-topps-buffalo-bills-279-black-diamante-foil-10-team-card",
+"sp": "Football",
+"y": 2026,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2025-topps-signature-class-baker-mayfield-50-veteran-orange-foil-50",
+"t": "2025 Topps Signature Class Baker Mayfield #50 Veteran Orange Foil /10",
+"p": 95,
+"pl": "Baker Mayfield",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_a71f9740-1a30-4cb9-804c-dc0f3b38dab8.jpg?v=1793201754",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_a71f9740-1a30-4cb9-804c-dc0f3b38dab8.jpg?v=1793201754",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57.jpg?v=1793201754"
+],
+"l": "/inventory?card=2025-topps-signature-class-baker-mayfield-50-veteran-orange-foil-50",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2025-topps-resurgence-josh-allen-10-blue-surge-refractor-28-99-bills",
+"t": "2025 Topps Resurgence Josh Allen #10 Blue Surge Refractor 28/99",
+"p": 87,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_4d8dd85c-717d-45ab-a212-13e7486307a7.jpg?v=1791616744",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_4d8dd85c-717d-45ab-a212-13e7486307a7.jpg?v=1791616744",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_26658288-431c-4578-ba46-3648b8f753c0.jpg?v=1791616744"
+],
+"l": "/inventory?card=2025-topps-resurgence-josh-allen-10-blue-surge-refractor-28-99-bills",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2024-panini-prizm-drake-maye-329-red-white-and-blue-rc-patriots-1",
+"t": "2024 Panini Prizm Drake Maye #329 Red White and Blue RC",
+"p": 81,
+"pl": "Drake Maye",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_4a70d1df-2bd7-4b8d-85f0-e1822756fa49.jpg?v=1792612831",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_4a70d1df-2bd7-4b8d-85f0-e1822756fa49.jpg?v=1792612831",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_7ccbf3f7-c11f-465e-972a-69a15cd2937d.jpg?v=1792612830"
+],
+"l": "/inventory?card=2024-panini-prizm-drake-maye-329-red-white-and-blue-rc-patriots-1",
+"sp": "Football",
+"y": 2024,
+"br": "Panini",
+"g": "Raw"
+},
+{
+"h": "2025-panini-donruss-optic-tetairoa-mcmillan-17-rookie-recruits-auto-199-rc",
+"t": "2025 Panini Donruss Optic Tetairoa McMillan #17 Rookie Recruits Auto /199 RC",
+"p": 80,
+"pl": "Tetairoa McMillan",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_d34fe726-3300-4596-aae5-a27bafb5db20.jpg?v=1792612834",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_d34fe726-3300-4596-aae5-a27bafb5db20.jpg?v=1792612834",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_24a5addb-14c8-4f19-be57-b2f0014033c1.jpg?v=1792612833"
+],
+"l": "/inventory?card=2025-panini-donruss-optic-tetairoa-mcmillan-17-rookie-recruits-auto-199-rc",
+"sp": "Football",
+"y": 2025,
+"br": "Panini",
+"g": "Raw"
+},
+{
+"h": "2025-panini-prizm-draft-picks-josh-allen-200-mojo-25",
+"t": "2025 Panini Prizm Draft Picks Josh Allen #200 Mojo /25",
+"p": 79,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_bca4ac13-a3d7-468a-aabf-a20552b9cb7d.jpg?v=1793201757",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_bca4ac13-a3d7-468a-aabf-a20552b9cb7d.jpg?v=1793201757",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_43662887-3a64-4cd8-b455-2bc719028c95.jpg?v=1793201757"
+],
+"l": "/inventory?card=2025-panini-prizm-draft-picks-josh-allen-200-mojo-25",
+"sp": "Football",
+"y": 2025,
+"br": "Panini",
+"g": "Raw"
+},
+{
+"h": "2026-topps-khalil-shakir-21-real-one-auto-green-foil-99-ssp-bills-1",
+"t": "2026 Topps Khalil Shakir #21 Real One Auto Green Foil /99 SSP",
+"p": 76,
+"pl": "Khalil Shakir",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_a38e9742-e69f-4a33-bf2f-f16383e36466.jpg?v=1790630934",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_a38e9742-e69f-4a33-bf2f-f16383e36466.jpg?v=1790630934",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_f2e3861d-a3ca-4165-a2e0-af7e13e8a92c.jpg?v=1790630934"
+],
+"l": "/inventory?card=2026-topps-khalil-shakir-21-real-one-auto-green-foil-99-ssp-bills-1",
+"sp": "Football",
+"y": 2026,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2025-topps-resurgence-josh-allen-10-blue-surge-refractor-99-bills-1",
+"t": "2025 Topps Resurgence Josh Allen #10 Blue Surge Refractor 84/99",
+"p": 75,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_a406ad31-a30a-4fd1-ae58-83e5562e437e.jpg?v=1793202049",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_a406ad31-a30a-4fd1-ae58-83e5562e437e.jpg?v=1793202049",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_5c57a1e1-8a6c-49ca-9155-a04ead8bdd82.jpg?v=1793202049"
+],
+"l": "/inventory?card=2025-topps-resurgence-josh-allen-10-blue-surge-refractor-99-bills-1",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2023-topps-update-roger-clemens-aa-53-all-aces-black-214-299-red-sox",
+"t": "2023 Topps Update Roger Clemens #AA-53 All Aces Black 214/299",
+"p": 62,
+"pl": "Roger Clemens",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_e595dca7-993f-47f4-8165-2a5fafa9112d.jpg?v=1793902208",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_e595dca7-993f-47f4-8165-2a5fafa9112d.jpg?v=1793902208",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_d4bd6839-1fce-44c0-ae03-5c63cb891968.jpg?v=1793902208"
+],
+"l": "/inventory?card=2023-topps-update-roger-clemens-aa-53-all-aces-black-214-299-red-sox",
+"sp": "Baseball",
+"y": 2023,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-chrome-dawvris-brito-1st-bowman-auto-cpa-db-red-sox",
+"t": "2026 Bowman Chrome Dawvris Brito 1st Bowman Auto #CPA DB",
+"p": 62,
+"pl": "Dawvris Brito",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_979eb3dd-d374-47aa-a008-0efa3589dae2.jpg?v=1793094087",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_979eb3dd-d374-47aa-a008-0efa3589dae2.jpg?v=1793094087",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_d14e49c6-367b-4209-9823-6ed057b9a475.jpg?v=1793094087"
+],
+"l": "/inventory?card=2026-bowman-chrome-dawvris-brito-1st-bowman-auto-cpa-db-red-sox",
+"sp": "Baseball",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2025-topps-chrome-black-treveyon-henderson-rau-the-rookie-auto-rc-patriots",
+"t": "2025 Topps Chrome Black TreVeyon Henderson #RAU-THE Rookie Auto RC",
+"p": 60,
+"pl": "TreVeyon Henderson",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_bde8c1c0-6b79-4dfd-9c1c-f965cb838d5f.jpg?v=1793201764",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_bde8c1c0-6b79-4dfd-9c1c-f965cb838d5f.jpg?v=1793201764",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_f239bfea-9b65-4637-861a-91714ce6fca4.jpg?v=1793201765"
+],
+"l": "/inventory?card=2025-topps-chrome-black-treveyon-henderson-rau-the-rookie-auto-rc-patriots",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-topps-bucky-irving-nflm-bi-nfl-material-blue-150-mem-buccaneers",
+"t": "2026 Topps Bucky Irving #NFLM-BI NFL Material Blue /150 MEM Buccaneers",
+"p": 59,
+"pl": "Bucky Irving",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_6d314f9b-9e0d-41d3-b82b-4669873e7935.jpg?v=1793903710",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_6d314f9b-9e0d-41d3-b82b-4669873e7935.jpg?v=1793903710",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_629838d2-45d5-45f5-b654-4ce469dd06bc.jpg?v=1793903710"
+],
+"l": "/inventory?card=2026-topps-bucky-irving-nflm-bi-nfl-material-blue-150-mem-buccaneers",
+"sp": "Football",
+"y": 2026,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2025-topps-finest-tom-brady-100-patriots",
+"t": "2025 Topps Finest Tom Brady #100",
+"p": 55,
+"pl": "Tom Brady",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_abbb9827-1657-4663-beb9-c6bc0eae65e9.jpg?v=1793202026",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_abbb9827-1657-4663-beb9-c6bc0eae65e9.jpg?v=1793202026"
+],
+"l": "/inventory?card=2025-topps-finest-tom-brady-100-patriots",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2023-panini-immaculate-collection-zay-flowers-8-rookie-autos-gold-10-auto-rc",
+"t": "2023 Panini Immaculate Collection Zay Flowers #8 Rookie Autos Gold /10 Auto RC",
+"p": 55,
+"pl": "Zay Flowers",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_701f9564-7497-49eb-a9dd-2a4f36bbbf4d.jpg?v=1794349215",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_701f9564-7497-49eb-a9dd-2a4f36bbbf4d.jpg?v=1794349215",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_56f40c8e-19f4-4172-b892-141ceca4ec02.jpg?v=1794349215"
+],
+"l": "/inventory?card=2023-panini-immaculate-collection-zay-flowers-8-rookie-autos-gold-10-auto-rc",
+"sp": "Football",
+"y": 2023,
+"br": "Panini",
+"g": "Raw"
+},
+{
+"h": "2026-panini-donruss-elite-franklin-arias-138-prospects-gold-10-rc-red-sox",
+"t": "2026 Panini Donruss Elite Franklin Arias #138 Prospects Gold /10 RC",
+"p": 55,
+"pl": "Franklin Arias",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_52e958e4-5195-47af-837e-18e2b3884eb4.jpg?v=1791616852",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_52e958e4-5195-47af-837e-18e2b3884eb4.jpg?v=1791616852",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_95f79988-f32d-4e70-8c72-7ec3857b340d.jpg?v=1791616852"
+],
+"l": "/inventory?card=2026-panini-donruss-elite-franklin-arias-138-prospects-gold-10-rc-red-sox",
+"sp": "Baseball",
+"y": 2026,
+"br": "Panini",
+"g": "Raw"
+},
+{
+"h": "2025-panini-phoenix-treveyon-henderson-rpj-thn-rc-jersey-auto-prizm-199",
+"t": "2025 Panini Phoenix TreVeyon Henderson #RPJ-THN RC Jersey Auto Prizm /199",
+"p": 50,
+"pl": "TreVeyon Henderson",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_abaf27bf-452a-4273-b12c-4c2ad48a33d2.jpg?v=1793305936",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_abaf27bf-452a-4273-b12c-4c2ad48a33d2.jpg?v=1793305936",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_e35dc056-6dbe-45a5-9fa7-cd293b214020.jpg?v=1793305936"
+],
+"l": "/inventory?card=2025-panini-phoenix-treveyon-henderson-rpj-thn-rc-jersey-auto-prizm-199",
+"sp": "Football",
+"y": 2025,
+"br": "Panini",
+"g": "Raw"
+},
+{
+"h": "1989-score-barry-sanders-257-rc-lions",
+"t": "1989 Score Barry Sanders #257 RC Lions",
+"p": 50,
+"pl": "Barry Sanders",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_3cde7c86-7f3d-4902-bbb5-c7091280e592.jpg?v=1794348024",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_3cde7c86-7f3d-4902-bbb5-c7091280e592.jpg?v=1794348024",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_61c2b444-271a-4499-b95f-db6adfaae64e.jpg?v=1794348024"
+],
+"l": "/inventory?card=1989-score-barry-sanders-257-rc-lions",
+"sp": "Football",
+"y": 1989,
+"br": "Panini",
+"g": "Raw"
+},
+{
+"h": "2026-topps-jonathan-taylor-91tf-49-1991-blue-crackle-foil-150-colts",
+"t": "2026 Topps Jonathan Taylor #91TF-49 1991 Blue Crackle Foil /150 Colts",
+"p": 45,
+"pl": "Jonathan Taylor",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_1aaa7399-09ed-4605-9d4a-03c155bc4253.jpg?v=1794348045",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_1aaa7399-09ed-4605-9d4a-03c155bc4253.jpg?v=1794348045",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_649db934-5d31-4ec4-9f3f-4525500739cb.jpg?v=1794348045"
+],
+"l": "/inventory?card=2026-topps-jonathan-taylor-91tf-49-1991-blue-crackle-foil-150-colts",
+"sp": "Football",
+"y": 2026,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2025-26-topps-chrome-jaylen-brown-51-orange-refractor-25-celtics",
+"t": "2025-26 Topps Chrome Jaylen Brown #51 Orange Refractor /25",
+"p": 45,
+"pl": "Jaylen Brown",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_8ddc0a31-5c9a-49d9-ab29-f5f8b00bccbc.jpg?v=1790630203",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_8ddc0a31-5c9a-49d9-ab29-f5f8b00bccbc.jpg?v=1790630203",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_72cd2a36-9dd0-4dc4-8513-dbdc4db05281.jpg?v=1790630203"
+],
+"l": "/inventory?card=2025-26-topps-chrome-jaylen-brown-51-orange-refractor-25-celtics",
+"sp": "Basketball",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2024-panini-phoenix-christian-mccaffrey-26-bronze-75-49ers-1",
+"t": "2024 Panini Phoenix Christian McCaffrey #26 Bronze /75 49ers",
+"p": 45,
+"pl": "Christian McCaffrey",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_fe446527-97f6-491a-8ec8-cf3ff31536a5.jpg?v=1794348047",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_fe446527-97f6-491a-8ec8-cf3ff31536a5.jpg?v=1794348047",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_8506d5b2-98b3-4da9-a96b-d1469d849d77.jpg?v=1794348047"
+],
+"l": "/inventory?card=2024-panini-phoenix-christian-mccaffrey-26-bronze-75-49ers-1",
+"sp": "Football",
+"y": 2024,
+"br": "Panini",
+"g": "Raw"
+},
+{
+"h": "2026-pokemon-mep-black-star-promos-nidorina-101",
+"t": "2026 Pokemon MEP Black Star Promos Nidorina #101",
+"p": 44,
+"pl": "Other",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_c272a376-5e36-40b3-ad79-e4d484700056.jpg?v=1790633246",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_c272a376-5e36-40b3-ad79-e4d484700056.jpg?v=1790633246",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_1db0db01-c36b-432d-b12b-ef01ec5c0d65.jpg?v=1790633246"
+],
+"l": "/inventory?card=2026-pokemon-mep-black-star-promos-nidorina-101",
+"sp": "Pokémon",
+"y": 2026,
+"br": "Pokemon",
+"g": "Raw"
+},
+{
+"h": "ernie-clement-5-card-lot-topps-now-gold-50-x3-chrome-purple-75-platinum-75",
+"t": "Ernie Clement 5 Card Lot Topps Now Gold /50 x3 Chrome Purple /75 Platinum /75",
+"p": 44,
+"pl": "Ernie Clement",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_5b303157-62be-4fb9-b80f-5cb155ee0cc1.jpg?v=1793117431",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_5b303157-62be-4fb9-b80f-5cb155ee0cc1.jpg?v=1793117431",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_838e0dcb-d007-465b-8f22-ce1828af61a3.jpg?v=1793117432"
+],
+"l": "/inventory?card=ernie-clement-5-card-lot-topps-now-gold-50-x3-chrome-purple-75-platinum-75",
+"sp": "Baseball",
+"y": null,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2025-topps-cosmic-chrome-malik-nabers-ls-33-light-speed-gold-50",
+"t": "2025 Topps Cosmic Chrome Malik Nabers #LS-33 Light Speed Gold /50",
+"p": 43,
+"pl": "Malik Nabers",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_49850fdb-09e0-48d3-a39b-636ce734f1c4.jpg?v=1792612844",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_49850fdb-09e0-48d3-a39b-636ce734f1c4.jpg?v=1792612844",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_fb0747d5-5350-4d12-837b-67607e09a324.jpg?v=1792612844"
+],
+"l": "/inventory?card=2025-topps-cosmic-chrome-malik-nabers-ls-33-light-speed-gold-50",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2025-topps-cosmic-chrome-colston-loveland-116-purple-nebula-refractor-150-rc",
+"t": "2025 Topps Cosmic Chrome Colston Loveland #116 Purple Nebula Refractor /150 RC",
+"p": 40,
+"pl": "Colston Loveland",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_5e0de0b8-5bf8-4484-84f9-fb0ed523ff6e.jpg?v=1794866415",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_5e0de0b8-5bf8-4484-84f9-fb0ed523ff6e.jpg?v=1794866415",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_574f5e73-a686-430f-8cbb-d6f3005ea782.jpg?v=1794866415"
+],
+"l": "/inventory?card=2025-topps-cosmic-chrome-colston-loveland-116-purple-nebula-refractor-150-rc",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-topps-chrome-tennis-267-card-lot-alcaraz-djokovic-nadal-swiatek-gauff-rc",
+"t": "2026 Topps Chrome Tennis 267 Card Lot Alcaraz Djokovic Nadal Swiatek Gauff RC",
+"p": 40,
+"pl": "Other",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_cd9ab325-8f3e-4176-8be3-58a10e744dd6.jpg?v=1793117446",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_cd9ab325-8f3e-4176-8be3-58a10e744dd6.jpg?v=1793117446",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_a3a442be-f138-428d-8d63-8ba50ec1646f.jpg?v=1793117446"
+],
+"l": "/inventory?card=2026-topps-chrome-tennis-267-card-lot-alcaraz-djokovic-nadal-swiatek-gauff-rc",
+"sp": "Tennis",
+"y": 2026,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2024-topps-chrome-tedy-bruschi-cla-tb-legends-auto-yellow-refractor-75",
+"t": "2024 Topps Chrome Tedy Bruschi #CLA-TB Legends Auto Yellow Refractor /75",
+"p": 38,
+"pl": "Tedy Bruschi",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_52b50247-6cb6-4e0f-9e9c-9a8fbd238bb9.jpg?v=1793202024",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_52b50247-6cb6-4e0f-9e9c-9a8fbd238bb9.jpg?v=1793202024",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_a0702983-92fa-4347-b822-db6ca18b715b.jpg?v=1793202024"
+],
+"l": "/inventory?card=2024-topps-chrome-tedy-bruschi-cla-tb-legends-auto-yellow-refractor-75",
+"sp": "Football",
+"y": 2024,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2025-topps-chrome-black-amon-ra-st-brown-35-purple-mini-diamond-refractor-75",
+"t": "2025 Topps Chrome Black Amon-Ra St. Brown #35 Purple Mini-Diamond Refractor /75",
+"p": 32,
+"pl": "Amon-Ra St. Brown",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_845caa3e-c11d-4caa-8be0-7a8428d1922d.jpg?v=1794348021",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_845caa3e-c11d-4caa-8be0-7a8428d1922d.jpg?v=1794348021",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_950c117c-0f8e-4f32-88fa-91f3bf8443ee.jpg?v=1794348021"
+],
+"l": "/inventory?card=2025-topps-chrome-black-amon-ra-st-brown-35-purple-mini-diamond-refractor-75",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-chrome-rueben-bain-jr-bcra-rb-rookie-auto-redemption-bucs",
+"t": "2026 Bowman Chrome Rueben Bain Jr. #BCRA-RB Rookie Auto Redemption Bucs",
+"p": 32,
+"pl": "Rueben Bain Jr.",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_e95333e4-d4ae-4a91-8110-c9a947c0b74e.jpg?v=1794350431",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_e95333e4-d4ae-4a91-8110-c9a947c0b74e.jpg?v=1794350431",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_33523155-8c7f-4adc-8a01-b58477c4cf54.jpg?v=1794350431"
+],
+"l": "/inventory?card=2026-bowman-chrome-rueben-bain-jr-bcra-rb-rookie-auto-redemption-bucs",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2026-topps-chrome-tennis-emerson-jones-54-orange-geometric-refractor-16-25-rc",
+"t": "2026 Topps Chrome Tennis Emerson Jones #54 Orange Geometric Refractor 16/25 RC",
+"p": 31,
+"pl": "Emerson Jones",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_12b93932-76a6-4aba-af01-81bef2026145.jpg?v=1792703433",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_12b93932-76a6-4aba-af01-81bef2026145.jpg?v=1792703433",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_3486c460-e182-4cbc-9f01-5196b3337e70.jpg?v=1792703433"
+],
+"l": "/inventory?card=2026-topps-chrome-tennis-emerson-jones-54-orange-geometric-refractor-16-25-rc",
+"sp": "Tennis",
+"y": 2026,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-topps-chris-brazzell-ii-ffs-cbr-first-signatures-rc-auto-panthers",
+"t": "2026 Topps Chris Brazzell II #FFS-CBR First Signatures RC Auto Panthers",
+"p": 30,
+"pl": "Chris Brazzell II",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_90f86c79-9f78-4e9d-b712-04e6bda8f720.jpg?v=1794866412",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_90f86c79-9f78-4e9d-b712-04e6bda8f720.jpg?v=1794866412",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_d350eec9-9d5f-421f-8a9f-ed084f9803e1.jpg?v=1794866412"
+],
+"l": "/inventory?card=2026-topps-chris-brazzell-ii-ffs-cbr-first-signatures-rc-auto-panthers",
+"sp": "Football",
+"y": 2026,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2025-topps-signature-class-dj-moore-67-veteran-auto-silver-foil-275-bears",
+"t": "2025 Topps Signature Class DJ Moore #67 Veteran Auto Silver Foil /275 Bears",
+"p": 28,
+"pl": "DJ Moore",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_21f977cb-fcff-4971-8d89-b56de1186d3f.jpg?v=1794348908",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_21f977cb-fcff-4971-8d89-b56de1186d3f.jpg?v=1794348908",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_3ecfef51-9363-4a39-91d2-59ed311ef4f9.jpg?v=1794348908"
+],
+"l": "/inventory?card=2025-topps-signature-class-dj-moore-67-veteran-auto-silver-foil-275-bears",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-khobie-martin-bcp-63-chrome-neon-green-refractor-399-1st-prospect",
+"t": "2026 Bowman Khobie Martin #BCP-63 Chrome Neon Green Refractor /399 1st Prospect",
+"p": 28,
+"pl": "Khobie Martin",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_5545963c-361f-4a2a-8ca1-1ad841349f5c.jpg?v=1792703451",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_5545963c-361f-4a2a-8ca1-1ad841349f5c.jpg?v=1792703451",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_ed9a0521-d15e-4443-96e6-0d24790d5b77.jpg?v=1792703451"
+],
+"l": "/inventory?card=2026-bowman-khobie-martin-bcp-63-chrome-neon-green-refractor-399-1st-prospect",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-chrome-u-antwan-raymond-bcpa-ar-1st-bowman-auto-rutgers",
+"t": "2026 Bowman Chrome U Antwan Raymond #BCPA AR 1st Bowman Auto Rutgers",
+"p": 27,
+"pl": "U Antwan Raymond",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_2ce3b445-3a1e-4c61-b4eb-fae5de7c5136.jpg?v=1793093697",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_2ce3b445-3a1e-4c61-b4eb-fae5de7c5136.jpg?v=1793093697",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_52bfbac7-6799-4583-ae3b-692a485a628a.jpg?v=1793093696"
+],
+"l": "/inventory?card=2026-bowman-chrome-u-antwan-raymond-bcpa-ar-1st-bowman-auto-rutgers",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2025-26-bowman-derrick-white-bca-di-chrome-auto-gold-refractor-50-celtics",
+"t": "2025-26 Bowman Derrick White #BCA-DI Chrome Auto Gold Refractor /50",
+"p": 25,
+"pl": "Derrick White",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_c9ee507c-b69d-4047-9c6f-810d6861e674.jpg?v=1794866419",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_c9ee507c-b69d-4047-9c6f-810d6861e674.jpg?v=1794866419",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_59bc7237-d31d-4795-b9a4-ea1d4ab0ad63.jpg?v=1794866420"
+],
+"l": "/inventory?card=2025-26-bowman-derrick-white-bca-di-chrome-auto-gold-refractor-50-celtics",
+"sp": "Basketball",
+"y": 2025,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2025-topps-finest-joe-burrow-229-rare-bengals",
+"t": "2025 Topps Finest Joe Burrow #229 Rare Bengals",
+"p": 23,
+"pl": "Joe Burrow",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_afd75494-2dd3-47d5-82b8-b433c2069e2e.jpg?v=1794866424",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_afd75494-2dd3-47d5-82b8-b433c2069e2e.jpg?v=1794866424"
+],
+"l": "/inventory?card=2025-topps-finest-joe-burrow-229-rare-bengals",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-jerome-myles-bcp-73-chrome-yellow-mojo-refractor-275-1st-prospect",
+"t": "2026 Bowman Jerome Myles #BCP-73 Chrome Yellow Mojo Refractor /275 1st Prospect",
+"p": 23,
+"pl": "Jerome Myles",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_cfeffd9f-c513-43ea-987b-6768635194cb.jpg?v=1792703453",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_cfeffd9f-c513-43ea-987b-6768635194cb.jpg?v=1792703453",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_d753e90d-a476-40c0-a3f7-f076591e32e0.jpg?v=1792703453"
+],
+"l": "/inventory?card=2026-bowman-jerome-myles-bcp-73-chrome-yellow-mojo-refractor-275-1st-prospect",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2026-topps-ashton-jeanty-262-future-stars-green-99-rc-raiders-rookie",
+"t": "2026 Topps Ashton Jeanty #262 Future Stars Green /99 RC Raiders Rookie",
+"p": 23,
+"pl": "Ashton Jeanty",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_bd80d3da-79a4-4079-b504-f29240e31a89.jpg?v=1794348039",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_bd80d3da-79a4-4079-b504-f29240e31a89.jpg?v=1794348039",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_653e72f5-d8d3-4169-ab10-d076242b97dd.jpg?v=1794348039"
+],
+"l": "/inventory?card=2026-topps-ashton-jeanty-262-future-stars-green-99-rc-raiders-rookie",
+"sp": "Football",
+"y": 2026,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-donruss-elite-jesus-made-158-prospects-bronze-35-brewers",
+"t": "2026 Donruss Elite Jesus Made #158 Prospects Bronze /35 Brewers",
+"p": 22,
+"pl": "Jesus Made",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_0b4ca77e-1981-4664-b866-7b874fd2611c.jpg?v=1793094079",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_0b4ca77e-1981-4664-b866-7b874fd2611c.jpg?v=1793094079",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_9b430235-a275-4d99-b115-29cf51cbbb3f.jpg?v=1793094079"
+],
+"l": "/inventory?card=2026-donruss-elite-jesus-made-158-prospects-bronze-35-brewers",
+"sp": "Baseball",
+"y": 2026,
+"br": "Panini",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-football-154-card-lot-chrome-josh-allen-mahomes-drake-maye-rc",
+"t": "2026 Bowman Football 154 Card Lot Chrome Josh Allen Mahomes Drake Maye RC",
+"p": 22,
+"pl": "Drake Maye",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_931375df-eaa4-4619-bb04-63b174a44485.jpg?v=1793117441",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_931375df-eaa4-4619-bb04-63b174a44485.jpg?v=1793117441",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_9f231a23-4d13-4d5b-a554-9361751f938b.jpg?v=1793117441"
+],
+"l": "/inventory?card=2026-bowman-football-154-card-lot-chrome-josh-allen-mahomes-drake-maye-rc",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-romello-height-bcv-150-chrome-nfl-blue-mojo-refractor-150-rc",
+"t": "2026 Bowman Romello Height #BCV-150 Chrome NFL Blue Mojo Refractor /150 RC",
+"p": 19,
+"pl": "Romello Height",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_718f2cf6-657d-46dd-9540-182aef7031b1.jpg?v=1794348049",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_718f2cf6-657d-46dd-9540-182aef7031b1.jpg?v=1794348049",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_2f134a24-a9fd-4ccc-ae23-a25362b1b749.jpg?v=1794348050"
+],
+"l": "/inventory?card=2026-bowman-romello-height-bcv-150-chrome-nfl-blue-mojo-refractor-150-rc",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-chrome-brenen-thompson-bcv-136-blue-refractor-150-rc-chargers",
+"t": "2026 Bowman Chrome Brenen Thompson #BCV-136 Blue Refractor /150 RC Chargers",
+"p": 19,
+"pl": "Brenen Thompson",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_e3afc0fb-598e-42c9-bc9c-76a3415db5d8.jpg?v=1794348316",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_e3afc0fb-598e-42c9-bc9c-76a3415db5d8.jpg?v=1794348316",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_7fd06d41-cb89-49bf-bc58-a9aae990eb40.jpg?v=1794348315"
+],
+"l": "/inventory?card=2026-bowman-chrome-brenen-thompson-bcv-136-blue-refractor-150-rc-chargers",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2026-topps-joe-burrow-40-gold-2026-bengals-1",
+"t": "2026 Topps Joe Burrow #40 Gold /2026 Bengals",
+"p": 19,
+"pl": "Joe Burrow",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_9e7d5019-9cde-4ec7-9261-3f87aa18e373.jpg?v=1794350107",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_9e7d5019-9cde-4ec7-9261-3f87aa18e373.jpg?v=1794350107",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_830cf5f1-5a62-4b61-a9d7-dd988a884cf7.jpg?v=1794350107"
+],
+"l": "/inventory?card=2026-topps-joe-burrow-40-gold-2026-bengals-1",
+"sp": "Football",
+"y": 2026,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-chrome-lt-overton-151-yellow-refractor-275-rc-cowboys",
+"t": "2026 Bowman Chrome LT Overton #151 Yellow Refractor /275 RC Cowboys",
+"p": 19,
+"pl": "LT Overton",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_e33304af-f349-4ec6-a791-7182df95bbea.jpg?v=1794348033",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_e33304af-f349-4ec6-a791-7182df95bbea.jpg?v=1794348033",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_da379751-c866-4aee-8ce4-90e8713c0c1d.jpg?v=1794348033"
+],
+"l": "/inventory?card=2026-bowman-chrome-lt-overton-151-yellow-refractor-275-rc-cowboys",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2025-topps-chrome-kaleb-johnson-323-gold-wave-refractor-50-rc-steelers",
+"t": "2025 Topps Chrome Kaleb Johnson #323 Gold Wave Refractor /50 RC Steelers",
+"p": 19,
+"pl": "Kaleb Johnson",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_ccdc76e4-7dcb-4625-8e99-567bd823ef4c.jpg?v=1794348035",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_ccdc76e4-7dcb-4625-8e99-567bd823ef4c.jpg?v=1794348035",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_67289da8-d782-4bca-b00f-c413372ebb1f.jpg?v=1794348035"
+],
+"l": "/inventory?card=2025-topps-chrome-kaleb-johnson-323-gold-wave-refractor-50-rc-steelers",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2025-topps-chrome-dylan-sampson-308-aqua-refractor-199-rc-browns",
+"t": "2025 Topps Chrome Dylan Sampson #308 Aqua Refractor /199 RC Browns",
+"p": 19,
+"pl": "Dylan Sampson",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_9ce8b3ab-a126-406b-b8fd-db759f225689.jpg?v=1794348037",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_9ce8b3ab-a126-406b-b8fd-db759f225689.jpg?v=1794348037",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_efc4708c-6fba-4961-96f0-8f7eb7c64dcc.jpg?v=1794348037"
+],
+"l": "/inventory?card=2025-topps-chrome-dylan-sampson-308-aqua-refractor-199-rc-browns",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-chrome-tee-higgins-bcv-21-yellow-refractor-275-bengals",
+"t": "2026 Bowman Chrome Tee Higgins #BCV-21 Yellow Refractor /275 Bengals",
+"p": 19,
+"pl": "Tee Higgins",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_cff14f9d-2ad0-4c45-af2c-e2dc2acee825.jpg?v=1794348031",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_cff14f9d-2ad0-4c45-af2c-e2dc2acee825.jpg?v=1794348031",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_21e84254-690a-4876-a1bf-458cece987aa.jpg?v=1794348031"
+],
+"l": "/inventory?card=2026-bowman-chrome-tee-higgins-bcv-21-yellow-refractor-275-bengals",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-chrome-makai-lemon-bcv-119-speckle-refractor-rc-eagles",
+"t": "2026 Bowman Chrome Makai Lemon #BCV 119 Speckle Refractor RC Eagles",
+"p": 18,
+"pl": "Makai Lemon",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_b0eba171-6c84-4703-94fd-e1ccd0a7bb18.jpg?v=1793093801",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_b0eba171-6c84-4703-94fd-e1ccd0a7bb18.jpg?v=1793093801",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_ea287d22-dad6-470b-8288-ee43b814401b.jpg?v=1793093801"
+],
+"l": "/inventory?card=2026-bowman-chrome-makai-lemon-bcv-119-speckle-refractor-rc-eagles",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-chrome-university-chase-jenkins-talent-tracker-tt-18-kansas",
+"t": "2026 Bowman Chrome University Chase Jenkins Talent Tracker #TT 18 Kansas",
+"p": 18,
+"pl": "Other",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_5b93a0aa-c7d6-47f2-adc7-dd6cffdf7f27.jpg?v=1793093824",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_5b93a0aa-c7d6-47f2-adc7-dd6cffdf7f27.jpg?v=1793093824",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_c295fe34-023c-4218-bea2-55477cb144ed.jpg?v=1793093824"
+],
+"l": "/inventory?card=2026-bowman-chrome-university-chase-jenkins-talent-tracker-tt-18-kansas",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-chrome-university-jaden-craig-bowman-verified-bv-21-tcu",
+"t": "2026 Bowman Chrome University Jaden Craig Bowman Verified #BV 21 TCU",
+"p": 18,
+"pl": "Jaden Craig",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_f1b8896b-e3bf-4ff9-b847-6d7790666f70.jpg?v=1793093876",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_f1b8896b-e3bf-4ff9-b847-6d7790666f70.jpg?v=1793093876",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_241e5a10-6175-4d17-bfff-e47668125e9b.jpg?v=1793093876"
+],
+"l": "/inventory?card=2026-bowman-chrome-university-jaden-craig-bowman-verified-bv-21-tcu",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-chrome-turbo-richard-bcp-22-1st-bowman-blue-mojo-150",
+"t": "2026 Bowman Chrome Turbo Richard #BCP 22 1st Bowman Blue Mojo /150",
+"p": 18,
+"pl": "Turbo Richard",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_6dd794a4-61e8-4abe-a552-967c7f3784d9.jpg?v=1793093908",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_6dd794a4-61e8-4abe-a552-967c7f3784d9.jpg?v=1793093908",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_43581c26-163c-4ded-9cf5-706e7e7295a2.jpg?v=1793093908"
+],
+"l": "/inventory?card=2026-bowman-chrome-turbo-richard-bcp-22-1st-bowman-blue-mojo-150",
+"sp": "Baseball",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-chrome-jackson-harris-bcp-56-1st-bowman-green-399-lsu",
+"t": "2026 Bowman Chrome Jackson Harris #BCP 56 1st Bowman Green /399 LSU",
+"p": 18,
+"pl": "Jackson Harris",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_4b95d771-3754-4285-adc6-7bbe0804b5b3.jpg?v=1793093962",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_4b95d771-3754-4285-adc6-7bbe0804b5b3.jpg?v=1793093962",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_dc2454e5-bd42-446c-8bd4-dc1748daecf0.jpg?v=1793093962"
+],
+"l": "/inventory?card=2026-bowman-chrome-jackson-harris-bcp-56-1st-bowman-green-399-lsu",
+"sp": "Baseball",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-chrome-jayden-maiava-bcp-93-refractor-499-usc",
+"t": "2026 Bowman Chrome Jayden Maiava #BCP 93 Refractor /499 USC",
+"p": 18,
+"pl": "Jayden Maiava",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_ef26564d-d982-45f1-9e51-8a07aa1c6b6e.jpg?v=1793093985",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_ef26564d-d982-45f1-9e51-8a07aa1c6b6e.jpg?v=1793093985",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_c16d9077-81b3-4088-beb8-d863d8685f6f.jpg?v=1793093985"
+],
+"l": "/inventory?card=2026-bowman-chrome-jayden-maiava-bcp-93-refractor-499-usc",
+"sp": "Baseball",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2023-24-panini-hoops-jayson-tatum-183-green-99-celtics-1",
+"t": "2023 24 Panini Hoops Jayson Tatum #183 Green /99",
+"p": 18,
+"pl": "Jayson Tatum",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_39298389-8139-4b33-943d-8a5862c153c6.jpg?v=1793094024",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_39298389-8139-4b33-943d-8a5862c153c6.jpg?v=1793094024",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_e19aae30-fd4e-4406-95ac-cd220732b5e0.jpg?v=1793094024"
+],
+"l": "/inventory?card=2023-24-panini-hoops-jayson-tatum-183-green-99-celtics-1",
+"sp": "Basketball",
+"y": 2023,
+"br": "Panini",
+"g": "Raw"
+},
+{
+"h": "2026-panini-prizm-fifa-world-cup-erling-haaland-333-norway",
+"t": "2026 Panini Prizm FIFA World Cup Erling Haaland #333 Norway",
+"p": 18,
+"pl": "Erling Haaland",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_f57fbe40-98cb-40b7-a241-418bf44467eb.jpg?v=1793094056",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_f57fbe40-98cb-40b7-a241-418bf44467eb.jpg?v=1793094056",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_16d9bbda-3760-49a4-960b-76a273c83a16.jpg?v=1793094056"
+],
+"l": "/inventory?card=2026-panini-prizm-fifa-world-cup-erling-haaland-333-norway",
+"sp": "Soccer",
+"y": 2026,
+"br": "Panini",
+"g": "Raw"
+},
+{
+"h": "2026-27-upper-deck-series-1-ilya-protas-young-guns-218-rc-capitals",
+"t": "2026 27 Upper Deck Series 1 Ilya Protas Young Guns #218 RC Capitals",
+"p": 18,
+"pl": "Other",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_06962181-2b3f-42ed-b9af-ea011ad28611.jpg?v=1793094063",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_06962181-2b3f-42ed-b9af-ea011ad28611.jpg?v=1793094063",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_8f2c5d8a-cb41-4d87-a90e-d42a92a86afe.jpg?v=1793094064"
+],
+"l": "/inventory?card=2026-27-upper-deck-series-1-ilya-protas-young-guns-218-rc-capitals",
+"sp": "Hockey",
+"y": 2026,
+"br": "Upper Deck",
+"g": "Raw"
+},
+{
+"h": "2026-27-upper-deck-series-1-macklin-celebrini-fan-faves-ff-3-sharks",
+"t": "2026 27 Upper Deck Series 1 Macklin Celebrini Fan Faves #FF 3 Sharks",
+"p": 18,
+"pl": "Other",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_3d479b5b-5836-421e-962d-889da65baa4b.jpg?v=1793094102",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_3d479b5b-5836-421e-962d-889da65baa4b.jpg?v=1793094102",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_88395430-b68b-4a54-a9fd-1e949ff55010.jpg?v=1793094102"
+],
+"l": "/inventory?card=2026-27-upper-deck-series-1-macklin-celebrini-fan-faves-ff-3-sharks",
+"sp": "Hockey",
+"y": 2026,
+"br": "Upper Deck",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-football-105-card-lot-1st-bowman-chrome-underwood-sellers-hoover-vip",
+"t": "2026 Bowman Football 105 Card Lot 1st Bowman Chrome Underwood Sellers Hoover VIP",
+"p": 18,
+"pl": "Other",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_1be10672-7af7-474b-ad44-0196ee4b8891.jpg?v=1793117450",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_1be10672-7af7-474b-ad44-0196ee4b8891.jpg?v=1793117450",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_996298d9-e64d-45e3-8425-3d8d35f7e599.jpg?v=1793117450"
+],
+"l": "/inventory?card=2026-bowman-football-105-card-lot-1st-bowman-chrome-underwood-sellers-hoover-vip",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2026-27-upper-deck-series-1-hockey-262-card-lot-mcdavid-bedard-matthews-makar",
+"t": "2026-27 Upper Deck Series 1 Hockey 262 Card Lot McDavid Bedard Matthews Makar",
+"p": 18,
+"pl": "Other",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_7560a8a1-700a-45d7-83bb-ade7b9d413b7.jpg?v=1793117708",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_7560a8a1-700a-45d7-83bb-ade7b9d413b7.jpg?v=1793117708",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_a230a9ec-1c6a-45f0-8757-2879fd8166eb.jpg?v=1793117708"
+],
+"l": "/inventory?card=2026-27-upper-deck-series-1-hockey-262-card-lot-mcdavid-bedard-matthews-makar",
+"sp": "Hockey",
+"y": 2026,
+"br": "Upper Deck",
+"g": "Raw"
+},
+{
+"h": "2026-topps-chrome-caleb-durbin-209-negative-refractor-red-sox-1",
+"t": "2026 Topps Chrome Caleb Durbin #209 Negative Refractor",
+"p": 14,
+"pl": "Caleb Durbin",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_9727ab1d-29e3-4330-b0bf-ede06d6e2096.jpg?v=1793094032",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_9727ab1d-29e3-4330-b0bf-ede06d6e2096.jpg?v=1793094032",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_1d404652-3a5c-43a6-9bc9-c489cbe214da.jpg?v=1793094032"
+],
+"l": "/inventory?card=2026-topps-chrome-caleb-durbin-209-negative-refractor-red-sox-1",
+"sp": "Baseball",
+"y": 2026,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-kc-concepcion-rr-10-rockstar-rookies-aqua-refractor-199-rc",
+"t": "2026 Bowman KC Concepcion #RR-10 Rockstar Rookies Aqua Refractor /199 RC",
+"p": 10,
+"pl": "KC Concepcion",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_cc9288c1-eceb-4a35-a3f9-7ff4c5ca5a2f.jpg?v=1793903708",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_cc9288c1-eceb-4a35-a3f9-7ff4c5ca5a2f.jpg?v=1793903708",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_d81a520f-79fe-4011-8276-bbead6410158.jpg?v=1793903708"
+],
+"l": "/inventory?card=2026-bowman-kc-concepcion-rr-10-rockstar-rookies-aqua-refractor-199-rc",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2025-topps-resurgence-nico-collins-39-spark-refractor-125-texans",
+"t": "2025 Topps Resurgence Nico Collins #39 Spark Refractor /125 Texans",
+"p": 10,
+"pl": "Nico Collins",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_b1ca373c-19ac-45a3-a489-0915209f6227.jpg?v=1793093768",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_b1ca373c-19ac-45a3-a489-0915209f6227.jpg?v=1793093768",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_a8d8f52f-e496-4eee-9038-2978d4175d05.jpg?v=1793093768"
+],
+"l": "/inventory?card=2025-topps-resurgence-nico-collins-39-spark-refractor-125-texans",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-topps-cj-stroud-80-houston-texans",
+"t": "2026 Topps CJ Stroud #80 Houston Texans",
+"p": 10,
+"pl": "C.J. Stroud",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_052dc71f-a84f-43cf-9f27-0781d9b4e4c5.jpg?v=1793093777",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_052dc71f-a84f-43cf-9f27-0781d9b4e4c5.jpg?v=1793093777",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_a4c20b6c-b7cc-4e95-903c-658dc49af22e.jpg?v=1793093777"
+],
+"l": "/inventory?card=2026-topps-cj-stroud-80-houston-texans",
+"sp": "Football",
+"y": 2026,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-chrome-jahmyr-gibbs-hobby-stars-hs-8-lions",
+"t": "2026 Bowman Chrome Jahmyr Gibbs Hobby Stars #HS 8 Lions",
+"p": 10,
+"pl": "Jahmyr Gibbs",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_14bb4c9b-b3bf-4633-b78e-11ceec999f72.jpg?v=1793093793",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_14bb4c9b-b3bf-4633-b78e-11ceec999f72.jpg?v=1793093793",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_b4dd993e-0329-48fc-a5da-9cb6befe8c8d.jpg?v=1793093793"
+],
+"l": "/inventory?card=2026-bowman-chrome-jahmyr-gibbs-hobby-stars-hs-8-lions",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-chrome-justin-herbert-bcv-60-aqua-mojo-refractor-199",
+"t": "2026 Bowman Chrome Justin Herbert #BCV 60 Aqua Mojo Refractor /199",
+"p": 10,
+"pl": "Justin Herbert",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_d7118e3c-d0ac-4c3c-8f88-3adfd8c21646.jpg?v=1793093808",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_d7118e3c-d0ac-4c3c-8f88-3adfd8c21646.jpg?v=1793093808",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_cf8d0c6c-54c6-4171-bee9-6e4a4068fd79.jpg?v=1793093808"
+],
+"l": "/inventory?card=2026-bowman-chrome-justin-herbert-bcv-60-aqua-mojo-refractor-199",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2025-topps-chrome-kyren-williams-168-purple-refractor-75-rams",
+"t": "2025 Topps Chrome Kyren Williams #168 Purple Refractor /75 Rams",
+"p": 10,
+"pl": "Kyren Williams",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_74ef3df4-799d-4f80-bcf6-0e5a53a5de58.jpg?v=1793093817",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_74ef3df4-799d-4f80-bcf6-0e5a53a5de58.jpg?v=1793093817",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_3efe5d05-0693-4276-8b41-49ba47325eb0.jpg?v=1793093816"
+],
+"l": "/inventory?card=2025-topps-chrome-kyren-williams-168-purple-refractor-75-rams",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-chrome-caleb-williams-hobby-stars-hs-4-refractor-bears",
+"t": "2026 Bowman Chrome Caleb Williams Hobby Stars #HS 4 Refractor Bears",
+"p": 10,
+"pl": "Caleb Williams",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_cbe6f895-b10e-499c-bfba-68c0d471c5c4.jpg?v=1793093841",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_cbe6f895-b10e-499c-bfba-68c0d471c5c4.jpg?v=1793093841",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_2248d983-1762-4ad0-ad59-b8b1d84cc912.jpg?v=1793093841"
+],
+"l": "/inventory?card=2026-bowman-chrome-caleb-williams-hobby-stars-hs-4-refractor-bears",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-chrome-brock-purdy-hobby-stars-hs-6-49ers",
+"t": "2026 Bowman Chrome Brock Purdy Hobby Stars #HS 6 49ers",
+"p": 10,
+"pl": "Brock Purdy",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_3a9c1270-3153-464c-b0bd-32086522c8e4.jpg?v=1793093851",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_3a9c1270-3153-464c-b0bd-32086522c8e4.jpg?v=1793093851",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_9d3daa0c-e658-4272-a4f3-01ac01d06d2c.jpg?v=1793093851"
+],
+"l": "/inventory?card=2026-bowman-chrome-brock-purdy-hobby-stars-hs-6-49ers",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-vicari-swain-bpp-143-1st-bowman-aqua-199-south-carolina",
+"t": "2026 Bowman Vicari Swain #BPP 143 1st Bowman Aqua /199 South Carolina",
+"p": 10,
+"pl": "Vicari Swain",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_6741ec16-07be-45a1-ad33-4190ad71a10d.jpg?v=1793093892",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_6741ec16-07be-45a1-ad33-4190ad71a10d.jpg?v=1793093892",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_77bd029b-e936-4e7c-8677-2fb7029f4ec1.jpg?v=1793093892"
+],
+"l": "/inventory?card=2026-bowman-vicari-swain-bpp-143-1st-bowman-aqua-199-south-carolina",
+"sp": "Baseball",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2026-topps-lamar-jackson-derrick-henry-quoth-the-ravens-300-green-99",
+"t": "2026 Topps Lamar Jackson Derrick Henry Quoth the Ravens #300 Green /99",
+"p": 10,
+"pl": "Derrick Henry",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_62b5d2c1-f167-40e2-b930-d046c6200c4b.jpg?v=1793093900",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_62b5d2c1-f167-40e2-b930-d046c6200c4b.jpg?v=1793093900",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_79cc7801-e535-4045-b639-329f0585d444.jpg?v=1793093900"
+],
+"l": "/inventory?card=2026-topps-lamar-jackson-derrick-henry-quoth-the-ravens-300-green-99",
+"sp": "Football",
+"y": 2026,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2025-topps-chrome-marvin-harrison-jr-1975-1975-1-blue-refractor-150",
+"t": "2025 Topps Chrome Marvin Harrison Jr. 1975 #1975 1 Blue Refractor /150",
+"p": 10,
+"pl": "Marvin Harrison Jr.",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_b59078b1-a930-4bf6-813d-84cdd9f2d693.jpg?v=1793093915",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_b59078b1-a930-4bf6-813d-84cdd9f2d693.jpg?v=1793093915",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_bee982a4-732b-4799-a195-337adff89453.jpg?v=1793093915"
+],
+"l": "/inventory?card=2025-topps-chrome-marvin-harrison-jr-1975-1975-1-blue-refractor-150",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2025-topps-resurgence-kyren-williams-59-bronze-surge-refractor-375",
+"t": "2025 Topps Resurgence Kyren Williams #59 Bronze Surge Refractor /375",
+"p": 10,
+"pl": "Kyren Williams",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_4918e51d-ee86-4140-b770-9515f0860fc0.jpg?v=1793093938",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_4918e51d-ee86-4140-b770-9515f0860fc0.jpg?v=1793093938",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_dfead0c4-4bc7-4f0a-97e0-454d946cfe12.jpg?v=1793093938"
+],
+"l": "/inventory?card=2025-topps-resurgence-kyren-williams-59-bronze-surge-refractor-375",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-chrome-cooper-kupp-bcv-90-purple-refractor-75-seahawks",
+"t": "2026 Bowman Chrome Cooper Kupp #BCV 90 Purple Refractor /75 Seahawks",
+"p": 10,
+"pl": "Cooper Kupp",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_adb7b373-55f4-4949-bf86-8cd5fdc1bc3b.jpg?v=1793093946",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_adb7b373-55f4-4949-bf86-8cd5fdc1bc3b.jpg?v=1793093946",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_43fa4910-2137-42c1-9cfc-975782fadd5f.jpg?v=1793093946"
+],
+"l": "/inventory?card=2026-bowman-chrome-cooper-kupp-bcv-90-purple-refractor-75-seahawks",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-chrome-lamar-jackson-hobby-stars-hs-9-ravens",
+"t": "2026 Bowman Chrome Lamar Jackson Hobby Stars #HS 9 Ravens",
+"p": 10,
+"pl": "Lamar Jackson",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_202c85ce-22e6-42a6-94c9-e9fb79c92081.jpg?v=1793093954",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_202c85ce-22e6-42a6-94c9-e9fb79c92081.jpg?v=1793093954",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_4919063b-7f2b-4dea-b7cd-4d82f6a139c5.jpg?v=1793093954"
+],
+"l": "/inventory?card=2026-bowman-chrome-lamar-jackson-hobby-stars-hs-9-ravens",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2026-bowman-chrome-lamar-jackson-hobby-stars-hs-9-ravens-insert",
+"t": "2026 Bowman Chrome Lamar Jackson Hobby Stars #HS 9 Ravens Insert",
+"p": 10,
+"pl": "Lamar Jackson",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_8e30f421-a99f-4e51-b4d8-4ad7719c5867.jpg?v=1793093977",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_8e30f421-a99f-4e51-b4d8-4ad7719c5867.jpg?v=1793093977",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_0473c82d-96a5-4eed-b5f1-ed2d5a68dc61.jpg?v=1793093977"
+],
+"l": "/inventory?card=2026-bowman-chrome-lamar-jackson-hobby-stars-hs-9-ravens-insert",
+"sp": "Football",
+"y": 2026,
+"br": "Bowman",
+"g": "Raw"
+},
+{
+"h": "2025-topps-chrome-josh-allen-all-chrome-team-act-2-bills",
+"t": "2025 Topps Chrome Josh Allen All Chrome Team #ACT 2",
+"p": 10,
+"pl": "Josh Allen",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_ad7ed883-1d3b-4db8-b001-a990db62db6b.jpg?v=1793093993",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_ad7ed883-1d3b-4db8-b001-a990db62db6b.jpg?v=1793093993",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_2d7c7d01-7efe-4d9d-8003-b62bcdd57ab3.jpg?v=1793093993"
+],
+"l": "/inventory?card=2025-topps-chrome-josh-allen-all-chrome-team-act-2-bills",
+"sp": "Football",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-27-upper-deck-series-1-josh-norris-stencils-green-199-st-9-sabres",
+"t": "2026 27 Upper Deck Series 1 Josh Norris Stencils Green /199 #ST 9 Sabres",
+"p": 10,
+"pl": "Other",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_fa2e08aa-9e6b-465b-a6e6-3dc632bfd4c1.jpg?v=1793094001",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_fa2e08aa-9e6b-465b-a6e6-3dc632bfd4c1.jpg?v=1793094001",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_aa62538c-5c6d-4ca1-9f5b-0a0cc68253a8.jpg?v=1793094001"
+],
+"l": "/inventory?card=2026-27-upper-deck-series-1-josh-norris-stencils-green-199-st-9-sabres",
+"sp": "Hockey",
+"y": 2026,
+"br": "Upper Deck",
+"g": "Raw"
+},
+{
+"h": "2026-27-upper-deck-series-1-matthews-celebrini-here-we-go-we-1",
+"t": "2026 27 Upper Deck Series 1 Matthews Celebrini Here We Go #WE 1",
+"p": 10,
+"pl": "Other",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_9673cae5-74f0-4b81-bbcd-dd0199eda5d7.jpg?v=1793094009",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_9673cae5-74f0-4b81-bbcd-dd0199eda5d7.jpg?v=1793094009",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_2e474b86-3f44-4860-b8d1-e47517ebb411.jpg?v=1793094009"
+],
+"l": "/inventory?card=2026-27-upper-deck-series-1-matthews-celebrini-here-we-go-we-1",
+"sp": "Hockey",
+"y": 2026,
+"br": "Upper Deck",
+"g": "Raw"
+},
+{
+"h": "2026-27-upper-deck-series-1-mackinnon-celebrini-canvas-checklist-c-90",
+"t": "2026 27 Upper Deck Series 1 MacKinnon Celebrini Canvas Checklist #C 90",
+"p": 10,
+"pl": "Other",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_3e862b44-a8c3-4f71-8789-1d5c32a6ea01.jpg?v=1793094017",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_3e862b44-a8c3-4f71-8789-1d5c32a6ea01.jpg?v=1793094017",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_31b25b63-d96a-4b6f-af2c-1992beaa738c.jpg?v=1793094017"
+],
+"l": "/inventory?card=2026-27-upper-deck-series-1-mackinnon-celebrini-canvas-checklist-c-90",
+"sp": "Hockey",
+"y": 2026,
+"br": "Upper Deck",
+"g": "Raw"
+},
+{
+"h": "2025-26-topps-chrome-victor-wembanyama-go-time-gt-11-spurs",
+"t": "2025 26 Topps Chrome Victor Wembanyama Go Time #GT 11 Spurs",
+"p": 10,
+"pl": "Victor Wembanyama",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_b3d8dbd2-fc63-4a70-ae9d-6761d3415f23.jpg?v=1793094040",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_b3d8dbd2-fc63-4a70-ae9d-6761d3415f23.jpg?v=1793094040",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_19b6dffa-1336-4721-8100-1b2f962595f3.jpg?v=1793094040"
+],
+"l": "/inventory?card=2025-26-topps-chrome-victor-wembanyama-go-time-gt-11-spurs",
+"sp": "Basketball",
+"y": 2025,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-27-upper-deck-series-1-charlie-mcavoy-9-boston-bruins",
+"t": "2026 27 Upper Deck Series 1 Charlie McAvoy #9 Boston",
+"p": 10,
+"pl": "Other",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_fc008183-2f92-4251-afcf-46b9cfc6def3.jpg?v=1793094048",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_fc008183-2f92-4251-afcf-46b9cfc6def3.jpg?v=1793094048",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_eff3745e-abfa-4a5f-9f39-c190699b5cd2.jpg?v=1793094048"
+],
+"l": "/inventory?card=2026-27-upper-deck-series-1-charlie-mcavoy-9-boston-bruins",
+"sp": "Hockey",
+"y": 2026,
+"br": "Upper Deck",
+"g": "Raw"
+},
+{
+"h": "2026-topps-finest-roman-anthony-52-rc-red-sox-1",
+"t": "2026 Topps Finest Roman Anthony #52 RC",
+"p": 10,
+"pl": "Roman Anthony",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_0a644cf2-de47-46c4-bc12-fd14d9914aca.jpg?v=1793094071",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_0a644cf2-de47-46c4-bc12-fd14d9914aca.jpg?v=1793094071",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_877f373d-6e13-4b27-a1a1-98178ec691f6.jpg?v=1793094071"
+],
+"l": "/inventory?card=2026-topps-finest-roman-anthony-52-rc-red-sox-1",
+"sp": "Baseball",
+"y": 2026,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-27-upper-deck-series-1-connor-bedard-repping-rp-3-blackhawks",
+"t": "2026 27 Upper Deck Series 1 Connor Bedard Repping #RP 3 Blackhawks",
+"p": 10,
+"pl": "Connor Bedard",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_c0143a7e-febf-403b-8fbd-29b344e50dcf.jpg?v=1793094095",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_c0143a7e-febf-403b-8fbd-29b344e50dcf.jpg?v=1793094095",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_33390414-8434-4d2a-abb2-99fbf503de12.jpg?v=1793094095"
+],
+"l": "/inventory?card=2026-27-upper-deck-series-1-connor-bedard-repping-rp-3-blackhawks",
+"sp": "Hockey",
+"y": 2026,
+"br": "Upper Deck",
+"g": "Raw"
+},
+{
+"h": "2026-topps-finest-roman-anthony-team-finest-tf-22-rc-red-sox",
+"t": "2026 Topps Finest Roman Anthony Team Finest #TF 22 RC",
+"p": 10,
+"pl": "Roman Anthony",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_0c585293-4da5-4285-9601-cd647079842c.jpg?v=1793094110",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_0c585293-4da5-4285-9601-cd647079842c.jpg?v=1793094110",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_e4f98c41-e9b2-4923-ab10-7ea7ceedc617.jpg?v=1793094110"
+],
+"l": "/inventory?card=2026-topps-finest-roman-anthony-team-finest-tf-22-rc-red-sox",
+"sp": "Baseball",
+"y": 2026,
+"br": "Topps",
+"g": "Raw"
+},
+{
+"h": "2026-donruss-elite-kristian-campbell-16-99-red-sox",
+"t": "2026 Donruss Elite Kristian Campbell #16 /99",
+"p": 10,
+"pl": "Kristian Campbell",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_176e9a0c-8e06-4446-b7c7-27c926b55b02.jpg?v=1793094118",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_176e9a0c-8e06-4446-b7c7-27c926b55b02.jpg?v=1793094118",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_8327feb3-b31d-4109-828f-3bd4eb5a4f16.jpg?v=1793094118"
+],
+"l": "/inventory?card=2026-donruss-elite-kristian-campbell-16-99-red-sox",
+"sp": "Baseball",
+"y": 2026,
+"br": "Panini",
+"g": "Raw"
+},
+{
+"h": "2026-27-upper-deck-series-1-alex-bump-debut-dates-dd-5-flyers",
+"t": "2026 27 Upper Deck Series 1 Alex Bump Debut Dates #DD 5 Flyers",
+"p": 10,
+"pl": "Other",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_295f3fcc-5cfb-4839-a3fb-b6ecb4547795.jpg?v=1793094126",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_295f3fcc-5cfb-4839-a3fb-b6ecb4547795.jpg?v=1793094126",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_26b503f2-3156-4633-8df7-b06ca9b7529f.jpg?v=1793094126"
+],
+"l": "/inventory?card=2026-27-upper-deck-series-1-alex-bump-debut-dates-dd-5-flyers",
+"sp": "Hockey",
+"y": 2026,
+"br": "Upper Deck",
+"g": "Raw"
+},
+{
+"h": "2026-27-upper-deck-series-1-jakub-dobes-canvas-c-5-canadiens",
+"t": "2026 27 Upper Deck Series 1 Jakub Dobes Canvas #C 5 Canadiens",
+"p": 10,
+"pl": "Other",
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_d012d2ba-9a01-4e54-ba5f-d4fb2d12c5b7.jpg?v=1793094133",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_d012d2ba-9a01-4e54-ba5f-d4fb2d12c5b7.jpg?v=1793094133",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/57_dbbb24eb-ed94-497a-9054-ca7868e2cad9.jpg?v=1793094134"
+],
+"l": "/inventory?card=2026-27-upper-deck-series-1-jakub-dobes-canvas-c-5-canadiens",
+"sp": "Hockey",
+"y": 2026,
+"br": "Upper Deck",
+"g": "Raw"
 }
 ]</script>
 <script>
@@ -497,30 +2194,51 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
   const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   // Each card opens its own spot on the collection page, which scrolls to it and
   // outlines it (see showSharedCollectionCard in js/main.js).
-  const link = h => '/collection.html?card=' + encodeURIComponent(h);
+  const link = h => { const c = CARDS.find(x => x.h === h); return (c && c.l) || '/collection.html?card=' + encodeURIComponent(h); };
   const byH = h => CARDS.find(c => c.h === h);
   const picked = new Set();   // cards on the buyer's list, in the order they were added
   const sent = new Set();     // cards already sent this visit
-  let player = '';
+  const st = { q: '', sort: 'pd', sport: '', player: '', brand: '', grade: '', price: '' };
   try { (JSON.parse(localStorage.getItem('dtp-picks') || '[]')).forEach(h => byH(h) && picked.add(h)); } catch (e) {}
   const remember = () => { try { localStorage.setItem('dtp-picks', JSON.stringify([...picked])); } catch (e) {} };
 
-  const players = [...new Set(CARDS.map(c => c.pl))];
-  filters.innerHTML = ['All', ...players].map((p, i) =>
-    `<button type="button" data-p="${i ? esc(p) : ''}" aria-pressed="${i === 0}">${esc(p)}</button>`).join('');
+  // Filters: sport chips, then dropdowns built from what's actually on the page.
+  const count = (k) => { const m = {}; CARDS.forEach(c => { if (c[k]) m[c[k]] = (m[c[k]] || 0) + 1; }); return m; };
+  const opts = (k, allLabel, min = 1) => { const m = count(k);
+    return `<option value="">${allLabel}</option>` + Object.keys(m).filter(x => m[x] >= min && x !== 'Other')
+      .sort((a, b) => m[b] - m[a] || a.localeCompare(b)).map(x => `<option>${esc(x)}</option>`).join(''); };
+  const sports = count('sp');
+  filters.innerHTML = ['', ...Object.keys(sports).sort((a, b) => sports[b] - sports[a])].map(s =>
+    `<button type="button" data-s="${esc(s)}" aria-pressed="${s === ''}">${s ? esc(s) + ' (' + sports[s] + ')' : 'All sports'}</button>`).join('');
   filters.addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
-    player = b.dataset.p;
+    st.sport = b.dataset.s;
     filters.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
     render();
   });
+  document.getElementById('fPlayer').innerHTML = opts('pl', 'All players', 2);
+  document.getElementById('fBrand').innerHTML = opts('br', 'All brands');
+  const bind = (id, k, ev = 'change') => document.getElementById(id).addEventListener(ev, e => { st[k] = e.target.value.trim(); render(); });
+  bind('q', 'q', 'input'); bind('sort', 'sort'); bind('fPlayer', 'player'); bind('fBrand', 'brand'); bind('fGrade', 'grade'); bind('fPrice', 'price');
+  function visible() {
+    const q = st.q.toLowerCase();
+    const [lo, hi] = st.price ? st.price.split('-').map(Number) : [0, Infinity];
+    const list = CARDS.filter(c => (!st.sport || c.sp === st.sport) && (!st.player || c.pl === st.player) &&
+      (!st.brand || c.br === st.brand) && (!st.grade || c.g === st.grade) && c.p >= lo && c.p < hi &&
+      (!q || (c.t + ' ' + c.pl).toLowerCase().includes(q)));
+    const by = { pd: (a, b) => b.p - a.p, pa: (a, b) => a.p - b.p, yd: (a, b) => (b.y || 0) - (a.y || 0) || b.p - a.p,
+      ya: (a, b) => (a.y || 9999) - (b.y || 9999) || b.p - a.p, n: (a, b) => a.pl.localeCompare(b.pl) || b.p - a.p }[st.sort];
+    return list.sort(by);
+  }
 
   function label(c) {
     if (sent.has(c.h)) return 'Sent';
     return picked.has(c.h) ? '✓ On your list' : "I'm interested";
   }
   function render() {
-    grid.innerHTML = CARDS.filter(c => !player || c.pl === player).map(c => `
+    const list = visible();
+    document.getElementById('count').textContent = `Showing ${list.length} of ${CARDS.length} cards`;
+    grid.innerHTML = list.length ? list.map(c => `
       <article class="card${picked.has(c.h) ? ' picked' : ''}${sent.has(c.h) ? ' sent' : ''}">
         <a class="ph" href="${link(c.h)}" data-view="${esc(c.h)}" aria-label="See ${esc(c.t)} up close"><img src="${esc(c.img)}&width=600" alt="${esc(c.t)}" loading="lazy" decoding="async"></a>
         <div class="body">
@@ -531,7 +2249,7 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
             <button type="button" class="btn btn-main" data-h="${esc(c.h)}" aria-pressed="${picked.has(c.h)}" ${sent.has(c.h) ? 'disabled' : ''}>${label(c)}</button>
           </div>
         </div>
-      </article>`).join('');
+      </article>`).join('') : '<p class="count">No cards match those filters.</p>';
     tray();
   }
   function tray() {

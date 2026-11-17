@@ -344,7 +344,7 @@ async function handleInterest(request, env) {
   const money = n => '$' + Number(n).toLocaleString('en-US');
   const total = cards.reduce((a, c) => a + Number(c.p), 0);
   const lines = cards.map((c, i) =>
-    `${i + 1}. ${c.t}\n   ${money(c.p)} shipped\n   https://duxtradingpost.com/collection.html?card=${encodeURIComponent(c.h)}`).join('\n\n');
+    `${i + 1}. ${c.t}\n   ${money(c.p)} shipped\n   https://duxtradingpost.com${c.l || '/collection.html?card=' + encodeURIComponent(c.h)}`).join('\n\n');
   const text =
     `Someone is interested in ${cards.length} card${cards.length === 1 ? '' : 's'} on the For Sale page.\n\n` +
     `Name:   ${name}\n` +
