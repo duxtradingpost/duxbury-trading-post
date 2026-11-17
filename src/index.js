@@ -325,38 +325,45 @@ async function handleInterest(request, env) {
   const name = clean(body.name, 120);
   const email = clean(body.email, 200);
   const note = clean(body.note, 1500, true);
-  const handle = clean(body.handle, 200);
+  // The page sends a list (handles); the first version sent one card (handle).
+  const wanted = (Array.isArray(body.handles) ? body.handles : [body.handle])
+    .map(h => clean(h, 200)).filter(Boolean).slice(0, 60);
   if (!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
     return json({ ok: false, error: 'Please add your name and a valid email.' }, 400);
   }
 
-  let card;
+  let all = [];
   try {
-    card = (await saleCards(request, env)).find(c => c.h === handle);
+    all = await saleCards(request, env);
   } catch (err) {
     console.error('interest: could not read card list:', err && err.message);
   }
-  if (!card) return json({ ok: false, error: 'That card is no longer listed.' }, 404);
+  const cards = [...new Set(wanted)].map(h => all.find(c => c.h === h)).filter(Boolean);
+  if (!cards.length) return json({ ok: false, error: 'Those cards are no longer listed.' }, 404);
 
-  const price = '$' + Number(card.p).toLocaleString('en-US');
-  const link = `https://duxtradingpost.com/collection.html?card=${encodeURIComponent(card.h)}`;
+  const money = n => '$' + Number(n).toLocaleString('en-US');
+  const total = cards.reduce((a, c) => a + Number(c.p), 0);
+  const lines = cards.map((c, i) =>
+    `${i + 1}. ${c.t}\n   ${money(c.p)} shipped\n   https://duxtradingpost.com/collection.html?card=${encodeURIComponent(c.h)}`).join('\n\n');
   const text =
-    `Someone is interested in a card on the For Sale page.\n\n` +
-    `Card:   ${card.t}\n` +
-    `Price:  ${price} shipped\n` +
-    `Link:   ${link}\n\n` +
+    `Someone is interested in ${cards.length} card${cards.length === 1 ? '' : 's'} on the For Sale page.\n\n` +
     `Name:   ${name}\n` +
     `Email:  ${email}\n\n` +
+    `----- cards -----\n\n${lines}\n\n` +
+    `Total at list prices: ${money(total)} shipped\n\n` +
     `----- their note -----\n\n${note || '(none)'}\n\n` +
     `----------------------\n` +
     `Reply straight to this email - it goes back to ${email}.\n`;
+  const subject = cards.length === 1
+    ? `Interested: ${cards[0].t} (${money(cards[0].p)}) - ${name}`
+    : `Interested in ${cards.length} cards (${money(total)}) - ${name}`;
 
   const raw = buildMime({
     from: SELL_FROM,
     fromName: 'DTP Cards website',
     to: SELL_TO,
     replyTo: email,
-    subject: `Interested: ${card.t} (${price}) - ${name}`,
+    subject,
     text,
     attachments: []
   });

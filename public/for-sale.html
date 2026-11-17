@@ -74,6 +74,22 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 .msg{font-size:14px;margin-top:10px;min-height:1.2em}
 .msg.err{color:var(--err)} .msg.ok{color:var(--ok)}
+.card.picked{border-color:var(--forest);box-shadow:0 0 0 2px var(--forest) inset}
+.card.picked .btn-main{background:var(--forest-dark)}
+.tray{position:sticky;bottom:0;z-index:10;background:var(--forest);color:var(--on-dark);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
+.tray .in{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.tray .sum{font-weight:600}
+.tray .sum span{font-family:var(--font-display);font-size:20px;letter-spacing:.02em;margin-left:6px}
+.tray .go{margin-left:auto;display:flex;gap:8px}
+.tray .btn{flex:none}
+.tray .btn-main{background:var(--on-dark);color:var(--forest);border-color:var(--on-dark)}
+.tray .btn-line{color:var(--on-dark);border-color:rgba(255,255,255,.5)}
+.picklist{list-style:none;margin:0 0 4px;padding:0;max-height:38vh;overflow:auto;border:1px solid var(--border);border-radius:8px}
+.picklist li{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:7px 10px;border-bottom:1px solid var(--border);font-size:13.5px}
+.picklist li:last-child{border-bottom:0}
+.picklist .pp{font-weight:600;white-space:nowrap}
+.picklist button{font:inherit;font-size:12px;border:0;background:none;color:var(--err);cursor:pointer;padding:2px 4px}
+.picktotal{display:flex;justify-content:space-between;font-weight:600;padding:6px 2px 0}
 footer{border-top:1px solid var(--border);color:var(--text-muted);font-size:13px}
 footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
 @media (prefers-reduced-motion:no-preference){.card{transition:box-shadow .15s}.card:hover{box-shadow:0 4px 18px rgba(0,0,0,.08)}}
@@ -88,11 +104,11 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
 
 <section class="hero"><div class="in">
   <h1>Cards For Sale</h1>
-  <p>A short list of graded Josh Allen, Jayson Tatum and Roman Anthony cards available direct. Tap a card's title or photo to see it on our site, and tap <b>I'm interested</b> to let us know. We'll email you back.</p>
+  <p>A short list of graded Josh Allen, Jayson Tatum and Roman Anthony cards available direct. Tap a card's title or photo to see it on our site, and tap <b>I'm interested</b> on as many cards as you like. Then send them to us in one go and we'll email you back.</p>
   <div class="terms">
     <span><b>Prices include shipping</b> &middot; USPS, tracked and insured (US)</span>
     <span><b>Payment</b> &middot; PayPal Goods &amp; Services or Venmo</span>
-    <span><b>Offers</b> &middot; welcome, add yours in the note</span>
+    <span><b>Offers</b> &middot; welcome, add yours in the note (bundles too)</span>
   </div>
 </div></section>
 
@@ -101,12 +117,22 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
   <div class="grid" id="grid"></div>
 </main>
 
+<div class="tray" id="tray" hidden><div class="in">
+  <div class="sum" id="traySum"></div>
+  <div class="go">
+    <button type="button" class="btn btn-line" id="clearAll">Clear</button>
+    <button type="button" class="btn btn-main" id="openSend">Send my list</button>
+  </div>
+</div></div>
+
 <footer><div class="in">DTP Cards &middot; PO Box 1076, Duxbury MA 02331 &middot; <a href="mailto:info@duxburytradingpost.com">info@duxburytradingpost.com</a></div></footer>
 
 <dialog id="dlg" aria-labelledby="dlg-title">
   <form class="dlg" id="form" method="dialog" novalidate>
-    <h3 id="dlg-title">I'm interested</h3>
-    <p class="which" id="which"></p>
+    <h3 id="dlg-title">Send your list</h3>
+    <p class="which">We'll get back to you about these cards:</p>
+    <ul class="picklist" id="picklist"></ul>
+    <div class="picktotal"><span id="pickCount"></span><span id="pickTotal"></span></div>
     <label for="f-name">Your name</label>
     <input id="f-name" name="name" autocomplete="name" required maxlength="120">
     <label for="f-email">Email</label>
@@ -330,8 +356,12 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
   // Each card opens its own spot on the collection page, which scrolls to it and
   // outlines it (see showSharedCollectionCard in js/main.js).
   const link = h => '/collection.html?card=' + encodeURIComponent(h);
-  const sent = new Set();
+  const byH = h => CARDS.find(c => c.h === h);
+  const picked = new Set();   // cards on the buyer's list, in the order they were added
+  const sent = new Set();     // cards already sent this visit
   let player = '';
+  try { (JSON.parse(localStorage.getItem('dtp-picks') || '[]')).forEach(h => byH(h) && picked.add(h)); } catch (e) {}
+  const remember = () => { try { localStorage.setItem('dtp-picks', JSON.stringify([...picked])); } catch (e) {} };
 
   const players = [...new Set(CARDS.map(c => c.pl))];
   filters.innerHTML = ['All', ...players].map((p, i) =>
@@ -343,33 +373,62 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
     render();
   });
 
+  function label(c) {
+    if (sent.has(c.h)) return 'Sent';
+    return picked.has(c.h) ? '✓ On your list' : "I'm interested";
+  }
   function render() {
     grid.innerHTML = CARDS.filter(c => !player || c.pl === player).map(c => `
-      <article class="card${sent.has(c.h) ? ' sent' : ''}">
+      <article class="card${picked.has(c.h) ? ' picked' : ''}${sent.has(c.h) ? ' sent' : ''}">
         <a class="ph" href="${link(c.h)}" aria-label="See ${esc(c.t)} on our site"><img src="${esc(c.img)}&width=600" alt="${esc(c.t)}" loading="lazy" decoding="async"></a>
         <div class="body">
           <h2><a href="${link(c.h)}">${esc(c.t)}</a></h2>
           <div class="price">${money(c.p)}<small>shipped</small></div>
           <div class="actions">
             <a class="btn btn-line" href="${link(c.h)}">See it</a>
-            <button type="button" class="btn btn-main" data-h="${esc(c.h)}" ${sent.has(c.h) ? 'disabled' : ''}>${sent.has(c.h) ? 'Sent' : "I'm interested"}</button>
+            <button type="button" class="btn btn-main" data-h="${esc(c.h)}" aria-pressed="${picked.has(c.h)}" ${sent.has(c.h) ? 'disabled' : ''}>${label(c)}</button>
           </div>
         </div>
       </article>`).join('');
+    tray();
+  }
+  function tray() {
+    const t = document.getElementById('tray');
+    const list = [...picked].map(byH);
+    t.hidden = !list.length;
+    document.getElementById('traySum').innerHTML =
+      `${list.length} card${list.length === 1 ? '' : 's'} on your list<span>${money(list.reduce((a, c) => a + c.p, 0))}</span>`;
   }
   render();
 
-  const dlg = document.getElementById('dlg'), form = document.getElementById('form'), msg = document.getElementById('msg');
-  const sendBtn = document.getElementById('send');
-  let current = null;
   grid.addEventListener('click', e => {
     const b = e.target.closest('button[data-h]'); if (!b || b.disabled) return;
-    current = CARDS.find(c => c.h === b.dataset.h);
-    document.getElementById('which').textContent = `${current.t} \u2014 ${money(current.p)} shipped`;
+    const h = b.dataset.h;
+    picked.has(h) ? picked.delete(h) : picked.add(h);
+    remember(); render();
+  });
+  document.getElementById('clearAll').addEventListener('click', () => { picked.clear(); remember(); render(); });
+
+  const dlg = document.getElementById('dlg'), form = document.getElementById('form'), msg = document.getElementById('msg');
+  const sendBtn = document.getElementById('send'), plist = document.getElementById('picklist');
+  function fillDialog() {
+    const list = [...picked].map(byH);
+    plist.innerHTML = list.map(c => `<li><span>${esc(c.t)}</span><span class="pp">${money(c.p)}</span><button type="button" data-rm="${esc(c.h)}" aria-label="Remove ${esc(c.t)}">Remove</button></li>`).join('');
+    document.getElementById('pickCount').textContent = `${list.length} card${list.length === 1 ? '' : 's'}`;
+    document.getElementById('pickTotal').textContent = money(list.reduce((a, c) => a + c.p, 0)) + ' shipped';
+    sendBtn.disabled = !list.length;
+  }
+  plist.addEventListener('click', e => {
+    const b = e.target.closest('button[data-rm]'); if (!b) return;
+    picked.delete(b.dataset.rm); remember(); render(); fillDialog();
+    if (!picked.size) dlg.close();
+  });
+  document.getElementById('openSend').addEventListener('click', () => {
     msg.textContent = ''; msg.className = 'msg';
-    sendBtn.disabled = false;
+    fillDialog();
     try { const saved = JSON.parse(localStorage.getItem('dtp-buyer') || '{}');
-      if (saved.name) form.name.value = saved.name; if (saved.email) form.email.value = saved.email; } catch (e) {}
+      if (saved.name && !form.name.value) form.name.value = saved.name;
+      if (saved.email && !form.email.value) form.email.value = saved.email; } catch (e) {}
     dlg.showModal();
     (form.name.value ? form.note : form.name).focus();
   });
@@ -378,20 +437,23 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
   form.addEventListener('submit', async e => {
     e.preventDefault();
     const name = form.name.value.trim(), email = form.email.value.trim();
+    const handles = [...picked];
+    if (!handles.length) return;
     if (!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
       msg.textContent = 'Please add your name and a valid email so we can reply.'; msg.className = 'msg err'; return;
     }
-    sendBtn.disabled = true; msg.textContent = 'Sending\u2026'; msg.className = 'msg';
+    sendBtn.disabled = true; msg.textContent = 'Sending…'; msg.className = 'msg';
     try {
       const res = await fetch('/api/interest', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ handle: current.h, name, email, note: form.note.value.trim(), company: form.company.value }) });
+        body: JSON.stringify({ handles, name, email, note: form.note.value.trim(), company: form.company.value }) });
       const out = await res.json().catch(() => ({}));
       if (!res.ok || !out.ok) throw new Error(out.error || 'Something went wrong sending that.');
       try { localStorage.setItem('dtp-buyer', JSON.stringify({ name, email })); } catch (e) {}
-      sent.add(current.h); form.note.value = '';
-      msg.textContent = "Thanks! We got it and will email you shortly."; msg.className = 'msg ok';
+      handles.forEach(h => sent.add(h));
+      picked.clear(); remember(); form.note.value = '';
+      msg.textContent = "Thanks! We got your list and will email you shortly."; msg.className = 'msg ok';
       render();
-      setTimeout(() => dlg.close(), 1600);
+      setTimeout(() => dlg.close(), 1800);
     } catch (err) {
       msg.textContent = err.message + ' You can also email info@duxburytradingpost.com.'; msg.className = 'msg err';
       sendBtn.disabled = false;
