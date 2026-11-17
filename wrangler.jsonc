@@ -17,5 +17,10 @@
       "name": "SELL_EMAIL",
       "destination_address": "info@duxburytradingpost.com"
     }
-  ]
+  ],
+  // Private Sell/Keep page + Craig's picks (see handleSellKeep in src/index.js).
+  "durable_objects": {
+    "bindings": [{ "name": "SELLKEEP", "class_name": "SellKeepStore" }]
+  },
+  "migrations": [{ "tag": "v1-sellkeep", "new_sqlite_classes": ["SellKeepStore"] }]
 }

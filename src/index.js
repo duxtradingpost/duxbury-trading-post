@@ -7,6 +7,7 @@
 // this file see the request at all.
 
 import { EmailMessage } from 'cloudflare:email';
+import { DurableObject } from 'cloudflare:workers';
 
 const CANONICAL_HOST = 'duxtradingpost.com';
 const ALIAS_HOSTS = new Set([
@@ -75,6 +76,13 @@ export default {
     if ((url.pathname === '/inventory' || url.pathname === '/inventory.html') &&
         url.searchParams.get('card') && request.method === 'GET') {
       return cardPreview(request, env, url.searchParams.get('card'));
+    }
+
+    // Private Sell/Keep page (Craig's collection with costs + market comps), rebuilt every
+    // morning by reports/collection-comps.py. Never in public/ or git: the page and the picks
+    // live in the SellKeepStore Durable Object, and every path needs the sell-keep token.
+    if (url.pathname === '/sell-keep' || url.pathname.startsWith('/api/sell-keep/')) {
+      return handleSellKeep(request, env, url);
     }
 
     return env.ASSETS.fetch(request);
@@ -496,4 +504,81 @@ function buildMime({ from, fromName, to, replyTo, subject, text, html, attachmen
   parts.push(`--${outer}--`, '');
 
   return head + '\r\n' + parts.join('\r\n');
+}
+
+
+// ---- Sell/Keep page -------------------------------------------------------------------
+// Access token = first 32 hex of HMAC-SHA256(BRIEFING_KEY, "sellkeep"), so there is no
+// second secret to manage: the Mac derives the same value from ~/.dtp-briefing-key.
+// Craig opens /sell-keep?k=<token> once per device; that sets a year-long cookie.
+async function sellKeepToken(env) {
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(env.BRIEFING_KEY || ''),
+    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const sig = new Uint8Array(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode('sellkeep')));
+  return [...sig].map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 32);
+}
+
+const NOT_FOUND = () => new Response('Not found', { status: 404, headers: { 'X-Robots-Tag': 'noindex' } });
+
+async function handleSellKeep(request, env, url) {
+  if (!env.BRIEFING_KEY || !env.SELLKEEP) return NOT_FOUND();
+  const token = await sellKeepToken(env);
+  const store = env.SELLKEEP.get(env.SELLKEEP.idFromName('main'));
+  const cookie = (request.headers.get('Cookie') || '').match(/(?:^|;\s*)dtp_sk=([0-9a-f]{32})/);
+  const viewer = cookie && cookie[1] === token;
+  const mac = (request.headers.get('X-DTP-Key') || '') === env.BRIEFING_KEY;
+  const noStore = { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' };
+
+  if (url.pathname === '/sell-keep') {
+    if (url.searchParams.get('k') === token) {
+      return new Response(null, { status: 302, headers: { ...noStore, Location: '/sell-keep',
+        'Set-Cookie': `dtp_sk=${token}; Path=/; Max-Age=31536000; HttpOnly; Secure; SameSite=Lax` } });
+    }
+    if (!viewer) return NOT_FOUND();
+    const html = await store.getValue('html');
+    if (!html) return new Response('Not built yet', { status: 503, headers: noStore });
+    return new Response(html, { headers: { ...noStore, 'Content-Type': 'text/html; charset=utf-8' } });
+  }
+
+  // The Mac uploads the rebuilt page and can read or seed the picks.
+  if (url.pathname === '/api/sell-keep/page') {
+    if (!mac) return json({ ok: false }, 401);
+    if (request.method !== 'PUT') return json({ ok: false, error: 'Method not allowed' }, 405);
+    const html = await request.text();
+    if (html.length < 1000 || html.length > 1900000) return json({ ok: false, error: 'Bad size' }, 400);
+    await store.setValue('html', html);
+    await store.setValue('built', new Date().toISOString());
+    return json({ ok: true, bytes: html.length });
+  }
+
+  if (url.pathname === '/api/sell-keep/picks') {
+    if (!viewer && !mac) return json({ ok: false }, 401);
+    if (request.method === 'GET') return json({ ok: true, picks: (await store.getValue('picks')) || {} });
+    if (request.method === 'PUT' && mac) {          // bulk seed from the old claude.ai page
+      const picks = await request.json();
+      await store.setValue('picks', picks);
+      return json({ ok: true, n: Object.keys(picks).length });
+    }
+    if (request.method === 'POST') {
+      let body;
+      try { body = await request.json(); } catch { return json({ ok: false }, 400); }
+      const id = String(body.id || '');
+      if (!/^\d{6,20}$/.test(id)) return json({ ok: false }, 400);
+      const choice = body.choice === 'sell' || body.choice === 'keep' ? body.choice : '';
+      return json({ ok: true, picks: await store.setPick(id, choice) });
+    }
+    return json({ ok: false, error: 'Method not allowed' }, 405);
+  }
+  return NOT_FOUND();
+}
+
+export class SellKeepStore extends DurableObject {
+  async getValue(k) { return this.ctx.storage.get(k); }
+  async setValue(k, v) { await this.ctx.storage.put(k, v); }
+  async setPick(id, choice) {
+    const picks = (await this.ctx.storage.get('picks')) || {};
+    if (choice) picks[id] = { choice, at: new Date().toISOString() }; else delete picks[id];
+    await this.ctx.storage.put('picks', picks);
+    return picks;
+  }
 }
