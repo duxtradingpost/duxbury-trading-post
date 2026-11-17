@@ -90,6 +90,18 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 .picklist .pp{font-weight:600;white-space:nowrap}
 .picklist button{font:inherit;font-size:12px;border:0;background:none;color:var(--err);cursor:pointer;padding:2px 4px}
 .picktotal{display:flex;justify-content:space-between;font-weight:600;padding:6px 2px 0}
+.viewer{max-width:980px;width:calc(100% - 24px)}
+.viewer .vb{padding:18px;display:grid;gap:14px}
+.viewer .pics{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.viewer .pics figure{margin:0;background:var(--band);border-radius:8px;overflow:hidden}
+.viewer .pics img{width:100%;height:auto;max-height:70vh;object-fit:contain;display:block}
+.viewer .pics figcaption{font-size:12px;color:var(--text-muted);text-align:center;padding:4px}
+.viewer .vh{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+.viewer h3{font-size:18px;margin:0;font-family:var(--font-body);text-transform:none;letter-spacing:0}
+.viewer .x{font:inherit;font-size:22px;line-height:1;border:0;background:none;color:var(--text-dark);cursor:pointer;padding:4px 8px}
+.viewer .vf{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.viewer .vf .btn{flex:none;min-width:180px}
+.notes-hint{font-size:13px;opacity:.85}
 footer{border-top:1px solid var(--border);color:var(--text-muted);font-size:13px}
 footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
 @media (prefers-reduced-motion:no-preference){.card{transition:box-shadow .15s}.card:hover{box-shadow:0 4px 18px rgba(0,0,0,.08)}}
@@ -104,7 +116,7 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
 
 <section class="hero"><div class="in">
   <h1>Cards For Sale</h1>
-  <p>A short list of graded Josh Allen, Jayson Tatum and Roman Anthony cards available direct. Tap a card's title or photo to see it on our site, and tap <b>I'm interested</b> on as many cards as you like. Then send them to us in one go and we'll email you back.</p>
+  <p>A short list of graded Josh Allen, Jayson Tatum and Roman Anthony cards available direct. Tap a card's title or photo to see it on our site, and tap <b>I'm interested</b> on as many cards as you like. When you're done, tap <b>Add notes &amp; send</b> at the bottom of the screen to add your details, any notes or an offer, and send them to us in one go.</p>
   <div class="terms">
     <span><b>Prices include shipping</b> &middot; UPS, tracked and insured (US)</span>
     <span><b>Payment</b> &middot; PayPal Goods &amp; Services or Venmo</span>
@@ -118,14 +130,22 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
 </main>
 
 <div class="tray" id="tray" hidden><div class="in">
-  <div class="sum" id="traySum"></div>
+  <div><div class="sum" id="traySum"></div><div class="notes-hint">Next step: add your name, email and any notes or offers</div></div>
   <div class="go">
     <button type="button" class="btn btn-line" id="clearAll">Clear</button>
-    <button type="button" class="btn btn-main" id="openSend">Send my list</button>
+    <button type="button" class="btn btn-main" id="openSend">Add notes &amp; send &rarr;</button>
   </div>
 </div></div>
 
 <footer><div class="in">DTP Cards &middot; PO Box 1076, Duxbury MA 02331 &middot; <a href="mailto:info@duxburytradingpost.com">info@duxburytradingpost.com</a></div></footer>
+
+<dialog id="viewer" class="viewer" aria-labelledby="v-title">
+  <div class="vb">
+    <div class="vh"><h3 id="v-title"></h3><button type="button" class="x" id="v-close" aria-label="Close">&times;</button></div>
+    <div class="pics" id="v-pics"></div>
+    <div class="vf"><div class="price" id="v-price"></div><button type="button" class="btn btn-main" id="v-pick"></button></div>
+  </div>
+</dialog>
 
 <dialog id="dlg" aria-labelledby="dlg-title">
   <form class="dlg" id="form" method="dialog" novalidate>
@@ -137,7 +157,7 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
     <input id="f-name" name="name" autocomplete="name" required maxlength="120">
     <label for="f-email">Email</label>
     <input id="f-email" name="email" type="email" autocomplete="email" required maxlength="200">
-    <label for="f-note">Notes (optional)</label>
+    <label for="f-note">Notes or offer (optional)</label>
     <textarea id="f-note" name="note" maxlength="1500" placeholder="Questions, an offer, a bundle price, or anything else we should know"></textarea>
     <div class="hp" aria-hidden="true"><label for="f-company">Company</label><input id="f-company" name="company" tabindex="-1" autocomplete="off"></div>
     <div class="msg" id="msg" role="status"></div>
@@ -154,196 +174,307 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
 "t": "2021 Panini Prizm Josh Allen #CB-3 Color Blast PSA 10",
 "p": 4825,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10354584682582_0.jpg?v=1793639336"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10354584682582_0.jpg?v=1793639336",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10354584682582_0.jpg?v=1793639336",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10354584682582_1.jpg?v=1793639342"
+]
 },
 {
 "h": "2026-bowman-football-josh-allen-arctic-allen-nflg-ja-garbage-pail-kids-refractor-bills",
 "t": "2026 Bowman Josh Allen Arctic Allen #NFLG-JA Garbage Pail Kids SSP PSA 10 Pop 1",
 "p": 4200,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/179411637-1.jpg?v=1792763706"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/179411637-1.jpg?v=1792763706",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/179411637-1.jpg?v=1792763706",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/179411637-2.jpg?v=1792763706"
+]
 },
 {
 "h": "2025-topps-cosmic-chrome-josh-allen-stn-12-stars-in-the-night-orange-galactic-09-25-psa-10-pop-2",
 "t": "2025 Topps Cosmic Chrome Josh Allen #STN-12 Stars in the Night Orange Galactic 09/25 PSA 10 Pop 2",
 "p": 3600,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10365938597974_0.jpg?v=1793639462"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10365938597974_0.jpg?v=1793639462",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10365938597974_0.jpg?v=1793639462",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10365938597974_1.jpg?v=1793639469"
+]
 },
 {
 "h": "2022-panini-prizm-josh-allen-cb-4-color-blast-psa-10-bills",
 "t": "2022 Panini Prizm Josh Allen #CB-4 Color Blast PSA 10",
 "p": 3575,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10352421830742_0.jpg?v=1793639363"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10352421830742_0.jpg?v=1793639363",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10352421830742_0.jpg?v=1793639363",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10352421830742_1.jpg?v=1793639370"
+]
 },
 {
 "h": "2025-topps-chrome-josh-allen-kai-7-kaiju-ssp-case-hit-bills",
 "t": "2025 Topps Chrome Josh Allen #KAI-7 Kaiju SSP Case Hit",
 "p": 3525,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/clip-164749881-1.jpg?v=1794849304"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/clip-164749881-1.jpg?v=1794849304",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/clip-164749881-1.jpg?v=1794849304",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/clip-164749881-2.jpg?v=1794849304"
+]
 },
 {
 "h": "2024-panini-donruss-optic-josh-allen-16-uptown-white-pandora-25-bills-psa-10",
 "t": "2024 Panini Donruss Optic Josh Allen #16 Uptown White Pandora /25 Bills PSA 10",
 "p": 2875,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/K90RKRvq5kq274g3965_sw.jpg?v=1793762263"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/K90RKRvq5kq274g3965_sw.jpg?v=1793762263",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/K90RKRvq5kq274g3965_sw.jpg?v=1793762263",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/lbaez3MkT0WdfVzOxKamNQ.jpg?v=1793762262"
+]
 },
 {
 "h": "2021-panini-donruss-optic-downtown-dt-1-josh-allen-psa-10-bills",
 "t": "2021 Panini Donruss Optic Downtown! #DT-1 Josh Allen PSA 10",
 "p": 2550,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/allen-dt1-optic-psa10-front.jpg?v=1794008438"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/allen-dt1-optic-psa10-front.jpg?v=1794008438",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/allen-dt1-optic-psa10-front.jpg?v=1794008438",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/allen-dt1-optic-psa10-back.jpg?v=1794008438"
+]
 },
 {
 "h": "2018-panini-prizm-205-josh-allen-red-white-blue-prizm-rc-psa-10",
 "t": "2018 Panini Prizm #205 Josh Allen Red White Blue Prizm RC PSA 10",
 "p": 2300,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/68440453-1.jpg?v=1793840910"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/68440453-1.jpg?v=1793840910",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/68440453-1.jpg?v=1793840910",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/68440453-2.jpg?v=1793840910"
+]
 },
 {
 "h": "2025-topps-cosmic-chrome-josh-allen-stn-12-stars-in-the-night-green-space-dust-72-75-psa-10-pop-1",
 "t": "2025 Topps Cosmic Chrome Josh Allen #STN-12 Stars in the Night Green Space Dust 72/75 PSA 10 Pop 1",
 "p": 2300,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10356664795222_0.jpg?v=1793639433"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10356664795222_0.jpg?v=1793639433",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10356664795222_0.jpg?v=1793639433",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10356664795222_1.jpg?v=1793639440"
+]
 },
 {
 "h": "2021-panini-donruss-downtown-josh-allen-dt-1",
 "t": "2021 Panini Donruss Downtown #DT-1 Josh Allen PSA 10",
 "p": 2050,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/175464394-1.jpg?v=1793644610"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/175464394-1.jpg?v=1793644610",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/175464394-1.jpg?v=1793644610",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/175464394-2.jpg?v=1793644611"
+]
 },
 {
 "h": "2023-panini-one-color-blast-8-josh-allen-psa-10",
 "t": "2023 Panini One Color Blast #8 Josh Allen PSA 10",
 "p": 2050,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156291408-1.jpg?v=1794846856"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156291408-1.jpg?v=1794846856",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156291408-1.jpg?v=1794846856",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156291408-2.jpg?v=1794846856"
+]
 },
 {
 "h": "2024-panini-donruss-optic-downtown-2-josh-allen-psa-10-bills",
 "t": "2024 Panini Donruss Optic Downtown! #2 Josh Allen PSA 10",
 "p": 2025,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/VMFoITPX4EKmJORfsWHk7g.jpg?v=1794265389"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/VMFoITPX4EKmJORfsWHk7g.jpg?v=1794265389",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/VMFoITPX4EKmJORfsWHk7g.jpg?v=1794265389",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/FxZG5IuZZkeWydRkmKcGug.jpg?v=1794265389"
+]
 },
 {
 "h": "2024-panini-donruss-downtown-2-josh-allen-psa-10-bills",
 "t": "2024 Panini Donruss Downtown! #2 Josh Allen PSA 10",
 "p": 1900,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/TUAnesXvoECQxZp0VGHo2g.jpg?v=1793632546"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/TUAnesXvoECQxZp0VGHo2g.jpg?v=1793632546",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/TUAnesXvoECQxZp0VGHo2g.jpg?v=1793632546",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/MRacxWmLTUuNNqn_J32-3w.jpg?v=1793632546"
+]
 },
 {
 "h": "2024-panini-phoenix-color-blast-cb-jan-josh-allen-psa-10",
 "t": "2024 Panini Phoenix Color Blast #CB-JAN Josh Allen PSA 10",
 "p": 1775,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/2gYSOgSz5EmdmsnrSxAZqA.jpg?v=1793668760"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/2gYSOgSz5EmdmsnrSxAZqA.jpg?v=1793668760",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/2gYSOgSz5EmdmsnrSxAZqA.jpg?v=1793668760",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/53jJAQxA_UKfLpKysK4mhg.jpg?v=1793668761"
+]
 },
 {
 "h": "2024-panini-obsidian-black-color-blast-25-josh-allen-psa-10",
 "t": "2024 Panini Obsidian Black Color Blast #25 Josh Allen PSA 10",
 "p": 1675,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/kQEjIQ5UjUeHO_FnbirmnQ.jpg?v=1793371129"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/kQEjIQ5UjUeHO_FnbirmnQ.jpg?v=1793371129",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/kQEjIQ5UjUeHO_FnbirmnQ.jpg?v=1793371129",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/xOCNiLwrKE67K9fNVUXPSw.jpg?v=1793371129"
+]
 },
 {
 "h": "2022-panini-obsidian-josh-allen-cbb-jal-color-blast-black-psa-10-bills",
 "t": "2022 Panini Obsidian Josh Allen #CBB-JAL Color Blast Black PSA 10",
 "p": 1600,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10357964996694_0.jpg?v=1793639390"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10357964996694_0.jpg?v=1793639390",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10357964996694_0.jpg?v=1793639390",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10357964996694_1.jpg?v=1793639397"
+]
 },
 {
 "h": "2024-panini-prizm-color-blast-duals-8-josh-allen-keon-coleman-rc-psa-10",
 "t": "2024 Panini Prizm Color Blast Duals #8 Josh Allen / Keon Coleman RC PSA 10",
 "p": 1275,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10385664344150_0.jpg?v=1793639532"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10385664344150_0.jpg?v=1793639532",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_10385664344150_0.jpg?v=1793639532"
+]
 },
 {
 "h": "2025-topps-finest-josh-allen-226-black-refractor-10-bills-psa-10",
 "t": "2025 Topps Finest Josh Allen #226 Black Refractor /10 Bills PSA 10",
 "p": 1025,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/IY1-koKa5U6lIcrc_I3lMQ_2b145747-b647-498b-b67d-49e2e3b3d431.jpg?v=1791817720"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/IY1-koKa5U6lIcrc_I3lMQ_2b145747-b647-498b-b67d-49e2e3b3d431.jpg?v=1791817720",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/IY1-koKa5U6lIcrc_I3lMQ_2b145747-b647-498b-b67d-49e2e3b3d431.jpg?v=1791817720",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/YxBUu8N0zESWJAWs4I-sjQ_d11500b4-3bc4-426f-b150-3e37f6f833a2.jpg?v=1791817720"
+]
 },
 {
 "h": "2025-topps-cosmic-chrome-josh-allen-cd-9-cosmic-dust-psa-10-bills",
 "t": "2025 Topps Cosmic Chrome Josh Allen #CD-9 Cosmic Dust PSA 10",
 "p": 1025,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/ed--1l1LSEya8GO7tLRwNw_e51bee57-77ea-4f42-9828-34882dd2fa5e.jpg?v=1791817730"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/ed--1l1LSEya8GO7tLRwNw_e51bee57-77ea-4f42-9828-34882dd2fa5e.jpg?v=1791817730",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/ed--1l1LSEya8GO7tLRwNw_e51bee57-77ea-4f42-9828-34882dd2fa5e.jpg?v=1791817730",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/ZYQy2fWFUE2A2MN8D3fXBQ_fb57d2a8-64e9-4eaf-98d0-ca383137bf1e.jpg?v=1791817729"
+]
 },
 {
 "h": "2024-panini-donruss-optic-josh-allen-16-uptown-ssp-bills-psa-11",
 "t": "2024 Panini Donruss Optic Josh Allen #16 Uptown SSP Bills PSA 10",
 "p": 790,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/SLSTRcpWOE2j-CTII-W95w_6776e8b9-2047-4477-bcef-8235d7ff0fda.jpg?v=1791817733"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/SLSTRcpWOE2j-CTII-W95w_6776e8b9-2047-4477-bcef-8235d7ff0fda.jpg?v=1791817733",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/SLSTRcpWOE2j-CTII-W95w_6776e8b9-2047-4477-bcef-8235d7ff0fda.jpg?v=1791817733",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/3mdLYAz0Skuxikm0EImphA_68812_b5c54069-6639-4a3a-9d30-02745b90771b.jpg?v=1791817733"
+]
 },
 {
 "h": "2025-panini-mosaic-josh-allen-24-micro-mosaic-psa-10-bills",
 "t": "2025 Panini Mosaic Josh Allen #24 Micro Mosaic PSA 10",
 "p": 710,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/2QBz5hkShEyTBACuSAbx3g_88e59510-3e29-43bb-ad4e-7d397fc7ea80.jpg?v=1791817723"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/2QBz5hkShEyTBACuSAbx3g_88e59510-3e29-43bb-ad4e-7d397fc7ea80.jpg?v=1791817723",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/2QBz5hkShEyTBACuSAbx3g_88e59510-3e29-43bb-ad4e-7d397fc7ea80.jpg?v=1791817723",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/FpGop-Dy8UOvQnx9OAQevA_efe69b41-4f7e-40f5-bd1c-e6462f62f35a.jpg?v=1791817723"
+]
 },
 {
 "h": "2025-panini-prizm-draft-picks-josh-allen-25-black-color-blast-psa-10",
 "t": "2025 Panini Prizm Draft Picks Josh Allen #25 Black Color Blast PSA 10",
 "p": 655,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_9606317965398_0.jpg?v=1793639404"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_9606317965398_0.jpg?v=1793639404",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_9606317965398_0.jpg?v=1793639404",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land_9606317965398_1.jpg?v=1793639411"
+]
 },
 {
 "h": "2018-panini-donruss-rated-rookie-304-josh-allen-rc-psa-10",
 "t": "2018 Panini Donruss Rated Rookie #304 Josh Allen RC PSA 10",
 "p": 500,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/77717709-1.jpg?v=1793840906"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/77717709-1.jpg?v=1793840906",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/77717709-1.jpg?v=1793840906",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/77717709-2.jpg?v=1793840907"
+]
 },
 {
 "h": "2023-panini-select-concourse-josh-allen-13-blue-disco-prizm-01-25-psa-10",
 "t": "2023 Panini Select Concourse Josh Allen #13 Blue Disco Prizm 01/25 PSA 10",
 "p": 295,
 "pl": "Josh Allen",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156897634-1.jpg?v=1792266706"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156897634-1.jpg?v=1792266706",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156897634-1.jpg?v=1792266706",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/156897634-2.jpg?v=1792266706"
+]
 },
 {
 "h": "2024-25-panini-prizm-black-prizmania-10-jayson-tatum-psa-10-celtics",
 "t": "2024-25 Panini Prizm Black Prizmania #10 Jayson Tatum PSA 10",
 "p": 1100,
 "pl": "Jayson Tatum",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/G_U8IuYOBU25n-slISC_hw.jpg?v=1794289708"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/G_U8IuYOBU25n-slISC_hw.jpg?v=1794289708",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/G_U8IuYOBU25n-slISC_hw.jpg?v=1794289708",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/5OW-t_5LE0qDZmY_xpGDSA.jpg?v=1794289708"
+]
 },
 {
 "h": "2025-26-bowman-chrome-jayson-tatum-cnb-6-crystallized-ssp-celtics-psa-10",
 "t": "2025-26 Bowman Chrome Jayson Tatum #CNB-6 Crystallized SSP Celtics PSA 10",
 "p": 800,
 "pl": "Jayson Tatum",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land-168434335-1.jpg?v=1794847026"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land-168434335-1.jpg?v=1794847026",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land-168434335-1.jpg?v=1794847026",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/land-168434335-2.jpg?v=1794847026"
+]
 },
 {
 "h": "2025-topps-chrome-jayson-tatum-h-7-helix-psa-10-celtics",
 "t": "2025 Topps Chrome Jayson Tatum #H-7 Helix PSA 10",
 "p": 515,
 "pl": "Jayson Tatum",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/tatumhx-front.jpg?v=1793885476"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/tatumhx-front.jpg?v=1793885476",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/tatumhx-front.jpg?v=1793885476",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/tatumhx-back.jpg?v=1793885477"
+]
 },
 {
 "h": "2026-topps-chrome-roman-anthony-hx-15-helix-rc-ssp-psa-10-red-sox",
 "t": "2026 Topps Chrome Roman Anthony #HX-15 Helix RC SSP PSA 10",
 "p": 2000,
 "pl": "Roman Anthony",
-"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/ra0_land.jpg?v=1793648175"
+"img": "https://cdn.shopify.com/s/files/1/0739/6392/9686/files/ra0_land.jpg?v=1793648175",
+"imgs": [
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/ra0_land.jpg?v=1793648175",
+"https://cdn.shopify.com/s/files/1/0739/6392/9686/files/ra1_land.jpg?v=1793648175"
+]
 }
 ]</script>
 <script>
@@ -380,12 +511,12 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
   function render() {
     grid.innerHTML = CARDS.filter(c => !player || c.pl === player).map(c => `
       <article class="card${picked.has(c.h) ? ' picked' : ''}${sent.has(c.h) ? ' sent' : ''}">
-        <a class="ph" href="${link(c.h)}" aria-label="See ${esc(c.t)} on our site"><img src="${esc(c.img)}&width=600" alt="${esc(c.t)}" loading="lazy" decoding="async"></a>
+        <a class="ph" href="${link(c.h)}" data-view="${esc(c.h)}" aria-label="See ${esc(c.t)} up close"><img src="${esc(c.img)}&width=600" alt="${esc(c.t)}" loading="lazy" decoding="async"></a>
         <div class="body">
-          <h2><a href="${link(c.h)}">${esc(c.t)}</a></h2>
+          <h2><a href="${link(c.h)}" data-view="${esc(c.h)}">${esc(c.t)}</a></h2>
           <div class="price">${money(c.p)}<small>shipped</small></div>
           <div class="actions">
-            <a class="btn btn-line" href="${link(c.h)}">See it</a>
+            <a class="btn btn-line" href="${link(c.h)}" data-view="${esc(c.h)}">See it</a>
             <button type="button" class="btn btn-main" data-h="${esc(c.h)}" aria-pressed="${picked.has(c.h)}" ${sent.has(c.h) ? 'disabled' : ''}>${label(c)}</button>
           </div>
         </div>
@@ -408,6 +539,36 @@ footer .in{max-width:1180px;margin:0 auto;padding:18px 16px}
     remember(); render();
   });
   document.getElementById('clearAll').addEventListener('click', () => { picked.clear(); remember(); render(); });
+
+  // "See it": the card's own front and back photos, full size, right here.
+  const viewer = document.getElementById('viewer');
+  let viewing = null;
+  const big = u => u + (u.includes('?') ? '&' : '?') + 'width=1400';
+  function openViewer(h) {
+    viewing = byH(h); if (!viewing) return;
+    document.getElementById('v-title').textContent = viewing.t;
+    const imgs = (viewing.imgs && viewing.imgs.length ? viewing.imgs : [viewing.img]);
+    document.getElementById('v-pics').innerHTML = imgs.map((u, i) =>
+      `<figure><img src="${esc(big(u))}" alt="${esc(viewing.t)} ${i ? 'back' : 'front'}"><figcaption>${i ? 'Back' : 'Front'}</figcaption></figure>`).join('');
+    document.getElementById('v-price').innerHTML = `${money(viewing.p)}<small>shipped</small>`;
+    viewerBtn();
+    viewer.showModal();
+  }
+  function viewerBtn() {
+    const b = document.getElementById('v-pick');
+    b.disabled = sent.has(viewing.h);
+    b.textContent = sent.has(viewing.h) ? 'Sent' : picked.has(viewing.h) ? '\u2713 On your list (tap to remove)' : "I'm interested";
+  }
+  grid.addEventListener('click', e => {
+    const a = e.target.closest('[data-view]'); if (!a) return;
+    e.preventDefault(); openViewer(a.dataset.view);
+  });
+  document.getElementById('v-pick').addEventListener('click', () => {
+    picked.has(viewing.h) ? picked.delete(viewing.h) : picked.add(viewing.h);
+    remember(); render(); viewerBtn();
+  });
+  document.getElementById('v-close').addEventListener('click', () => viewer.close());
+  viewer.addEventListener('click', e => { if (e.target === viewer) viewer.close(); });
 
   const dlg = document.getElementById('dlg'), form = document.getElementById('form'), msg = document.getElementById('msg');
   const sendBtn = document.getElementById('send'), plist = document.getElementById('picklist');
