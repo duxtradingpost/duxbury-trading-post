@@ -349,9 +349,9 @@ async function handleInterest(request, env) {
     `Someone is interested in ${cards.length} card${cards.length === 1 ? '' : 's'} on the For Sale page.\n\n` +
     `Name:   ${name}\n` +
     `Email:  ${email}\n\n` +
+    `----- NOTES FROM THE BUYER -----\n\n${note || '(they left no notes)'}\n\n` +
     `----- cards -----\n\n${lines}\n\n` +
     `Total at list prices: ${money(total)} shipped\n\n` +
-    `----- their note -----\n\n${note || '(none)'}\n\n` +
     `----------------------\n` +
     `Reply straight to this email - it goes back to ${email}.\n`;
   const subject = cards.length === 1
