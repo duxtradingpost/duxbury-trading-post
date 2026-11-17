@@ -19,6 +19,7 @@
 
   function addButton(wrap) {
     if (wrap.querySelector('.card-dl')) return;
+    watch(wrap);
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'card-dl';
@@ -32,12 +33,13 @@
     (root.querySelectorAll ? root : document).querySelectorAll('.product-image-wrap').forEach(addButton);
   }
 
-  // Shopify serves the grid at maxWidth 900; drop the size so the download is
-  // the full original upload.
+  // The grid shows 700px photos; the saved copy is 1400px wide (sharp on a
+  // phone, small enough to hold a screenful of them in memory).
   function fullSize(src) {
     try {
       const u = new URL(src, location.href);
       ['width', 'height', 'crop'].forEach(k => u.searchParams.delete(k));
+      u.pathname = u.pathname.replace(/_(\d+x\d*|\d*x\d+)(?=\.[a-z]+$)/i, '_1400x');
       return u.toString();
     } catch (e) { return src; }
   }
@@ -49,16 +51,16 @@
     return `${slug || 'card'}-${side}.jpg`;
   }
 
-  // iPhone Safari only opens the share sheet straight from a tap. Awaiting the
-  // photo download first used up the tap, so the sheet was refused and the
-  // photo opened in a new tab instead (Craig, 16 Nov 2026: "pop up option to
-  // save to my camera roll"). So the photo starts loading the moment a finger
-  // touches the button, the sheet opens on the tap itself when the file is
-  // ready, and otherwise a "Save to Photos" button appears whose own tap opens
-  // it. In-app browsers (Instagram, Facebook) cannot share files at all, so
-  // they get the full photo with press-and-hold instructions instead.
+  // iPhone Safari only opens the share sheet straight from a tap, and Craig
+  // (16 Nov 2026) wants the tap to go straight to "Save Image" with no download
+  // step. So on phones each photo is quietly fetched while its card is on
+  // screen, and the tap hands the ready file to the share sheet at once. If a
+  // photo is not ready yet (or the browser cannot share files, e.g. Instagram's
+  // in-app browser) the full photo opens with press-and-hold, which is the
+  // phone's own Save to Photos menu.
   const isPhone = () => window.matchMedia('(hover: none)').matches;
-  const cache = new Map();   // url -> {promise, file}
+  const cache = new Map();   // url -> {promise, file}; oldest dropped past KEEP
+  const KEEP = 40;
 
   function target(wrap) {
     const flipped = wrap.classList.contains('is-flipped');
@@ -79,6 +81,7 @@
       });
       c.promise.catch(() => cache.delete(t.url));
       cache.set(t.url, c);
+      while (cache.size > KEEP) cache.delete(cache.keys().next().value);
     }
     return c;
   }
@@ -102,12 +105,6 @@
     o.addEventListener('click', e => { if (e.target === o || e.target.closest('[data-close]')) o.remove(); });
     document.body.appendChild(o);
     return o;
-  }
-
-  function readyButton(file) {
-    const o = sheet('<div>Your photo is ready</div><button type="button" data-save style="background:#fff;color:#111;' +
-      'border:0;border-radius:999px;padding:14px 28px;font:inherit;font-size:17px">Save to Photos</button>');
-    o.querySelector('[data-save]').addEventListener('click', () => { o.remove(); share(file); });
   }
 
   function pressAndHold(src) {
@@ -134,14 +131,24 @@
       if (isPhone() && canShareFile(c.file)) return share(c.file);
       return isPhone() ? pressAndHold(t.url) : desktopDownload(c.file);
     }
-    c.promise.then(file => {
-      if (isPhone() && canShareFile(file)) readyButton(file);
-      else if (isPhone()) pressAndHold(t.url);
-      else desktopDownload(file);
-    }).catch(() => isPhone() ? pressAndHold(t.url) : window.open(t.url, '_blank', 'noopener'));
+    if (isPhone()) return pressAndHold(t.url);   // not loaded yet: no waiting, no download
+    c.promise.then(desktopDownload).catch(() => window.open(t.url, '_blank', 'noopener'));
   }
 
-  // Start loading as soon as a finger (or mouse) lands on the button.
+  // Phones: load each card's photo while it is on screen (and the back once it
+  // is flipped), so the save tap never has to wait.
+  const seen = new IntersectionObserver(entries => entries.forEach(en => {
+    if (!en.isIntersecting) return;
+    const t = target(en.target);
+    if (t) load(t);
+  }), { rootMargin: '150px 0px' });
+  function watch(wrap) { if (isPhone()) seen.observe(wrap); }
+  document.addEventListener('click', e => {
+    const w = e.target.closest && e.target.closest('.product-image-wrap');
+    if (w && isPhone()) setTimeout(() => { const t = target(w); if (t) load(t); }, 400);
+  });
+
+  // Also start loading as soon as a finger (or mouse) lands on the button.
   ['touchstart', 'pointerdown'].forEach(ev => document.addEventListener(ev, e => {
     const b = e.target.closest && e.target.closest('.card-dl');
     const t = b && target(b.closest('.product-image-wrap'));
