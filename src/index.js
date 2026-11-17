@@ -18,7 +18,7 @@ const SELL_TO = 'info@duxburytradingpost.com';
 const SELL_FROM = 'website@duxburytradingpost.com';
 
 // Pauses every alert email from the Mac jobs (/api/briefing). Buyer and sell-form emails are unaffected.
-const ALERTS_PAUSED = true;
+const ALERTS_PAUSED = false;
 
 // The browser downscales photos before upload (see js/find-form.js), so these
 // ceilings are a backstop against someone posting to the endpoint directly
