@@ -71,6 +71,8 @@ def auto_query(title):
     q = re.sub(r'#|PSA\s*\d+|\s+', ' ', t).strip().lower()
     q = re.sub(r'\s+', ' ', q) + (' psa 10' if g == '10' else ' psa 9' if g == '9' else '')
     must = re.escape(num.group(1).lower()).replace('\\-', '-?') if num else ''
+    sur = player_of(title).split()[-1].lower() if player_of(title) != 'Other' else ''
+    must = (f'^(?=.*{sur})' if sur else '^') + (f'(?=.*(?:{must}))' if must else '')
     x = 'psa|bgs|sgc|cgc' if g == 'raw' else ''
     if not re.search(r'/\s?\d', title):          # unnumbered card: keep numbered parallels out
         x = (x + '|' if x else '') + r'/\s?\d{1,3}\b|numbered|superfractor'
@@ -293,11 +295,11 @@ def value(c, ebay, cl, scp):
         c['conf'] = 'thin'
     if new is not None:
         new = round(new / 5) * 5 if new < 1000 else round(new / 25) * 25
-    if recent:
+    if recent and new != prev and prev is not None or (recent and prev is None):
         lo, hi = min(p for _, p in recent), max(p for _, p in recent)
         c['range'] = fmt(lo) if lo == hi else f'{fmt(lo)}–{fmt(hi)}'
         c['last_sale'] = recent[0][0]
-    if parts:
+    if parts and (new != prev or prev is None or len(recent) >= 3 and not note):
         c['src'] = '; '.join(parts)
     c['auto_note'] = note
     c['market'] = new
@@ -308,6 +310,30 @@ def value(c, ebay, cl, scp):
 
 
 # ---------- page ----------
+def daily(hist):
+    """One value per date (the last one written that day), oldest first."""
+    d = {}
+    for day, v in hist or []:
+        if v:
+            d[day] = v
+    return sorted(d.items())
+
+
+def portfolio(state):
+    """Collection value per day, using TODAY's cards priced as they were on each date (a card with no
+    history yet counts at its first value), so the line moves on price changes only, not on buys/sells."""
+    series = [(c, daily(c.get('hist'))) for c in state['cards']]
+    days = sorted({d for _, h in series for d, _ in h})[-30:]
+    out = []
+    for day in days:
+        tot = 0
+        for c, h in series:
+            past = [v for d, v in h if d <= day]
+            tot += past[-1] if past else (h[0][1] if h else (c.get('market') or 0))
+        out.append([day, round(tot)])
+    return out
+
+
 def build(state):
     rows = []
     for c in state['cards']:
@@ -317,13 +343,17 @@ def build(state):
         sug = int(math.ceil(sug / 5.0) * 5) if sug < 1000 else int(math.ceil(sug / 25.0) * 25)
         note = '; '.join(x for x in (c.get('note', ''), c.get('auto_note', '')) if x)
         t = re.sub(r'\s+(Bills|Celtics|Red Sox|Bruins)$', '', c['title'])
-        rows.append(dict(id=c['id'], t=t, p=player_of(c['title']), k=c.get('kind', 'Raw'), c=cost, m=mkt,
+        h = daily(c.get('hist'))
+        dv = round(h[-1][1] - h[-2][1]) if len(h) >= 2 else 0           # change since the previous day's value
+        dp = round(100.0 * dv / h[-2][1], 1) if len(h) >= 2 and h[-2][1] else 0
+        rows.append(dict(id=c['id'], t=t, p=player_of(c['title']), k=c.get('kind', 'Raw'), c=cost, m=mkt, dv=dv, dp=dp,
                          r=c.get('range', ''), s=c.get('src', ''), q=c.get('conf', 'thin'), n=note, f=floor,
                          g=sug, u=bool(floor and floor > mkt), i=c.get('img', '')))
     tpl = open(TPL).read()
     stamp = datetime.now().strftime('%-d %b %Y')
     tpl = re.sub(r'Prices pulled [^.<]*\.', f'Prices pulled {stamp} (updated daily).', tpl)
     body = tpl.replace('__DATA__', json.dumps(rows, separators=(',', ':')).replace('</', '<\\/'))
+    body = body.replace('__TREND__', json.dumps(portfolio(state), separators=(',', ':')))
     open(OUT, 'w').write(SKELETON + body + '</body></html>')
     return len(rows)
 
