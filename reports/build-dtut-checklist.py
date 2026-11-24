@@ -5,6 +5,7 @@
 
 Craig, 2 Nov 2026: "collect all the Josh Allen uptown and downtowns in PSA 10s.
 Preferably black pandora where available" + "Add that checklist to the site as well".
+24 Nov 2026: list cut to the rare variations (6 Downtowns + the Uptown White Pandora); heading and subtitle changed to match.
 Same layout as the Color Blast / Stars in the Night sets, placed below Stars in the Night.
 Cards and what is owned live in reports/downtown-uptown-set.json; this rewrites the
 block between the DTUT-CHECKLIST markers (inserting them after the STN block the first
@@ -23,7 +24,7 @@ out = [f'''<section class="cb-set" id="downtown-uptown-set" aria-labelledby="dtu
   <div class="container">
     <p class="cb-eyebrow">In Search Of</p>
     <h2 class="section-title" id="dtut-set-title">Josh Allen Downtown &amp; Uptown</h2>
-    <p class="section-sub">Every Josh Allen Downtown and Uptown in PSA 10, Black Pandora where it exists. Have one we still need? <a href="index.html#contact">Get in touch</a>.</p>
+    <p class="section-sub">The rare Josh Allen Downtowns and Uptowns we are hunting, all in PSA 10. Have one we still need? <a href="index.html#contact">Get in touch</a>.</p>
     <div class="cb-progress"><span class="cb-count"><b>{have}</b> of {len(cards)} in the collection</span>
       <div class="cb-bar" role="progressbar" aria-label="Downtown and Uptown progress" aria-valuemin="0" aria-valuemax="{len(cards)}" aria-valuenow="{have}"><i style="width:{have / len(cards) * 100:.1f}%"></i></div></div>''']
 for s in data['sets']:
