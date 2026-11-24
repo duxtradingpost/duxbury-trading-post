@@ -95,13 +95,49 @@ const countEl = document.getElementById('inv-count');
 const chipWrap = document.getElementById('quick-filters');
 const moreBtn = document.getElementById('inv-more');
 const sortSel = document.getElementById('inv-sort');
+const priceSel = document.getElementById('inv-price');
 
 let CARDS = [];
 const ACTIVE = new Set();   // chips currently toggled on
 // Homepage "Shop Fast" tiles link here with ?q= (words), ?f= (a chip label)
-// or ?max= (price ceiling, website price). MAX_PRICE has no chip of its own.
+// or ?max= / ?min= (price bounds, website price). The Price dropdown holds the
+// range as "min-max"; either end may be blank.
 const PARAMS = new URLSearchParams(location.search);
-let MAX_PRICE = Number(PARAMS.get('max')) || 0;
+let MIN_PRICE = 0;
+let MAX_PRICE = 0;
+
+function readPriceRange() {
+  const [lo, hi] = (priceSel.value || '').split('-');
+  MIN_PRICE = Number(lo) || 0;
+  MAX_PRICE = Number(hi) || 0;
+}
+
+// A ?max=25 link from the homepage has no preset in the dropdown, so it gets
+// its own option rather than being silently widened to the nearest bucket.
+function initPriceFromParams() {
+  const lo = Number(PARAMS.get('min')) || 0;
+  const hi = Number(PARAMS.get('max')) || 0;
+  if (!lo && !hi) return;
+  const value = `${lo || 0}-${hi || ''}`;
+  if (![...priceSel.options].some(o => o.value === value)) {
+    const label = lo && hi ? `$${lo} \u2013 $${hi}` : hi ? `Under $${hi}` : `$${lo} & up`;
+    priceSel.add(new Option(label, value), 1);
+  }
+  priceSel.value = value;
+  readPriceRange();
+}
+initPriceFromParams();
+
+// Same honesty rule as the chips: a price range nothing in stock falls into is
+// dropped, so the menu never offers an empty page. The selected range stays.
+function prunePriceOptions() {
+  [...priceSel.options].forEach(o => {
+    if (!o.value || o.selected) return;
+    const [lo, hi] = o.value.split('-').map(Number);
+    const any = CARDS.some(c => !c.personal && Number(c.web) >= (lo || 0) && (!hi || Number(c.web) <= hi));
+    if (!any) o.remove();
+  });
+}
 
 document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -201,10 +237,13 @@ async function loadInventory() {
           || `https://${SHOPIFY_DOMAIN}/products/${node.handle}`;
         // A Coming Soon card behaves like a collection card (no price, asks by email).
         const soon = isSoon(node) && !isPersonal(node);
+        // Away for grading: same `At PSA` tag the My Collection page reads (Craig, 5 Oct 2026).
+        const atPsa = (node.tags || []).includes('At PSA');
         const personal = isPersonal(node) || soon;
         return {
           title: node.title,
           handle: node.handle,
+          atPsa,
           // `url` is what the Share button sends: this card on OUR site, not the
           // Shopify theme page. The Worker fills in the card's photo and price
           // for the link preview (see cardPreview in src/index.js).
@@ -236,10 +275,11 @@ async function loadInventory() {
     }
 
     buildChips();
+    prunePriceOptions();
     input.disabled = false;
     if (PARAMS.get('q')) input.value = PARAMS.get('q');
     if (PARAMS.get('f') && FILTERS.some(f => f.label === PARAMS.get('f'))) ACTIVE.add(PARAMS.get('f'));
-    if (PARAMS.get('q') || PARAMS.get('f') || MAX_PRICE) applySearch(); else render(CARDS);
+    if (PARAMS.get('q') || PARAMS.get('f') || MIN_PRICE || MAX_PRICE) applySearch(); else render(CARDS);
     if (!openSharedCard() && !PARAMS.get('q')) input.focus();
   } catch (err) {
     status.textContent = 'Couldn\'t load the inventory right now — browse our eBay store instead.';
@@ -251,18 +291,11 @@ function buildChips() {
   // A chip only exists if something in stock carries one of its tags, so the row
   // stays honest — no chip that filters to nothing.
   const present = FILTERS.filter(f => CARDS.some(c => f.tags.some(t => c.tags.includes(t))));
-  if (!present.length && !MAX_PRICE) return;
-  // A price ceiling from a homepage link shows as its own chip, so the narrowing
-  // is visible and one tap undoes it.
-  const priceChip = MAX_PRICE
-    ? `<button type="button" class="chip chip--on chip--price" id="price-chip" aria-label="Remove price limit">Under $${MAX_PRICE} <span aria-hidden="true">&times;</span></button>`
-    : '';
-  chipWrap.innerHTML = priceChip + present
+  if (!present.length) return;
+  chipWrap.innerHTML = present
     .map(f => `<button type="button" class="chip" data-term="${f.label}" aria-pressed="false">${f.label}</button>`)
     .join('');
   chipWrap.hidden = false;
-  const pc = document.getElementById('price-chip');
-  if (pc) pc.addEventListener('click', () => { MAX_PRICE = 0; pc.remove(); applySearch(); });
   chipWrap.querySelectorAll('.chip[data-term]').forEach(btn => {
     btn.addEventListener('click', () => {
       // Chips stack: Football + Auto + Numbered narrows to cards with all three.
@@ -281,23 +314,25 @@ function applySearch() {
   // "Pokemon" (which is how the listings are written).
   const q = input.value.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const words = q ? q.split(/\s+/) : [];
-  clearBtn.hidden = !q && !ACTIVE.size && !MAX_PRICE;
+  const priced = MIN_PRICE || MAX_PRICE;
+  clearBtn.hidden = !q && !ACTIVE.size && !priced;
 
   chipWrap.querySelectorAll('.chip[data-term]').forEach(btn => {
     btn.classList.toggle('chip--on', ACTIVE.has(btn.dataset.term));
     btn.setAttribute('aria-pressed', String(ACTIVE.has(btn.dataset.term)));
   });
 
-  // Personal Collection cards have no price on this site, so a price ceiling
+  // Personal Collection cards have no price on this site, so a price range
   // can't honestly include them.
-  const underMax = c => !MAX_PRICE || (!c.personal && Number(c.web) <= MAX_PRICE);
-  if (!words.length && !ACTIVE.size && !MAX_PRICE) return render(CARDS);
+  const inRange = c => !priced || (!c.personal &&
+    Number(c.web) >= MIN_PRICE && (!MAX_PRICE || Number(c.web) <= MAX_PRICE));
+  if (!words.length && !ACTIVE.size && !priced) return render(CARDS);
   // A chip is satisfied by any one of its tags — "Sealed" matches a Hobby Box or
   // a loose Pack — but every active chip still has to be satisfied.
   const accepts = label => (FILTERS.find(f => f.label === label) || { tags: [label] }).tags;
   render(CARDS.filter(c =>
     [...ACTIVE].every(label => accepts(label).some(t => c.tags.includes(t))) &&
-    words.every(w => c.haystack.includes(w)) && underMax(c)
+    words.every(w => c.haystack.includes(w)) && inRange(c)
   ));
 }
 
@@ -325,7 +360,8 @@ function cardHtml(c) {
       <h3><button type="button" class="copy-title" data-title="${escapeAttr(c.title)}"
         title="Click to copy this title">${escapeHtml(c.title)}</button></h3>
       ${c.personal
-        ? `<p class="product-price product-price--pc">${c.soon ? 'Coming Soon' : 'Personal Collection'}</p>`
+        ? `<p class="product-price product-price--pc">${c.soon ? 'Coming Soon' : 'Personal Collection'}</p>
+           ${c.atPsa ? '<p class="pc-note">Off to PSA for grading</p>' : ''}`
         : `<p class="product-price">
         $${c.web}
         ${WEBSITE_DISCOUNT > 0 ? `<span class="product-price__was">$${c.price}</span>
@@ -542,6 +578,7 @@ async function shareListing(url, title, btn) {
 
 moreBtn.addEventListener('click', appendPage);
 sortSel.addEventListener('change', applySearch);
+priceSel.addEventListener('change', () => { readPriceRange(); applySearch(); });
 
 // ---- Photo viewer -------------------------------------------------------
 // Cards are photographed front and back (some have a dozen shots), and the
@@ -630,6 +667,6 @@ lb.el.addEventListener('touchend', e => {
 }, { passive: true });
 
 input.addEventListener('input', applySearch);
-clearBtn.addEventListener('click', () => { input.value = ''; ACTIVE.clear(); MAX_PRICE = 0; document.getElementById('price-chip')?.remove(); applySearch(); input.focus(); });
+clearBtn.addEventListener('click', () => { input.value = ''; ACTIVE.clear(); priceSel.value = ''; readPriceRange(); applySearch(); input.focus(); });
 input.disabled = true;
 loadInventory();

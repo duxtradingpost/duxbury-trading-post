@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=20261004a">
+<link rel="stylesheet" href="css/styles.css?v=20261124a">
 <!-- Open Graph / social share preview. Without these a shared link renders as a
      bare URL — most of our traffic arrives from Instagram and text messages. -->
 <meta property="og:type" content="website">
@@ -141,6 +141,19 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
 
     <div class="inv-bar">
       <p class="inv-count" id="inv-count" aria-live="polite"></p>
+      <div class="inv-controls">
+      <label class="sort-label" for="inv-price">
+        Price
+        <select id="inv-price" class="sort-select">
+          <option value="">Any price</option>
+          <option value="0-50">Under $50</option>
+          <option value="50-100">$50 &ndash; $100</option>
+          <option value="100-250">$100 &ndash; $250</option>
+          <option value="250-500">$250 &ndash; $500</option>
+          <option value="500-1000">$500 &ndash; $1,000</option>
+          <option value="1000-">$1,000 &amp; up</option>
+        </select>
+      </label>
       <label class="sort-label" for="inv-sort">
         Sort
         <select id="inv-sort" class="sort-select">
@@ -150,6 +163,7 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
           <option value="title">Name: A&ndash;Z</option>
         </select>
       </label>
+      </div>
     </div>
 
     <!-- Placeholder cards while the catalogue loads. render() replaces the whole
@@ -218,7 +232,7 @@ src="https://www.facebook.com/tr?id=1103188462148115&ev=PageView&noscript=1"/></
   </div>
 </footer>
 
-<script src="js/inventory.js?v=20261002a"></script>
+<script src="js/inventory.js?v=20261124b"></script>
 <script src="js/banner.js?v=20260921e"></script>
 <script src="js/hold-zoom.js?v=20261001b"></script>
 <script src="js/card-download.js?v=20261116b"></script>

@@ -826,6 +826,12 @@ a { color: inherit; text-decoration: none; }
 
 .inv-bar .inv-count { margin-bottom: 0; }
 
+.inv-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .sort-label {
   font-family: var(--font-display);
   font-size: 0.78rem;
